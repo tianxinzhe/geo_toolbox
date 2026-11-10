@@ -1041,6 +1041,17 @@ tbody tr:hover {
   color: var(--ink-2);
 }
 
+/* 分类标签移到卡片底部：去掉顶部标签位自带的下外边距 */
+.card__more .card__tag {
+  margin-block-end: 0;
+}
+
+.card__open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
 .card__arrow {
   font-family: var(--mono);
   transition: transform 120ms ease-out;

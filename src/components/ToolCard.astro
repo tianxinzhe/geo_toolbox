@@ -2,8 +2,8 @@
 /**
  * 工具卡片 —— 首页索引、分类页与「相关工具」共用
  *
- * 结构固定为「标签 / 名称 / 说明 / 打开提示」，保证三处列表的
- * 视觉与文案一致；标签统一显示工具所属分类。
+ * 结构固定为「名称 / 说明 / 底部分类 + 打开提示」，保证三处列表的
+ * 视觉与文案一致；分类放在底部，左上角不再承担标签位。
  */
 import type { Lang } from '../config/i18n'
 import { CATEGORY_META, type ToolMeta } from '../i18n/tools'
@@ -19,11 +19,13 @@ const { lang, tool } = Astro.props
 ---
 
 <a class="card tool-card" href={toolPath(lang, tool.slug)}>
-  <span class="card__tag">{CATEGORY_META[tool.category].names[lang]}</span>
   <span class="card__title">{tool.names[lang]}</span>
   <span class="card__desc">{tool.desc[lang]}</span>
   <span class="card__more">
-    <span>{t(lang, 'home.openTool')}</span>
-    <span class="card__arrow" aria-hidden="true">→</span>
+    <span class="card__tag">{CATEGORY_META[tool.category].names[lang]}</span>
+    <span class="card__open">
+      <span>{t(lang, 'home.openTool')}</span>
+      <span class="card__arrow" aria-hidden="true">→</span>
+    </span>
   </span>
 </a>
