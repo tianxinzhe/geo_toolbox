@@ -25,7 +25,6 @@ const en = {
   'nav.home': 'Home',
   'nav.allTools': 'All tools',
   'nav.guide': 'Guides',
-  'nav.categories': 'Categories',
   'nav.about': 'About',
   'nav.contact': 'Contact',
   'nav.privacy': 'Privacy Policy',
@@ -176,7 +175,8 @@ const en = {
   'tool.dms-decimal.target.dmsSymbolic': 'DMS (symbolic)',
   'tool.dms-decimal.target.dmsTextual': 'DMS (spelled out)',
   'tool.dms-decimal.coordHint':
-    'Longitude first, latitude second. Paste the whole pair, e.g. 116.3974, 39.9088.',
+    'Longitude first, latitude second. One pair per line — paste several lines at once.',
+  'tool.dms-decimal.lineError': 'Line {n}: {message}',
   'tool.dms-decimal.errFormat':
     'The input does not match the selected source format ({name}).',
   'tool.dms-decimal.errFormatHint':
@@ -601,8 +601,8 @@ const en = {
 
   /* ---------- T15 Map Preview ---------- */
   'tool.map-preview.fileTitle': 'Data file',
-  'tool.map-preview.chooseFile': 'Choose a file',
-  'tool.map-preview.changeFile': 'Change file',
+  'tool.map-preview.chooseFile': 'Choose files',
+  'tool.map-preview.addFile': 'Add files',
   'tool.map-preview.formatLabel': 'File format',
   'tool.map-preview.formatAuto': 'Detect automatically',
   'tool.map-preview.formatHint':
@@ -610,8 +610,11 @@ const en = {
   'tool.map-preview.supported':
     'GeoJSON, TopoJSON, KML/KMZ, GPX, CSV/TSV, Excel, Shapefile (ZIP), FlatGeobuf, GeoPackage, WKT, GML, DXF, MIF/MID and GMT.',
   'tool.map-preview.dataTitle': 'Loaded data',
+  'tool.map-preview.fileCount': '{n} files',
+  'tool.map-preview.totalFeatures': '{n} features in total',
+  'tool.map-preview.removeFile': 'Remove this file',
   'tool.map-preview.empty':
-    'No data yet. Pick a file to overlay it on the map and see feature statistics here.',
+    'No data yet. Pick one or more files to overlay them on the map and see per-file statistics here.',
   'tool.map-preview.statFormat': 'Format',
   'tool.map-preview.statFeatures': 'Features',
   'tool.map-preview.statTypes': 'Geometry types',

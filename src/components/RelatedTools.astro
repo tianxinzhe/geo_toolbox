@@ -12,7 +12,7 @@
  * 卡片 hover 只变边框颜色，不加阴影、不位移（位移会导致 CLS）。
  */
 import type { Lang } from '../config/i18n'
-import { CATEGORY_META, getTool } from '../i18n/tools'
+import { getTool } from '../i18n/tools'
 import { t } from '../i18n/ui'
 import { homePath } from '../lib/paths'
 import ToolCard from './ToolCard.astro'
@@ -24,11 +24,9 @@ interface Props {
   /** 当前工具 slug，用于过滤自身 */
   current: string
   heading: string
-  /** 分类名文案，来自 CATEGORY_META */
-  categoryLabel: (cat: keyof typeof CATEGORY_META) => string
 }
 
-const { lang, slugs, current, heading, categoryLabel } = Astro.props
+const { lang, slugs, current, heading } = Astro.props
 
 const currentCat = getTool(current)?.category
 
@@ -55,12 +53,7 @@ const ordered = [...cross, ...same].slice(0, 12)
     {
       ordered.map((tool) => (
         <li>
-          <ToolCard
-            lang={lang}
-            tool={tool}
-            showCategory
-            categoryName={categoryLabel(tool.category)}
-          />
+          <ToolCard lang={lang} tool={tool} />
         </li>
       ))
     }

@@ -30,7 +30,7 @@ The site uses `localStorage` **in your own browser** to remember a few preferenc
 - Expanded/collapsed state of advanced panels
 - Last selected output format
 - The "comma meaning" toggle used by the coordinate parser
-- The current canvas contents of the map drawing tool (T09 only), so a refresh does not lose your work
+- The current canvas contents of the map drawing tool, so a refresh does not lose your work
 
 None of this ever leaves your device and we cannot read it. You can clear it at any time from the "Cookie settings" link in the footer, or by clearing site data in your browser.
 

@@ -29,6 +29,14 @@ Decimal degrees is the **computational** format: one number that can be added, c
 
 The real job of this tool is therefore not arithmetic but **bridging**: the DMS figure you copied off a paper sheet has to become a decimal number before it can enter a database, and the decimal number your API returned has to become DMS before it can go into a report.
 
+## Converting several points at once
+
+The input box accepts several lines, one longitude/latitude pair per line. Results come back in the same order, one line per successful input, and the copy button takes the whole block.
+
+- Blank lines are ignored and do not shift the line numbers.
+- A bad line fails on its own: the message names the original line and shows an example, while the other lines still return results.
+- The share button is hidden for multi-line input, because a share link can only carry one coordinate pair.
+
 ## Sign convention: west and south are negative
 
 This is where tools disagree with each other most often, so the convention used here is stated explicitly.

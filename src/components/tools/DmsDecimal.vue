@@ -147,25 +147,41 @@ function settleNow(): void {
  * 解析与结果
  * ------------------------------------------------------------------ */
 
+/** 拆行：保留原始行号（多行报错要指到第几行），忽略空行 */
+function inputLines(raw: string): Array<{ line: number; text: string }> {
+  return raw
+    .split(/\r?\n/)
+    .map((text, index) => ({ line: index + 1, text: text.trim() }))
+    .filter((item) => item.text !== '')
+}
+
 function parse(raw: string, src: SourceFormat, comma: CommaAs) {
   if (raw.trim() === '') return null
   return parseCoordinatePair(raw, { source: src, commaAs: comma })
 }
 
-/** 结果区用的解析：只读快照 */
-const parsed = computed(() => parse(settled.value.coord, settled.value.src, settled.value.comma))
+/** 即时多行判断：分享按钮按输入框当前状态显示/隐藏 */
+const liveMulti = computed(() => inputLines(coordInput.value).length > 1)
 
-/** 即时解析：只服务于 aria-invalid 与分享链接，不参与结果渲染 */
-const liveParsed = computed(() => parse(coordInput.value, sourceFormat.value, commaAs.value))
+/** 即时解析第一行：只服务于分享链接，不参与结果渲染 */
+const liveFirst = computed(() => {
+  const first = inputLines(coordInput.value)[0]
+  return first ? parse(first.text, sourceFormat.value, commaAs.value) : null
+})
 
 /** 输入是否为空。空 → 显示空状态引导，而不是报错（SR-06） */
 const isEmpty = computed(() => coordInput.value.trim() === '')
 
 /**
  * aria-invalid 用非防抖状态：读屏用户按下键就要知道输入不对，
- * 等 300ms 会让其以为已经输对了。
+ * 等 300ms 会让其以为已经输对了。多行时任意一行不合法即标记。
  */
-const invalid = computed(() => liveParsed.value !== null && !liveParsed.value.ok)
+const invalid = computed(() =>
+  inputLines(coordInput.value).some(({ text }) => {
+    const r = parse(text, sourceFormat.value, commaAs.value)
+    return r !== null && !r.ok
+  })
+)
 
 function formatName(f: DmsFormat): string {
   return props.ui[FORMAT_NAME_KEY[f]]
@@ -208,33 +224,32 @@ function alternativeNotes(r: Extract<NonNullable<ReturnType<typeof parse>>, { ok
   return notes
 }
 
-/** 交给模板的平铺视图：模板只负责摆放 */
-interface View {
-  kind: 'none' | 'error' | 'ok'
+/** 逐行错误：多行输入时用 line 指向原始行号 */
+interface LineError {
+  line: number
   title: string
   hint: string
   example: string
+}
+
+/** 交给模板的平铺视图：模板只负责摆放 */
+interface View {
+  kind: 'none' | 'error' | 'ok'
+  /** 成功行的结果，逐行用 \n 连接（复制按钮原样带走多行） */
   output: string
   detected: string
   normalizedNote: string
   alternativeNotes: string[]
+  errors: LineError[]
+  /** 多行输入时错误标题前加「第 N 行」 */
+  showLines: boolean
 }
 
-function errorView(r: NonNullable<ReturnType<typeof parse>>): View {
-  const base: View = {
-    kind: 'error',
-    title: '',
-    hint: '',
-    example: FORMAT_EXAMPLE[settled.value.src],
-    output: '',
-    detected: '',
-    normalizedNote: '',
-    alternativeNotes: []
-  }
+function describeError(r: NonNullable<ReturnType<typeof parse>>): Omit<LineError, 'line'> {
+  const example = FORMAT_EXAMPLE[settled.value.src]
 
   if (!r.ok && r.kind === 'format') {
     return {
-      ...base,
       title: props.ui['tool.dms-decimal.errFormat'].replace('{name}', formatName(r.expected)),
       hint: props.ui['tool.dms-decimal.errFormatHint'],
       example: FORMAT_EXAMPLE[r.expected]
@@ -246,58 +261,85 @@ function errorView(r: NonNullable<ReturnType<typeof parse>>): View {
     if (e.kind === 'range') {
       const isLat = e.field === 'lat'
       return {
-        ...base,
         title: `${isLat ? props.ui['err.lat.range'] : props.ui['err.lng.range']} (${e.value})`,
-        hint: isLat ? props.ui['err.lat.range.hint'] : props.ui['err.lng.range.hint']
+        hint: isLat ? props.ui['err.lat.range.hint'] : props.ui['err.lng.range.hint'],
+        example
       }
     }
     return {
-      ...base,
-      title: e.kind === 'singleValue' ? props.ui['tool.dms-decimal.needBoth'] : props.ui['err.parse.title'],
-      hint: e.kind === 'singleValue' ? props.ui['tool.dms-decimal.needBothHint'] : props.ui['err.parse.hint']
+      title:
+        e.kind === 'singleValue' ? props.ui['tool.dms-decimal.needBoth'] : props.ui['err.parse.title'],
+      hint:
+        e.kind === 'singleValue'
+          ? props.ui['tool.dms-decimal.needBothHint']
+          : props.ui['err.parse.hint'],
+      example
     }
   }
 
-  return base
+  return { title: '', hint: '', example }
 }
 
 /** 只依赖 settled 的视图 —— 输入停顿 300ms 后才更新 */
 const view = computed<View>(() => {
-  const r = parsed.value
-  if (!r) {
-    return {
-      kind: 'none',
-      title: '',
-      hint: '',
-      example: FORMAT_EXAMPLE[settled.value.src],
-      output: '',
-      detected: '',
-      normalizedNote: '',
-      alternativeNotes: []
-    }
+  const lines = inputLines(settled.value.coord)
+  const base: View = {
+    kind: 'none',
+    output: '',
+    detected: '',
+    normalizedNote: '',
+    alternativeNotes: [],
+    errors: [],
+    showLines: lines.length > 1
   }
-  if (!r.ok) return errorView(r)
+  if (lines.length === 0) return base
 
-  return {
-    kind: 'ok',
-    title: '',
-    hint: '',
-    example: '',
-    output: formatPairValue(
-      r.lng,
-      r.lat,
-      settled.value.dst,
-      settled.value.p,
-      props.lang
-    ),
-    detected:
+  const outputs: string[] = []
+  const errors: LineError[] = []
+  const detected: string[] = []
+  const alternatives: string[] = []
+  let normalized = ''
+
+  for (const { line, text } of lines) {
+    const r = parse(text, settled.value.src, settled.value.comma)
+    if (!r) continue
+    if (!r.ok) {
+      errors.push({ line, ...describeError(r) })
+      continue
+    }
+
+    outputs.push(formatPairValue(r.lng, r.lat, settled.value.dst, settled.value.p, props.lang))
+
+    const name =
       r.lngFormat === r.latFormat
         ? formatName(r.lngFormat)
-        : `${formatName(r.lngFormat)} / ${formatName(r.latFormat)}`,
-    normalizedNote: normalizedNote(r.lngParsed, r.latParsed),
-    alternativeNotes: alternativeNotes(r)
+        : `${formatName(r.lngFormat)} / ${formatName(r.latFormat)}`
+    if (!detected.includes(name)) detected.push(name)
+
+    if (normalized === '') normalized = normalizedNote(r.lngParsed, r.latParsed)
+
+    // 歧义提示只对单行输入给出：多行时逐条提示会淹没结果
+    if (lines.length === 1) alternatives.push(...alternativeNotes(r))
+  }
+
+  return {
+    kind: outputs.length > 0 ? 'ok' : 'error',
+    output: outputs.join('\n'),
+    detected: detected.join(' · '),
+    normalizedNote: normalized,
+    alternativeNotes: alternatives,
+    errors,
+    showLines: lines.length > 1
   }
 })
+
+/** 多行时给错误标题加行号，单行时保持原文 */
+function lineErrorText(error: LineError): string {
+  if (!view.value.showLines) return error.title
+  return props.ui['tool.dms-decimal.lineError']
+    .replace('{n}', String(error.line))
+    .replace('{message}', error.title)
+}
 
 /* ------------------------------------------------------------------ *
  * 交互
@@ -320,8 +362,8 @@ function clearAll(): void {
 async function onShare(): Promise<void> {
   const state: ShareState = { p: precision.value, comma: commaAs.value }
 
-  // 分享必须拿输入框里的最新值，不能读 300ms 前的快照
-  const live = liveParsed.value
+  // 分享必须拿输入框里的最新值，不能读 300ms 前的快照；多行时只编码第一组
+  const live = liveFirst.value
   if (live?.ok) {
     state.lng = Number(std(live.lng, 8))
     state.lat = Number(std(live.lat, 8))
@@ -444,18 +486,20 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
   <form class="t02" @submit.prevent>
     <div class="field">
       <label for="t02-coord">{{ ui['coord.lngLat'] }}</label>
-      <!-- ⚠️ type="text" + inputmode="decimal"，禁止 type="number"（FR-11 必踩坑）：
-           number 会拒绝 ° ' " 与「度分秒」汉字、截断前导零，还显示占空间的上下箭头 -->
-      <input
+      <!-- 一行一组坐标，可整段粘贴多行；textarea 才能保留换行。
+           不用 type="number"（FR-11 必踩坑）：它会拒绝 ° ' " 与「度分秒」汉字、
+           截断前导零，还显示占空间的上下箭头 -->
+      <textarea
         id="t02-coord"
         v-model="coordInput"
-        type="text"
+        class="coord-input"
+        rows="3"
         inputmode="decimal"
         autocomplete="off"
         spellcheck="false"
         :placeholder="ui['coord.pairPlaceholder']"
         :aria-invalid="invalid ? 'true' : undefined"
-      />
+      ></textarea>
       <span class="field__hint">{{ ui['tool.dms-decimal.coordHint'] }}</span>
     </div>
 
@@ -514,14 +558,7 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
       </div>
 
       <template v-else>
-        <!-- 错误就地显示（SR-06 三段式：原因 / 正确写法 / 示例） -->
-        <div v-if="view.kind === 'error'" class="error-box" role="alert">
-          <p class="error-box__title">{{ view.title }}</p>
-          <p class="error-box__hint">{{ view.hint }}</p>
-          <p class="error-box__example">{{ view.example }}</p>
-        </div>
-
-        <div v-else-if="view.kind === 'ok'" class="result">
+        <div v-if="view.kind === 'ok'" class="result">
           <!-- SR-01 规则 ④：回显识别出的原始格式，使任何误判对用户可见 -->
           <p class="echo">
             <span class="echo__label">{{ ui['tool.dms-decimal.detected'] }}</span>
@@ -530,7 +567,7 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
 
           <div class="result__row">
             <span class="result__label">{{ ui['coord.lngLat'] }}</span>
-            <span class="result__value">{{ view.output }}</span>
+            <span class="result__value result__value--lines">{{ view.output }}</span>
             <span class="result__extra">
               <CopyButton
                 :text="view.output"
@@ -549,7 +586,8 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
           <p v-for="(n, i) in view.alternativeNotes" :key="i" class="note note--warn">{{ n }}</p>
 
           <div class="btn-row">
-            <button type="button" class="btn btn--primary" @click="onShare">
+            <!-- 多行输入时隐藏分享：链接只编码一组坐标，给出会误导 -->
+            <button v-if="!liveMulti" type="button" class="btn btn--primary" @click="onShare">
               {{ ui['common.share'] }}
             </button>
             <button type="button" class="btn btn--ghost" @click="clearAll">
@@ -558,7 +596,19 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
           </div>
 
           <!-- FR-05：分享按钮旁常驻提示 -->
-          <p class="hint">{{ ui['common.shareWarning'] }}</p>
+          <p v-if="!liveMulti" class="hint">{{ ui['common.shareWarning'] }}</p>
+        </div>
+
+        <!-- 错误就地显示（SR-06 三段式：原因 / 正确写法 / 示例）。多行时逐行列出并标注行号 -->
+        <div
+          v-for="(error, i) in view.errors"
+          :key="i"
+          class="error-box"
+          :role="i === 0 ? 'alert' : undefined"
+        >
+          <p class="error-box__title">{{ lineErrorText(error) }}</p>
+          <p class="error-box__hint">{{ error.hint }}</p>
+          <p class="error-box__example">{{ error.example }}</p>
         </div>
 
         <!-- 分享提示放在条件分支之外：链接参数解析失败时也要能看到提示 -->
@@ -644,6 +694,17 @@ watch([coordInput, sourceFormat, targetFormat, precision, commaAs], () => {
   /* 长 URL 不能撑破容器 */
   overflow-wrap: anywhere;
   font-family: var(--mono);
+}
+
+/* 坐标输入框：等宽字体便于对齐多行，高度略低于全局 textarea 默认值 */
+.coord-input {
+  min-block-size: 88px;
+  font-family: var(--mono);
+}
+
+/* 多行结果原样换行显示；单行时与普通文本表现一致 */
+.result__value--lines {
+  white-space: pre-wrap;
 }
 
 .advanced {

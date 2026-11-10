@@ -67,8 +67,11 @@ const groups = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
       })()
     </script>
 
-    <title>{site.name.en} — {site.tagline.en}</title>
-    <meta name="description" content={site.tagline.en} />
+    <title>{site.name.en} — choose your language</title>
+    <meta
+      name="description"
+      content="Choose your language for GeoToolbox: English, Chinese or Japanese. 11 browser-based geospatial tools for coordinates, projections, formats and map tiles."
+    />
     <link rel="canonical" href={absolute(site.url, '/')} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
@@ -78,7 +81,7 @@ const groups = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name.en} />
-    <meta property="og:title" content={`${site.name.en} — ${site.tagline.en}`} />
+    <meta property="og:title" content={`${site.name.en} — choose your language`} />
     <meta property="og:description" content={site.tagline.en} />
     <meta property="og:url" content={absolute(site.url, '/')} />
 
@@ -261,9 +264,7 @@ const groups = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
                   {tools.map((tool) => (
                     <li>
                       <a href={toolPath(l, tool.slug)}>
-                        <b>
-                          {tool.id} · {tool.names[l]}
-                        </b>
+                        <b>{tool.names[l]}</b>
                         <span>{tool.desc[l]}</span>
                       </a>
                     </li>

@@ -39,9 +39,14 @@
 /* ---------- 主导航 ----------
    用原生 <details> 实现汉堡菜单：**零 JS**。
    理由（SR-12 硬规则 5）：爬虫可读、无需 JS、无 hydration 风险、无 CLS。
-   菜单紧接品牌名之后；移动端为下拉面板，768px 起平铺成一行。 */
+   菜单紧接品牌名之后；移动端为下拉面板，1024px 起平铺成一行。 */
 .site-nav {
   position: relative;
+  /* 覆盖全局 details 的卡片外框：导航本身不是折叠卡片，
+     否则桌面端会显示成一个压住页头的浮层边框 */
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .site-nav__toggle {
@@ -101,6 +106,12 @@
   display: none;
 }
 
+/* 全局 `details > :last-child` 会给末个子元素加 16px 底内边距，
+   导航面板中招后比品牌矮一截、看起来「不一样高」，这里清掉 */
+.site-nav > .site-nav__panel {
+  padding: 0;
+}
+
 .site-nav[open] > .site-nav__panel {
   display: block;
   position: absolute;
@@ -123,6 +134,11 @@
   gap: var(--sp-1);
 }
 
+/* 正文列表的 li 带 8px 下外边距，导航里会让整行走样（比品牌高 4px） */
+.site-nav li {
+  margin: 0;
+}
+
 .site-nav a {
   display: block;
   padding: var(--sp-3) var(--sp-2);
@@ -142,8 +158,10 @@
   font-weight: 600;
 }
 
-/* 桌面端平铺：隐藏汉堡，导航项横向排在品牌右侧 */
-@media (min-width: 768px) {
+/* 桌面端平铺：隐藏汉堡，导航项横向排在品牌右侧。
+   分类名较长（英文尤甚），因此平铺从 1024px 起，
+   768~1023px 仍用汉堡菜单避免换行挤压。 */
+@media (min-width: 1024px) {
   .site-nav__toggle {
     display: none;
   }
@@ -172,7 +190,8 @@
   }
 
   .site-nav a {
-    padding: var(--sp-2) var(--sp-3);
+    padding: var(--sp-2);
+    font-size: var(--fs-label);
     min-height: 0;
   }
 }

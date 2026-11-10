@@ -1,12 +1,12 @@
 ---
 title: 'Contact | GeoToolbox'
-description: 'How to contact GeoToolbox: report a wrong calculation, suggest a tool, ask about the privacy policy or point out an error in the documentation. Includes what to include in a bug report.'
-updated: 2026-11-07
+description: 'How to contact GeoToolbox by email: report a wrong calculation, suggest a tool, ask about the privacy policy or point out an error in the documentation. Includes what to put in a bug report.'
+updated: 2026-11-10
 ---
 
 ## When it is worth contacting us
 
-This site has no comment section and no user accounts, so this page is the only direct channel. The following kinds of feedback are the most useful to us, ordered by how quickly they get handled:
+This site has no comment section and no user accounts, so the email address at the top of this page is the only direct channel. Please put the feedback type in the subject line (for example "Wrong result · Coordinate conversion"). The categories below are the most useful, ordered by how quickly they get handled:
 
 | Priority | Type | Detail |
 |---|---|---|
@@ -19,7 +19,7 @@ This site has no comment section and no user accounts, so this page is the only 
 
 ## What to include when reporting a calculation error
 
-Calculation bugs are easy to report in a way that cannot be reproduced. Please include as much of this as you can:
+Calculation bugs are easy to report in a way that cannot be reproduced. Please put as much of the following into the email body as you can:
 
 1. **The tool name or page URL** — the ten tools behave differently, and a URL pinpoints it exactly
 2. **The complete input values** — paste them verbatim, do not round. Precision problems often live in the last digit
@@ -33,7 +33,7 @@ One reproducible example is worth more than ten paragraphs of description.
 
 To avoid wasting your time and ours, there are several requests this site cannot fulfil:
 
-- **Processing data on your behalf** — there is no backend, so we cannot receive files or run jobs. All computation has to happen in your browser. For large datasets, use a tool's batch mode and run it locally
+- **Processing data on your behalf** — there is no backend, so we cannot run jobs for you, and please do not send data files by email. All computation happens in your browser. For large datasets, use a tool's batch mode and run it locally
 - **Providing legally binding survey output** — cadastral work, land registration and construction setting-out require certified tooling and a qualified workflow. This site issues no certification of any kind
 - **Answering general programming questions** — the focus here is geospatial computation
 - **Reviewing whether your coordinates are classified or restricted** — determining data sensitivity and regulatory compliance is the user's responsibility
@@ -46,7 +46,7 @@ This is a side project with no support team, so no response-time guarantee is po
 - **Everything else** is processed in the order it arrives and may take longer
 - **Feature requests** are recorded in a backlog. There is no commitment to implement them, and not every one gets an individual reply
 
-If your report concerns a security issue — for example, an input that causes data to leak — please say so in the subject line and it will be treated as urgent.
+If your report concerns a security issue — for example, an input that causes data to leak — please mark the subject line "Security" and it will be treated as urgent.
 
 ## Reusing content
 

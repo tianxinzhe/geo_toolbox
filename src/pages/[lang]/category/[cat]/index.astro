@@ -59,20 +59,6 @@ const others = CATEGORIES.filter((c) => c !== cat)
 >
   <p class="page-meta">{t(lang, 'home.toolCount', { n: tools.length })}</p>
 
-  {/* 分类切换：让分类页成为可达的导航节点，而不是孤岛 */}
-  <nav class="cat-nav" aria-label={t(lang, 'nav.categories')}>
-    {
-      CATEGORIES.filter((c) => getToolsByCategory(c).length > 0).map((c) => (
-        <a class="chip" href={categoryPath(lang, c)} aria-current={c === cat ? 'page' : undefined}>
-          {CATEGORY_META[c].names[lang]}
-        </a>
-      ))
-    }
-    <a class="chip" href={`${homePath(lang)}#tools`}>
-      {t(lang, 'nav.allTools')}
-    </a>
-  </nav>
-
   <ul class="grid tools-grid">
     {
       tools.map((tool) => (
@@ -94,12 +80,7 @@ const others = CATEGORIES.filter((c) => c !== cat)
       {
         others.map((tool) => (
           <li>
-            <ToolCard
-              lang={lang}
-              tool={tool}
-              showCategory
-              categoryName={CATEGORY_META[tool.category].names[lang]}
-            />
+            <ToolCard lang={lang} tool={tool} />
           </li>
         ))
       }
@@ -108,12 +89,6 @@ const others = CATEGORIES.filter((c) => c !== cat)
 </ContentPage>
 
 <style>
-  .cat-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-  }
-
   .tools-grid {
     list-style: none;
     padding: 0;

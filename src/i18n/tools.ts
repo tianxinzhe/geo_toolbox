@@ -57,7 +57,7 @@ export const CATEGORY_META: Record<CategoryKey, { names: Record<Lang, string>; d
 }
 
 export interface ToolMeta {
-  /** 编号，如 'T01'。卡片上展示，便于用户与文档互相引用 */
+  /** 内部编号，如 'T01'。用于组件分发与分享参数表，不在页面上展示 */
   id: string
   /** URL 标识，三语言共用，全小写连字符 */
   slug: string

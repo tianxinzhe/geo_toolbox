@@ -18,9 +18,9 @@ The precision of each tool is bounded by the algorithm itself, the quality of th
 
 | Tool | Accuracy | Main limiting factor |
 |---|---|---|
-| Coordinate conversion (T01) | WGS84 and CGCS2000 treated as equivalent | Ellipsoid parameters differ below a centimetre; not valid for millimetre-level surveying |
-| DMS conversion (T02) | Exact, limited only by input digits | The significant figures present in your input |
-| Projected CRS conversion (T03) | Depends on the datum-shift parameters used | Regional applicability of 7-parameter / 4-parameter shifts; epoch differences such as JGD2000 vs JGD2011 amount to centimetres or decimetres |
+| Coordinate conversion | WGS84 and CGCS2000 treated as equivalent | Ellipsoid parameters differ below a centimetre; not valid for millimetre-level surveying |
+| DMS conversion | Exact, limited only by input digits | The significant figures present in your input |
+| Projected CRS conversion | Depends on the datum-shift parameters used | Regional applicability of 7-parameter / 4-parameter shifts; epoch differences such as JGD2000 vs JGD2011 amount to centimetres or decimetres |
 
 Anything marked "about", "approximate" or "reference" is labelled as such in the interface and never presented as exact. **Display precision is configurable; computation precision is not.** Changing the decimal places from 6 to 10 does not make a result more accurate.
 

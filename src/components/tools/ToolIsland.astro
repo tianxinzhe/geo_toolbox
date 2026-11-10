@@ -54,9 +54,7 @@ const registered = isRegistered(tool.slug)
 {
   !registered && (
     <div class="empty-state">
-      <p>
-        {tool.id} · {tool.names[lang]}
-      </p>
+      <p>{tool.names[lang]}</p>
       <p>{t(lang, 'err.empty.title')}</p>
     </div>
   )

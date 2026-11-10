@@ -1,0 +1,68 @@
+---
+/**
+ * 404 页面
+ *
+ * 静态站点由托管平台返回此文件（Cloudflare Pages / EdgeOne Pages 均识别 404.html）。
+ * 目的：陌生网址不要落到平台默认页，给用户明确的回站入口，
+ * 同时 noindex 避免 404 被搜索引擎收录。
+ */
+import { TOOLS } from '../i18n/tools'
+import { guideIndexPath, homePath, toolPath } from '../lib/paths'
+import ContentPage from '../layouts/ContentPage.astro'
+
+const popularTools = ['coord-convert', 'tile-coords', 'format-convert', 'epsg-convert']
+  .map((slug) => TOOLS.find((tool) => tool.slug === slug))
+  .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined)
+---
+
+<ContentPage
+  lang="zh"
+  path="/404/"
+  title="页面不存在（404）| 地理工具箱"
+  description="这个地址没有对应的页面。返回首页，或从工具列表重新找到你要使用的地理工具。"
+  h1="页面不存在"
+  lead="这个地址可能已经变更或被删除。可以从下面的入口重新开始。"
+  noindex
+  ads={false}
+  anchor={false}
+>
+  <ul class="not-found__links">
+    <li><a href={homePath('zh')}>中文首页</a></li>
+    <li><a href={homePath('en')}>English home</a></li>
+    <li><a href={homePath('ja')}>日本語ホーム</a></li>
+    <li><a href={guideIndexPath('zh')}>科普文章</a></li>
+  </ul>
+
+  <h2>常用工具</h2>
+  <ul class="not-found__links">
+    {popularTools.map((tool) => (
+      <li><a href={toolPath('zh', tool.slug)}>{tool.names.zh}</a></li>
+    ))}
+  </ul>
+</ContentPage>
+
+<style>
+  .not-found__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .not-found__links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.25rem;
+    padding-inline: var(--sp-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-ctl);
+    text-decoration: none;
+  }
+
+  .not-found__links a:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+  }
+</style>

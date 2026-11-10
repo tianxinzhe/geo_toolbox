@@ -19,7 +19,6 @@ const ja: Record<UiKey, string> = {
   'nav.home': 'ホーム',
   'nav.allTools': 'ツール一覧',
   'nav.guide': '解説記事',
-  'nav.categories': 'カテゴリ',
   'nav.about': 'このサイトについて',
   'nav.contact': 'お問い合わせ',
   'nav.privacy': 'プライバシーポリシー',
@@ -163,7 +162,8 @@ const ja: Record<UiKey, string> = {
   'tool.dms-decimal.target.dmsSymbolic': '度分秒（記号形式）',
   'tool.dms-decimal.target.dmsTextual': '度分秒（テキスト形式）',
   'tool.dms-decimal.coordHint':
-    '経度が先、緯度が後です。116.3974, 39.9088 のようにまとめて貼り付けられます。',
+    '経度が先、緯度が後です。1 行に 1 組、複数行まとめて貼り付けられます。',
+  'tool.dms-decimal.lineError': '{n} 行目：{message}',
   'tool.dms-decimal.errFormat': '入力が選択した元の形式（{name}）と一致しません。',
   'tool.dms-decimal.errFormatHint':
     '元の形式を「自動判定」に変更するか、選択した形式で座標を書き直してください。',
@@ -598,15 +598,18 @@ const ja: Record<UiKey, string> = {
   /* ---------- T15 マッププレビュー ---------- */
   'tool.map-preview.fileTitle': 'データファイル',
   'tool.map-preview.chooseFile': 'ファイルを選択',
-  'tool.map-preview.changeFile': 'ファイルを変更',
+  'tool.map-preview.addFile': 'ファイルを追加',
   'tool.map-preview.formatLabel': 'ファイル形式',
   'tool.map-preview.formatAuto': '自動判別',
   'tool.map-preview.formatHint': '判別できない場合は、左側で形式を選ぶと再解析します。',
   'tool.map-preview.supported':
     'GeoJSON、TopoJSON、KML/KMZ、GPX、CSV/TSV、Excel、Shapefile（ZIP）、FlatGeobuf、GeoPackage、WKT、GML、DXF、MIF/MID、GMT に対応しています。',
   'tool.map-preview.dataTitle': '読み込んだデータ',
+  'tool.map-preview.fileCount': '{n} ファイル',
+  'tool.map-preview.totalFeatures': '合計 {n} 要素',
+  'tool.map-preview.removeFile': 'このファイルを削除',
   'tool.map-preview.empty':
-    'まだデータがありません。ファイルを選ぶと地図に重ねて表示し、ここに要素の統計を出します。',
+    'まだデータがありません。ファイルを選ぶと地図に重ねて表示し、ここにファイルごとの統計を出します。',
   'tool.map-preview.statFormat': '形式',
   'tool.map-preview.statFeatures': '要素',
   'tool.map-preview.statTypes': 'ジオメトリ種別',

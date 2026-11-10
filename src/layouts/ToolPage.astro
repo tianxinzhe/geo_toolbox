@@ -75,8 +75,6 @@ const needsDesktopHint = tool.mobileTier === 'C'
           <a class="page-meta__link" href={categoryPath(lang, tool.category)}>
             {CATEGORY_META[tool.category].names[lang]}
           </a>
-          <span class="page-meta__sep" aria-hidden="true">·</span>
-          <span>{tool.id}</span>
         </p>
       </header>
 
@@ -121,7 +119,6 @@ const needsDesktopHint = tool.mobileTier === 'C'
         slugs={tool.related}
         current={tool.slug}
         heading={t(lang, 'doc.related')}
-        categoryLabel={(cat) => CATEGORY_META[cat].names[lang]}
       />
 
       {/* 广告位 C：页脚展示 */}

@@ -47,7 +47,7 @@ const featuredGuides = GUIDE_GROUPS.flatMap((group) => {
   lang={lang}
   path={path}
   title={`${site.name[lang]} — ${site.tagline[lang]}`}
-  description={site.tagline[lang]}
+  description={t(lang, 'home.intro')}
   h1={t(lang, 'home.h1')}
   lead={t(lang, 'home.intro')}
   width="tool"

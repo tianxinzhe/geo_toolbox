@@ -7,8 +7,9 @@
  */
 import type { Lang } from '../config/i18n'
 import { site } from '../config/site'
+import { CATEGORIES, CATEGORY_META, getToolsByCategory } from '../i18n/tools'
 import { t } from '../i18n/ui'
-import { homePath, legalPath, guideIndexPath } from '../lib/paths'
+import { categoryPath, homePath, legalPath, guideIndexPath } from '../lib/paths'
 import LangSwitch from './LangSwitch.astro'
 
 interface Props {
@@ -19,11 +20,33 @@ interface Props {
 
 const { lang, path } = Astro.props
 
+// 导航直接平铺四个分类，再跟科普与两个合规页；不再有指向首页锚点的「All tools」
+const guideRoot = guideIndexPath(lang)
+
 const navItems = [
-  { label: t(lang, 'nav.allTools'), href: homePath(lang) + '#tools' },
-  { label: t(lang, 'nav.guide'), href: guideIndexPath(lang) },
-  { label: t(lang, 'nav.about'), href: legalPath(lang, 'about') },
-  { label: t(lang, 'nav.contact'), href: legalPath(lang, 'contact') }
+  ...CATEGORIES.filter((cat) => getToolsByCategory(cat).length > 0).map((cat) => {
+    const href = categoryPath(lang, cat)
+    return {
+      label: CATEGORY_META[cat].names[lang],
+      href,
+      current: path === href
+    }
+  }),
+  {
+    label: t(lang, 'nav.guide'),
+    href: guideRoot,
+    current: path.startsWith(guideRoot)
+  },
+  {
+    label: t(lang, 'nav.about'),
+    href: legalPath(lang, 'about'),
+    current: path === legalPath(lang, 'about')
+  },
+  {
+    label: t(lang, 'nav.contact'),
+    href: legalPath(lang, 'contact'),
+    current: path === legalPath(lang, 'contact')
+  }
 ]
 ---
 
@@ -48,7 +71,7 @@ const navItems = [
           {
             navItems.map((item) => (
               <li>
-                <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+                <a href={item.href} aria-current={item.current ? 'page' : undefined}>
                   {item.label}
                 </a>
               </li>

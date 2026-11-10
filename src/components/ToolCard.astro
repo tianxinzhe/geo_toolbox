@@ -3,28 +3,23 @@
  * 工具卡片 —— 首页索引、分类页与「相关工具」共用
  *
  * 结构固定为「标签 / 名称 / 说明 / 打开提示」，保证三处列表的
- * 视觉与文案一致；`showCategory` 用于分类页的跨分类推荐，
- * 此时标签显示分类名而不是工具编号。
+ * 视觉与文案一致；标签统一显示工具所属分类。
  */
 import type { Lang } from '../config/i18n'
-import type { ToolMeta } from '../i18n/tools'
+import { CATEGORY_META, type ToolMeta } from '../i18n/tools'
 import { t } from '../i18n/ui'
 import { toolPath } from '../lib/paths'
 
 interface Props {
   lang: Lang
   tool: ToolMeta
-  /** 标签显示分类名而非工具编号 */
-  showCategory?: boolean
-  /** showCategory 为 true 时必传，避免在组件内重复查表 */
-  categoryName?: string
 }
 
-const { lang, tool, showCategory = false, categoryName = '' } = Astro.props
+const { lang, tool } = Astro.props
 ---
 
 <a class="card tool-card" href={toolPath(lang, tool.slug)}>
-  <span class="card__tag">{showCategory ? categoryName : tool.id}</span>
+  <span class="card__tag">{CATEGORY_META[tool.category].names[lang]}</span>
   <span class="card__title">{tool.names[lang]}</span>
   <span class="card__desc">{tool.desc[lang]}</span>
   <span class="card__more">

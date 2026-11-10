@@ -41,13 +41,19 @@ When the content is ambiguous — no extension, a renamed file, or a bare list o
 
 Choosing the wrong format usually ends in a parse error, or in coordinates that fall outside the valid longitude/latitude range. The second case often means the file holds projected coordinates rather than degrees.
 
+## Several files at once
+
+You can select several files in one go or add them one by one. Each file is parsed and summarised on its own card, with its own format selector and feature count; the × button on a card removes just that file and leaves the others untouched.
+
+The map overlays every file that parsed successfully and fits the extent of all of them. The panel header shows the number of files and the total feature count, and “Clear data” empties the whole list.
+
 ## How it is drawn
 
 The parsed result is normalised to GeoJSON and then:
 
 - points, lines and polygons are drawn as they are, keeping rings and holes;
 - the map fits the extent of the data so the overall distribution is visible at once;
-- the left panel reports the format, feature count, geometry types and how many issues the parser found;
+- each file reports its format, feature count, geometry types and how many issues the parser found;
 - an empty file or all-invalid coordinates leave the default view in place with an explicit message instead of a blank map.
 
 You can switch between street, satellite and terrain basemaps. Tile failures only affect the background, never your data. To keep editing or exporting, send the same data to the [map drawing tool](/en/tools/map-draw/) or save it in another format with the [vector format converter](/en/tools/format-convert/).
