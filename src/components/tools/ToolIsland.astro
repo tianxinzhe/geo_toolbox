@@ -20,9 +20,11 @@ import { TOOL_UI_KEYS } from '../../i18n/uiKeys'
 import type { ToolMeta } from '../../i18n/tools'
 import { isRegistered, keysFor } from './registry'
 
+import AttributeExtract from './AttributeExtract.vue'
 import BufferCircle from './BufferCircle.vue'
+import ClipOverlay from './ClipOverlay.vue'
 import CoordConvert from './CoordConvert.vue'
-import DataViewer from './DataViewer.vue'
+import MapPreview from './MapPreview.vue'
 import DmsDecimal from './DmsDecimal.vue'
 import EpsgConvert from './EpsgConvert.vue'
 import FormatConvert from './FormatConvert.vue'
@@ -94,6 +96,14 @@ const registered = isRegistered(tool.slug)
   <TileCoords client:load lang={lang} ui={ui} toolId={tool.id} />
 )}
 
-{tool.slug === 'data-viewer' && (
-  <DataViewer client:load lang={lang} ui={ui} toolId={tool.id} />
+{tool.slug === 'map-preview' && (
+  <MapPreview client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'clip-overlay' && (
+  <ClipOverlay client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'attribute-extract' && (
+  <AttributeExtract client:load lang={lang} ui={ui} toolId={tool.id} />
 )}

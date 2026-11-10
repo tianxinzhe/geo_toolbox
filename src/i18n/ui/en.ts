@@ -121,7 +121,7 @@ const en = {
   /* ---------- 首页与索引 ---------- */
   'home.h1': 'Geospatial tools that never leave your browser',
   'home.intro':
-    'Nine focused utilities for coordinates, projections and vector formats. No sign-up, no upload — every calculation happens on your own device.',
+    'Eleven focused utilities for coordinates, projections and vector formats. No sign-up, no upload — every calculation happens on your own device.',
   'home.section.tools': 'All tools',
   'home.section.why': 'Why this site',
   'home.why.local': 'Nothing is uploaded. Sensitive boundaries and tracks stay on your machine.',
@@ -599,39 +599,135 @@ const en = {
   'tool.tile-coords.errGeneric':
     'Tile calculation failed. Adjust the extent or zoom levels and try again.',
 
-  /* ---------- T15 View My Data ---------- */
-  'tool.data-viewer.fileTitle': 'Data file',
-  'tool.data-viewer.chooseFile': 'Choose a file',
-  'tool.data-viewer.changeFile': 'Change file',
-  'tool.data-viewer.formatLabel': 'File format',
-  'tool.data-viewer.formatAuto': 'Detect automatically',
-  'tool.data-viewer.formatHint':
+  /* ---------- T15 Map Preview ---------- */
+  'tool.map-preview.fileTitle': 'Data file',
+  'tool.map-preview.chooseFile': 'Choose a file',
+  'tool.map-preview.changeFile': 'Change file',
+  'tool.map-preview.formatLabel': 'File format',
+  'tool.map-preview.formatAuto': 'Detect automatically',
+  'tool.map-preview.formatHint':
     'If detection fails, pick the format on the left to parse the file again.',
-  'tool.data-viewer.supported':
+  'tool.map-preview.supported':
     'GeoJSON, TopoJSON, KML/KMZ, GPX, CSV/TSV, Excel, Shapefile (ZIP), FlatGeobuf, GeoPackage, WKT, GML, DXF, MIF/MID and GMT.',
-  'tool.data-viewer.dataTitle': 'Loaded data',
-  'tool.data-viewer.empty':
+  'tool.map-preview.dataTitle': 'Loaded data',
+  'tool.map-preview.empty':
     'No data yet. Pick a file to overlay it on the map and see feature statistics here.',
-  'tool.data-viewer.statFormat': 'Format',
-  'tool.data-viewer.statFeatures': 'Features',
-  'tool.data-viewer.statTypes': 'Geometry types',
-  'tool.data-viewer.statIssues': 'Issues',
-  'tool.data-viewer.issuesValue': '{n} found',
-  'tool.data-viewer.warnings': '{n} additional parse notices',
-  'tool.data-viewer.loading': 'Parsing…',
-  'tool.data-viewer.clearData': 'Clear data',
-  'tool.data-viewer.errRead': 'The file could not be read. Please choose it again.',
-  'tool.data-viewer.errTooLarge': 'The file is larger than 20 MB. Crop or simplify it first.',
-  'tool.data-viewer.errUnknownFormat':
+  'tool.map-preview.statFormat': 'Format',
+  'tool.map-preview.statFeatures': 'Features',
+  'tool.map-preview.statTypes': 'Geometry types',
+  'tool.map-preview.statIssues': 'Issues',
+  'tool.map-preview.issuesValue': '{n} found',
+  'tool.map-preview.warnings': '{n} additional parse notices',
+  'tool.map-preview.loading': 'Parsing…',
+  'tool.map-preview.clearData': 'Clear data',
+  'tool.map-preview.errRead': 'The file could not be read. Please choose it again.',
+  'tool.map-preview.errTooLarge': 'The file is larger than 20 MB. Crop or simplify it first.',
+  'tool.map-preview.errUnknownFormat':
     'The format could not be recognised. Choose a format on the left and try again.',
-  'tool.data-viewer.errParse':
+  'tool.map-preview.errParse':
     'Parsing failed. The file may be damaged, incomplete, or not match the selected format.',
-  'tool.data-viewer.errNoCoords': 'The file contains no usable coordinates to show on the map.',
-  'tool.data-viewer.errCoordRange':
+  'tool.map-preview.errNoCoords': 'The file contains no usable coordinates to show on the map.',
+  'tool.map-preview.errCoordRange':
     'Coordinates are outside the longitude/latitude range (lng ±180, lat ±90). Check that the data is WGS84.',
-  'tool.data-viewer.errEmptyFile': 'The file is empty.',
-  'tool.data-viewer.errTooMany':
+  'tool.map-preview.errEmptyFile': 'The file is empty.',
+  'tool.map-preview.errTooMany':
     'More than 50,000 features. Crop the extent before viewing.',
+
+  /* ---------- T16 Clip & Overlay ---------- */
+  'tool.clip-overlay.layerA': 'Layer A (input)',
+  'tool.clip-overlay.layerB': 'Layer B (overlay)',
+  'tool.clip-overlay.chooseFile': 'Choose a file',
+  'tool.clip-overlay.changeFile': 'Change file',
+  'tool.clip-overlay.noLayer': 'No file selected',
+  'tool.clip-overlay.featuresCount': '{n} features',
+  'tool.clip-overlay.parsing': 'Parsing…',
+  'tool.clip-overlay.layerBSkip': 'This operation only uses layer A',
+  'tool.clip-overlay.operation': 'Operation',
+  'tool.clip-overlay.op.clip': 'Clip',
+  'tool.clip-overlay.op.intersect': 'Intersect',
+  'tool.clip-overlay.op.difference': 'Difference',
+  'tool.clip-overlay.op.simplify': 'Simplify',
+  'tool.clip-overlay.op.clipHint': 'Keep the part of layer A that falls inside layer B.',
+  'tool.clip-overlay.op.intersectHint': 'Keep the area shared by layer A and layer B.',
+  'tool.clip-overlay.op.differenceHint': 'Remove the area of layer A that overlaps layer B.',
+  'tool.clip-overlay.op.simplifyHint':
+    'Reduce the vertices of layer A. A smaller tolerance keeps more detail.',
+  'tool.clip-overlay.tolerance': 'Tolerance (metres)',
+  'tool.clip-overlay.run': 'Run',
+  'tool.clip-overlay.running': 'Calculating…',
+  'tool.clip-overlay.resultTitle': 'Result',
+  'tool.clip-overlay.resultFeatures': 'Result features',
+  'tool.clip-overlay.resultArea': 'Total area',
+  'tool.clip-overlay.resultSkipped': 'Skipped',
+  'tool.clip-overlay.download': 'Download GeoJSON',
+  'tool.clip-overlay.clear': 'Clear',
+  'tool.clip-overlay.privacy': 'Everything runs locally in your browser. Files are never uploaded.',
+  'tool.clip-overlay.note':
+    'Clip, intersect and difference work on polygons only; points and lines are skipped and counted under “Skipped”.',
+  'tool.clip-overlay.errTooLarge': 'The file is larger than 20 MB. Crop or simplify it first.',
+  'tool.clip-overlay.errUnknownFormat':
+    'The format could not be detected. Convert the file to GeoJSON first.',
+  'tool.clip-overlay.errTooMany': 'More than 50,000 features. Crop the extent first.',
+  'tool.clip-overlay.errEmpty': 'The file is empty or has no usable features.',
+  'tool.clip-overlay.errParse': 'Parsing failed. The file may be damaged or in another format.',
+  'tool.clip-overlay.errNoResult':
+    'The result is empty: the layers may not overlap, or they contain only points and lines.',
+  'tool.clip-overlay.errGeneric': 'The operation failed. Check that both layers are valid.',
+  'tool.clip-overlay.errNeedA': 'Choose layer A first.',
+  'tool.clip-overlay.errNeedBoth': 'Clip, intersect and difference need both layer A and layer B.',
+
+  /* ---------- T17 Extract by Attribute ---------- */
+  'tool.attribute-extract.fileTitle': 'Data file',
+  'tool.attribute-extract.chooseFile': 'Choose a file',
+  'tool.attribute-extract.changeFile': 'Change file',
+  'tool.attribute-extract.parsing': 'Parsing…',
+  'tool.attribute-extract.noLayer': 'No file selected',
+  'tool.attribute-extract.featuresCount': '{n} features',
+  'tool.attribute-extract.layerLabel': 'Layer',
+  'tool.attribute-extract.layerAll': 'All features',
+  'tool.attribute-extract.layer.point': 'Point layer',
+  'tool.attribute-extract.layer.line': 'Line layer',
+  'tool.attribute-extract.layer.polygon': 'Polygon layer',
+  'tool.attribute-extract.layer.other': 'Other',
+  'tool.attribute-extract.conditionTitle': 'Filter',
+  'tool.attribute-extract.fieldLabel': 'Field',
+  'tool.attribute-extract.fieldPlaceholder': 'No attribute fields found',
+  'tool.attribute-extract.sampleHint': '{field} samples: {values}',
+  'tool.attribute-extract.operatorLabel': 'Condition',
+  'tool.attribute-extract.op.eq': 'Equals',
+  'tool.attribute-extract.op.neq': 'Does not equal',
+  'tool.attribute-extract.op.contains': 'Contains',
+  'tool.attribute-extract.op.gt': 'Greater than',
+  'tool.attribute-extract.op.gte': 'Greater than or equal',
+  'tool.attribute-extract.op.lt': 'Less than',
+  'tool.attribute-extract.op.lte': 'Less than or equal',
+  'tool.attribute-extract.op.empty': 'Is empty',
+  'tool.attribute-extract.op.notEmpty': 'Is not empty',
+  'tool.attribute-extract.valueLabel': 'Value',
+  'tool.attribute-extract.valuePlaceholder': 'Value to match',
+  'tool.attribute-extract.valueHint': '{n} existing values. Pick one or type your own.',
+  'tool.attribute-extract.numericHint':
+    'This field is not numeric, so greater/less conditions will not match anything.',
+  'tool.attribute-extract.run': 'Extract',
+  'tool.attribute-extract.running': 'Extracting…',
+  'tool.attribute-extract.resultTitle': 'Result',
+  'tool.attribute-extract.resultCount': '{matched} of {total} features matched',
+  'tool.attribute-extract.download': 'Download GeoJSON',
+  'tool.attribute-extract.clear': 'Clear',
+  'tool.attribute-extract.privacy':
+    'Everything runs locally in your browser. Files are never uploaded.',
+  'tool.attribute-extract.errNeedFile': 'Choose a data file first.',
+  'tool.attribute-extract.errNeedField': 'Choose the field to filter on.',
+  'tool.attribute-extract.errNeedValue': 'Enter the value to match.',
+  'tool.attribute-extract.errTooLarge': 'The file is larger than 20 MB. Crop or simplify it first.',
+  'tool.attribute-extract.errUnknownFormat':
+    'The format could not be detected. Convert the file to GeoJSON first.',
+  'tool.attribute-extract.errTooMany': 'More than 50,000 features. Crop the extent first.',
+  'tool.attribute-extract.errEmpty': 'The file is empty or has no usable features.',
+  'tool.attribute-extract.errParse':
+    'Parsing failed. The file may be damaged or in another format.',
+  'tool.attribute-extract.errNoMatch': 'No features match. Adjust the condition or value.',
+  'tool.attribute-extract.errGeneric': 'Extraction failed. Check that the data is valid.',
 
   /* ---------- Guides (P1 /guide/) ---------- */
   'guide.title': 'Guides: coordinate systems, projections and vector formats | GeoToolbox',

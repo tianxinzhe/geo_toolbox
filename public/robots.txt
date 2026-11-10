@@ -8,4 +8,4 @@ Allow: /
 # 屏蔽广告参数页与开发期路径（当前站点为纯静态，无动态查询页）
 Disallow: /*?mode=batch$
 
-Sitemap: https://geo-toolbox.pages.dev/sitemap.xml
+Sitemap: https://www.soulscop.com/sitemap.xml

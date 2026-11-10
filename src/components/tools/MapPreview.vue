@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * T15 查看我的数据
+ * T15 地图速览
  *
  * 本地文件 → 统一解析成 FeatureCollection → Leaflet 叠加显示。
  * Leaflet 只认 GeoJSON，因此 KML / Shapefile / Excel 等格式都在这里
@@ -146,7 +146,7 @@ async function parse(): Promise<void> {
     if (run !== runId) return
 
     if (data.length === 0) {
-      setError('tool.data-viewer.errEmptyFile')
+      setError('tool.map-preview.errEmptyFile')
       return
     }
 
@@ -155,13 +155,13 @@ async function parse(): Promise<void> {
     const text = binary ? '' : mod.decodeBytes(data)
 
     if (!binary && text.trim() === '') {
-      setError('tool.data-viewer.errEmptyFile')
+      setError('tool.map-preview.errEmptyFile')
       return
     }
 
     // 自动识别不到就明确报错，并让用户在左栏手动指定格式
     if (!forced && !binary && !mod.detectFormat(text, fileName.value)) {
-      setError('tool.data-viewer.errUnknownFormat')
+      setError('tool.map-preview.errUnknownFormat')
       return
     }
 
@@ -177,11 +177,11 @@ async function parse(): Promise<void> {
     if (run !== runId) return
 
     if (outcome.collection.features.length === 0) {
-      setError('tool.data-viewer.errNoCoords')
+      setError('tool.map-preview.errNoCoords')
       return
     }
     if (outcome.collection.features.length > MAX_FEATURES) {
-      setError('tool.data-viewer.errTooMany')
+      setError('tool.map-preview.errTooMany')
       return
     }
 
@@ -194,11 +194,11 @@ async function parse(): Promise<void> {
   } catch (error) {
     const message = error instanceof Error ? error.message : ''
     if (message === 'unknown-format') {
-      setError('tool.data-viewer.errUnknownFormat')
+      setError('tool.map-preview.errUnknownFormat')
     } else if (message.includes('crs') || message.includes('coordinate')) {
-      setError('tool.data-viewer.errCoordRange')
+      setError('tool.map-preview.errCoordRange')
     } else {
-      setError('tool.data-viewer.errParse')
+      setError('tool.map-preview.errParse')
     }
   } finally {
     if (run === runId) loading.value = false
@@ -212,7 +212,7 @@ async function onFilePicked(event: Event): Promise<void> {
 
   errorKey.value = ''
   if (file.size > MAX_BYTES) {
-    setError('tool.data-viewer.errTooLarge')
+    setError('tool.map-preview.errTooLarge')
     input.value = ''
     return
   }
@@ -224,7 +224,7 @@ async function onFilePicked(event: Event): Promise<void> {
     sourceFormat.value = 'auto'
     await parse()
   } catch {
-    setError('tool.data-viewer.errRead')
+    setError('tool.map-preview.errRead')
   }
 }
 
@@ -238,13 +238,13 @@ function onFormatChange(): void {
     <div class="dv__layout">
       <div class="dv__panel">
         <div class="dv__card">
-          <p class="result-title">{{ ui['tool.data-viewer.fileTitle'] }}</p>
+          <p class="result-title">{{ ui['tool.map-preview.fileTitle'] }}</p>
           <div class="dv__row">
             <button type="button" class="btn btn--primary dv__choose" @click="openPicker">
               {{
                 collection
-                  ? ui['tool.data-viewer.changeFile']
-                  : ui['tool.data-viewer.chooseFile']
+                  ? ui['tool.map-preview.changeFile']
+                  : ui['tool.map-preview.chooseFile']
               }}
             </button>
             <input
@@ -257,23 +257,23 @@ function onFormatChange(): void {
             />
           </div>
           <label class="dv__field">
-            <span>{{ ui['tool.data-viewer.formatLabel'] }}</span>
+            <span>{{ ui['tool.map-preview.formatLabel'] }}</span>
             <select v-model="sourceFormat" :disabled="loading" @change="onFormatChange">
-              <option value="auto">{{ ui['tool.data-viewer.formatAuto'] }}</option>
+              <option value="auto">{{ ui['tool.map-preview.formatAuto'] }}</option>
               <option v-for="format in FORMATS" :key="format" :value="format">
                 {{ FORMAT_LABEL[format] }}
               </option>
             </select>
           </label>
-          <p class="hint">{{ ui['tool.data-viewer.formatHint'] }}</p>
-          <p class="hint">{{ ui['tool.data-viewer.supported'] }}</p>
+          <p class="hint">{{ ui['tool.map-preview.formatHint'] }}</p>
+          <p class="hint">{{ ui['tool.map-preview.supported'] }}</p>
         </div>
 
         <div class="dv__card">
           <div class="dv__head">
-            <p class="result-title">{{ ui['tool.data-viewer.dataTitle'] }}</p>
+            <p class="result-title">{{ ui['tool.map-preview.dataTitle'] }}</p>
             <button v-if="collection" type="button" class="btn btn--ghost" @click="clearAll">
-              {{ ui['tool.data-viewer.clearData'] }}
+              {{ ui['tool.map-preview.clearData'] }}
             </button>
           </div>
 
@@ -281,35 +281,35 @@ function onFormatChange(): void {
             <p class="dv__name mono">{{ fileName }}</p>
             <dl class="dv__stats">
               <div>
-                <dt>{{ ui['tool.data-viewer.statFormat'] }}</dt>
+                <dt>{{ ui['tool.map-preview.statFormat'] }}</dt>
                 <dd class="mono">{{ formatLabel }}</dd>
               </div>
               <div>
-                <dt>{{ ui['tool.data-viewer.statFeatures'] }}</dt>
+                <dt>{{ ui['tool.map-preview.statFeatures'] }}</dt>
                 <dd class="mono">{{ countText(featureCount) }}</dd>
               </div>
               <div>
-                <dt>{{ ui['tool.data-viewer.statTypes'] }}</dt>
+                <dt>{{ ui['tool.map-preview.statTypes'] }}</dt>
                 <dd>{{ typeSummary }}</dd>
               </div>
               <div v-if="issueCount > 0">
-                <dt>{{ ui['tool.data-viewer.statIssues'] }}</dt>
+                <dt>{{ ui['tool.map-preview.statIssues'] }}</dt>
                 <dd class="mono">
-                  {{ msg('tool.data-viewer.issuesValue', { n: countText(issueCount) }) }}
+                  {{ msg('tool.map-preview.issuesValue', { n: countText(issueCount) }) }}
                 </dd>
               </div>
             </dl>
             <p v-if="warningCount > 0" class="hint">
-              {{ msg('tool.data-viewer.warnings', { n: countText(warningCount) }) }}
+              {{ msg('tool.map-preview.warnings', { n: countText(warningCount) }) }}
             </p>
           </template>
-          <p v-else class="hint">{{ ui['tool.data-viewer.empty'] }}</p>
+          <p v-else class="hint">{{ ui['tool.map-preview.empty'] }}</p>
         </div>
 
         <p v-if="errorKey" class="note note--danger" role="alert">
           {{ ui[errorKey] ?? errorKey }}
         </p>
-        <p v-if="loading" class="hint" role="status">{{ ui['tool.data-viewer.loading'] }}</p>
+        <p v-if="loading" class="hint" role="status">{{ ui['tool.map-preview.loading'] }}</p>
       </div>
 
       <div class="dv__map-col">

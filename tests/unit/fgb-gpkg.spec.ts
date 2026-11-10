@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { collectionToFgb, parseFgb } from '../../src/lib/convert/fgb'
-import { collectionToGpkg, parseGpkg } from '../../src/lib/convert/gpkg'
+import { collectionToGpkg, gpkgLayerNames, parseGpkg } from '../../src/lib/convert/gpkg'
 import type { VectorFeatureCollection } from '../../src/lib/convert/types'
 import { readGpkgGeometry, readWkb, writeGpkgGeometry, writeWkb } from '../../src/lib/convert/wkb'
 import type { GeoJsonGeometry } from '../../src/lib/convert/wkt'
@@ -206,6 +206,16 @@ describe('GeoPackage', () => {
     ])
     expect(out.collection.features[0].properties.rank).toBe(1)
     expect(out.collection.features[0].properties.ok).toBe(1)
+  })
+
+  it('可以列出图层并按图层名解析', async () => {
+    const { bytes } = await collectionToGpkg(FC)
+    const names = await gpkgLayerNames(bytes)
+    expect(names).toEqual(['features'])
+    const out = await parseGpkg(bytes, 'features')
+    expect(out.collection.features).toHaveLength(3)
+    // 指定图层后不再提示「多图层只读了第一个」
+    expect(out.warnings.some((w) => w.startsWith('gpkg-multi-layer'))).toBe(false)
   })
 
   it('混合类型属性列降级为文本，对象转 JSON', async () => {

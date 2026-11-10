@@ -84,14 +84,18 @@ interface LayerInfo {
   layerCount: number
 }
 
-function resolveLayer(db: SqlDatabase): LayerInfo {
+function featureTables(db: SqlDatabase): string[] {
   const contents = db.exec(
     "SELECT table_name FROM gpkg_contents WHERE data_type = 'features' ORDER BY table_name"
   )
-  const tables = (contents[0]?.values ?? []).map((row) => String(row[0]))
+  return (contents[0]?.values ?? []).map((row) => String(row[0]))
+}
+
+function resolveLayer(db: SqlDatabase, tableName?: string): LayerInfo {
+  const tables = featureTables(db)
   if (tables.length === 0) throw new Error('gpkg-no-feature-table')
 
-  const table = tables[0]
+  const table = tableName && tables.includes(tableName) ? tableName : tables[0]
   const cols = db.exec(
     'SELECT column_name, srs_id FROM gpkg_geometry_columns WHERE table_name = ?',
     [table]
@@ -105,13 +109,14 @@ function resolveLayer(db: SqlDatabase): LayerInfo {
   }
 }
 
-function readDatabase(db: SqlDatabase): ParseOutcome {
+function readDatabase(db: SqlDatabase, tableName?: string): ParseOutcome {
   if (!hasTable(db, 'gpkg_contents') || !hasTable(db, 'gpkg_geometry_columns')) {
     throw new Error('invalid-gpkg')
   }
-  const layer = resolveLayer(db)
+  const layer = resolveLayer(db, tableName)
   const warnings: string[] = []
-  if (layer.layerCount > 1) warnings.push(`gpkg-multi-layer:${layer.layerCount}`)
+  // 显式选择图层后不再提示「多图层只读了第一个」
+  if (!tableName && layer.layerCount > 1) warnings.push(`gpkg-multi-layer:${layer.layerCount}`)
   if (layer.srsId > 0 && layer.srsId !== SRS_ID) warnings.push(`gpkg-crs:${layer.srsId}`)
 
   const stmt = db.prepare(`SELECT * FROM ${quoteIdent(layer.table)}`)
@@ -156,8 +161,8 @@ function readDatabase(db: SqlDatabase): ParseOutcome {
   }
 }
 
-/** 解析 .gpkg 字节 */
-export async function parseGpkg(bytes: Uint8Array): Promise<ParseOutcome> {
+/** 列出 GeoPackage 内的要素图层名（供多图层选择） */
+export async function gpkgLayerNames(bytes: Uint8Array): Promise<string[]> {
   if (bytes.length < 16) throw new Error('invalid-gpkg')
   const SQL = await loadSql()
   let db: SqlDatabase
@@ -167,7 +172,29 @@ export async function parseGpkg(bytes: Uint8Array): Promise<ParseOutcome> {
     throw new Error('invalid-gpkg')
   }
   try {
-    return readDatabase(db)
+    if (!hasTable(db, 'gpkg_contents') || !hasTable(db, 'gpkg_geometry_columns')) {
+      throw new Error('invalid-gpkg')
+    }
+    const tables = featureTables(db)
+    if (tables.length === 0) throw new Error('gpkg-no-feature-table')
+    return tables
+  } finally {
+    db.close()
+  }
+}
+
+/** 解析 .gpkg 字节；table 为空时读取第一个要素图层 */
+export async function parseGpkg(bytes: Uint8Array, table?: string): Promise<ParseOutcome> {
+  if (bytes.length < 16) throw new Error('invalid-gpkg')
+  const SQL = await loadSql()
+  let db: SqlDatabase
+  try {
+    db = new SQL.Database(bytes)
+  } catch {
+    throw new Error('invalid-gpkg')
+  }
+  try {
+    return readDatabase(db, table)
   } catch (e) {
     if (e instanceof Error && e.message.startsWith('gpkg-')) throw e
     throw new Error('invalid-gpkg')

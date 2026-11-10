@@ -13,3 +13,11 @@
 /en/category/measure /en/#tools 301
 /ja/category/measure/ /ja/#tools 301
 /ja/category/measure /ja/#tools 301
+
+# 工具改名：查看我的数据 → 地图速览
+/zh/tools/data-viewer/ /zh/tools/map-preview/ 301
+/zh/tools/data-viewer /zh/tools/map-preview/ 301
+/en/tools/data-viewer/ /en/tools/map-preview/ 301
+/en/tools/data-viewer /en/tools/map-preview/ 301
+/ja/tools/data-viewer/ /ja/tools/map-preview/ 301
+/ja/tools/data-viewer /ja/tools/map-preview/ 301

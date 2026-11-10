@@ -11,7 +11,7 @@
  * shpjs 与 proj4 都通过动态 import 加载，不进入任何工具的首屏包。
  */
 
-import { unzipSync } from 'fflate'
+import { unzipSync, zipSync } from 'fflate'
 
 export interface ShapefileLayerResult {
   /** shpjs 返回的原始 GeoJSON 要素，由 format.ts 统一规范化 */
@@ -41,14 +41,33 @@ export function shapefileLayers(bytes: Uint8Array): string[] {
   return layerNames(entryMap(bytes))
 }
 
-export async function parseShapefileZIP(bytes: Uint8Array): Promise<ShapefileLayerResult> {
+export async function parseShapefileZIP(
+  bytes: Uint8Array,
+  layerName?: string
+): Promise<ShapefileLayerResult> {
   const files = entryMap(bytes)
   const layers = layerNames(files)
   if (layers.length === 0) throw new Error('shapefile-no-shp')
 
+  const chosen = layerName && layers.includes(layerName) ? layerName : layers[0]
   const lower = new Set(Object.keys(files).map((n) => n.toLowerCase()))
-  const base = layers[0].replace(/\.shp$/i, '').toLowerCase()
+  const base = chosen.replace(/\.shp$/i, '').toLowerCase()
   const hasPrj = lower.has(`${base}.prj`)
+
+  // 选择非首个图层时，只把该图层的 .shp/.dbf/.shx/.prj 等重新打包，
+  // 交给 shpjs 解析。shpjs 对多图层 zip 的返回顺序没有明确保证，
+  // 过滤后重新打包比按索引取数组更可靠。
+  let source = bytes
+  if (layerName && chosen !== layers[0]) {
+    const subset: Record<string, Uint8Array> = {}
+    for (const [name, data] of Object.entries(files)) {
+      const lowerName = name.toLowerCase()
+      if (!lowerName.startsWith(`${base}.`)) continue
+      if (!/\.(shp|shx|dbf|prj|cpg|qix)$/.test(lowerName)) continue
+      subset[name] = data
+    }
+    source = zipSync(subset)
+  }
 
   let mod: typeof import('shpjs')
   try {
@@ -59,7 +78,7 @@ export async function parseShapefileZIP(bytes: Uint8Array): Promise<ShapefileLay
 
   let result: Awaited<ReturnType<typeof mod.getShapefile>>
   try {
-    result = await mod.getShapefile(bytes)
+    result = await mod.getShapefile(source)
   } catch {
     throw new Error('shapefile-parse-failed')
   }

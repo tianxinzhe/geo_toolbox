@@ -322,13 +322,16 @@ export function parseKmz(bytes: Uint8Array): ParseOutcome {
  * Shapefile：ZIP 内取首个 .shp 图层（P1）。
  * 这是异步入口，因为 shpjs / proj4 只在用户真的上传 Shapefile 时才加载。
  */
-export async function parseShapefile(bytes: Uint8Array): Promise<ParseOutcome> {
-  const r = await parseShapefileZIP(bytes)
+export async function parseShapefile(
+  bytes: Uint8Array,
+  layer?: string
+): Promise<ParseOutcome> {
+  const r = await parseShapefileZIP(bytes, layer)
   const features = r.features.map((f, i) => normalizeFeature(f, i))
   const warnings: string[] = [
     r.hasPrj ? 'shapefile-prj' : 'shapefile-no-prj'
   ]
-  if (r.layerCount > 1) warnings.push(`shapefile-multi-layer:${r.layerCount}`)
+  if (!layer && r.layerCount > 1) warnings.push(`shapefile-multi-layer:${r.layerCount}`)
   return {
     format: 'shapefile',
     collection: { type: 'FeatureCollection', features },
@@ -376,6 +379,8 @@ export interface ParseInputOptions {
   /** 用户显式指定的源格式；'auto' 或不传时按内容/文件名识别 */
   source?: VectorFormat | 'auto'
   csv?: CsvParseOptions
+  /** 多图层容器（GPKG / Shapefile ZIP）中选择的图层名 */
+  layer?: string
 }
 
 /** 解析源格式：显式选择优先，否则按内容识别 */
@@ -443,7 +448,7 @@ export async function parseFileInput(
   // 显式指定为二进制容器时，必须拿到原始字节；粘贴文本无法还原
   if (forced === 'shapefile') {
     if (!opts.bytes) throw new Error('shapefile-needs-file')
-    return parseShapefile(opts.bytes)
+    return parseShapefile(opts.bytes, opts.layer)
   }
   if (forced === 'fgb' || (!forced && opts.bytes && /\.fgb$/i.test(opts.fileName ?? ''))) {
     if (!opts.bytes) throw new Error('fgb-needs-file')
@@ -453,7 +458,7 @@ export async function parseFileInput(
   if (forced === 'gpkg' || (!forced && opts.bytes && /\.gpkg$/i.test(opts.fileName ?? ''))) {
     if (!opts.bytes) throw new Error('gpkg-needs-file')
     const { parseGpkg } = await import('./gpkg')
-    return parseGpkg(opts.bytes)
+    return parseGpkg(opts.bytes, opts.layer)
   }
   if (forced === 'kmz') {
     if (!opts.bytes) throw new Error('kmz-needs-file')
@@ -474,7 +479,7 @@ export async function parseFileInput(
   }
 
   if (!forced && opts.bytes && /\.(zip|shp)$/i.test(opts.fileName ?? '')) {
-    return parseShapefile(opts.bytes)
+    return parseShapefile(opts.bytes, opts.layer)
   }
   return parseInput(text, opts)
 }

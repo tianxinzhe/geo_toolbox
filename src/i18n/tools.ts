@@ -112,7 +112,7 @@ export const TOOLS: ToolMeta[] = [
       'dms-decimal',
       'epsg-convert',
       'geohash',
-      'data-viewer',
+      'map-preview',
       'map-draw',
       'tile-coords',
       'format-convert',
@@ -143,7 +143,7 @@ export const TOOLS: ToolMeta[] = [
       'coord-convert',
       'epsg-convert',
       'geohash',
-      'data-viewer',
+      'map-preview',
       'tile-coords',
       'map-draw',
       'format-convert',
@@ -173,7 +173,7 @@ export const TOOLS: ToolMeta[] = [
     related: [
       'coord-convert',
       'dms-decimal',
-      'data-viewer',
+      'map-preview',
       'geohash',
       'format-convert',
       'map-draw',
@@ -203,7 +203,7 @@ export const TOOLS: ToolMeta[] = [
     },
     related: [
       'map-draw',
-      'data-viewer',
+      'map-preview',
       'buffer-circle',
       'epsg-convert',
       'geohash',
@@ -236,7 +236,7 @@ export const TOOLS: ToolMeta[] = [
       'coord-convert',
       'dms-decimal',
       'map-draw',
-      'data-viewer',
+      'map-preview',
       'epsg-convert',
       'format-convert',
       'tile-coords',
@@ -266,7 +266,7 @@ export const TOOLS: ToolMeta[] = [
     related: [
       'buffer-circle',
       'format-convert',
-      'data-viewer',
+      'map-preview',
       'coord-convert',
       'geohash',
       'tile-coords',
@@ -296,7 +296,7 @@ export const TOOLS: ToolMeta[] = [
     },
     related: [
       'map-draw',
-      'data-viewer',
+      'map-preview',
       'format-convert',
       'coord-convert',
       'tile-coords',
@@ -334,7 +334,7 @@ export const TOOLS: ToolMeta[] = [
       'buffer-circle',
       'coord-convert',
       'epsg-convert',
-      'data-viewer',
+      'map-preview',
       'format-convert',
       'geohash',
       'dms-decimal'
@@ -342,7 +342,7 @@ export const TOOLS: ToolMeta[] = [
   },
   {
     id: 'T15',
-    slug: 'data-viewer',
+    slug: 'map-preview',
     category: 'map',
     map: 'primary',
     fileIO: true,
@@ -350,12 +350,12 @@ export const TOOLS: ToolMeta[] = [
     mobileTier: 'B',
     gps: false,
     names: {
-      zh: '查看我的数据',
-      en: 'View My Data',
-      ja: 'データを表示'
+      zh: '地图速览',
+      en: 'Map Preview',
+      ja: 'マッププレビュー'
     },
     desc: {
-      zh: '把本地矢量数据直接叠加到地图上',
+      zh: '把本地矢量数据直接叠加到地图上快速查看',
       en: 'Preview local vector data on a map',
       ja: 'ローカルのベクタデータを地図に表示'
     },
@@ -372,7 +372,7 @@ export const TOOLS: ToolMeta[] = [
         'geopackage',
         'flatgeobuf'
       ],
-      zh: ['查看数据', '数据查看', '导入数据', '矢量数据', '地图预览', '叠加显示', '格式识别'],
+      zh: ['地图速览', '查看数据', '数据查看', '导入数据', '矢量数据', '地图预览', '叠加显示', '格式识别'],
       ja: ['データ表示', '地図表示', 'ベクタデータ', '読み込み', 'プレビュー']
     },
     related: [
@@ -384,6 +384,85 @@ export const TOOLS: ToolMeta[] = [
       'dms-decimal',
       'buffer-circle',
       'geohash'
+    ]
+  },
+  {
+    id: 'T16',
+    slug: 'clip-overlay',
+    category: 'map',
+    map: 'primary',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: {
+      zh: '图层裁切与叠加',
+      en: 'Clip & Overlay',
+      ja: 'クリップとオーバーレイ'
+    },
+    desc: {
+      zh: '裁切、相交、擦除与几何简化',
+      en: 'Clip, intersect, difference and simplify',
+      ja: 'クリップ・交差・差分・簡略化'
+    },
+    keywords: {
+      all: [
+        'clip',
+        'intersect',
+        'difference',
+        'erase',
+        'overlay',
+        'simplify',
+        'douglas-peucker',
+        'qgis'
+      ],
+      zh: ['裁切', '裁剪', '相交', '擦除', '叠加', '叠加分析', '几何简化', '抽稀', '矢量叠加'],
+      ja: ['クリップ', '交差', '差分', '簡略化', 'オーバーレイ', 'ベクタ']
+    },
+    related: [
+      'map-draw',
+      'map-preview',
+      'format-convert',
+      'buffer-circle',
+      'coord-convert',
+      'tile-coords',
+      'epsg-convert',
+      'geohash'
+    ]
+  },
+  {
+    id: 'T17',
+    slug: 'attribute-extract',
+    category: 'map',
+    map: 'primary',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: {
+      zh: '按属性提取要素',
+      en: 'Extract by Attribute',
+      ja: '属性で抽出'
+    },
+    desc: {
+      zh: '按字段条件筛选要素并导出 GeoJSON',
+      en: 'Filter features by an attribute value',
+      ja: '属性条件でフィーチャを絞り込む'
+    },
+    keywords: {
+      all: ['attribute', 'filter', 'query', 'extract', 'select', 'where', 'property'],
+      zh: ['属性', '筛选', '过滤', '提取', '查询', '条件', '字段', '属性查询'],
+      ja: ['属性', '抽出', 'フィルタ', '条件', 'クエリ']
+    },
+    related: [
+      'clip-overlay',
+      'map-preview',
+      'format-convert',
+      'map-draw',
+      'coord-convert',
+      'geohash',
+      'buffer-circle',
+      'tile-coords'
     ]
   }
 ]

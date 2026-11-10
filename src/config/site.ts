@@ -1,13 +1,13 @@
 /**
  * 站点级常量
  *
- * 域名待定（PRD OQ-01）。M0~M13 全部在 *.pages.dev 上开发验证，
- * 域名确定后只需改 `site.url` 与 astro.config.mjs 的 `site` 字段。
+ * 站点主域名：https://www.soulscop.com
+ * 修改域名时需同步 astro.config.mjs 的 `site` 与 public/robots.txt 的 Sitemap 行。
  */
 
 export const site = {
   /** 站点主域名，用于 canonical / hreflang / sitemap / JSON-LD */
-  url: 'https://geo-toolbox.pages.dev',
+  url: 'https://www.soulscop.com',
 
   /** 站名，各语言自称。`<title>` 模板：{核心关键词} - {补充说明} | {站名} */
   name: {
@@ -18,9 +18,9 @@ export const site = {
 
   /** 一句话定位，用于首页与 og:description */
   tagline: {
-    zh: '9 个地理信息小工具，全部在浏览器本地计算，数据不上传',
-    en: '9 geospatial utilities. Everything runs locally in your browser.',
-    ja: '9 の地理情報ツール。すべてブラウザ内で計算、データは送信されません'
+    zh: '11 个地理信息小工具，全部在浏览器本地计算，数据不上传',
+    en: '11 geospatial utilities. Everything runs locally in your browser.',
+    ja: '11 の地理情報ツール。すべてブラウザ内で計算、データは送信されません'
   },
 
   /**

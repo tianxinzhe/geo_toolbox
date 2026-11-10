@@ -2,10 +2,10 @@ import { defineConfig } from 'astro/config'
 import vue from '@astrojs/vue'
 import { fileURLToPath } from 'node:url'
 
-// 站点域名待定（PRD OQ-01）。M0~M13 全部在 *.pages.dev 上开发验证，
-// 域名确定后只需改这一行以及 src/config/site.ts。
+// 站点主域名：https://www.soulscop.com
+// 影响 canonical / hreflang / sitemap / robots（与 src/config/site.ts 保持一致）
 export default defineConfig({
-  site: 'https://geo-toolbox.pages.dev',
+  site: 'https://www.soulscop.com',
   output: 'static',
 
   // 三语言统一为 /{lang}/…，根路径 / 完全由 src/pages/index.astro 自己控制

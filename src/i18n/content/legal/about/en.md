@@ -6,12 +6,12 @@ updated: 2026-11-07
 
 ## What this site is
 
-GeoToolbox is a collection of **online geospatial utilities**. The first batch of nine tools covers four recurring needs:
+GeoToolbox is a collection of **online geospatial utilities**. The first batch of eleven tools covers four recurring needs:
 
 - **Coordinates and conversion** — WGS84 and CGCS2000 conversion, degrees-minutes-seconds to decimal degrees, and projected coordinate conversion by EPSG code
 - **Data formats** — GeoJSON / KML / KMZ / GPX / TopoJSON conversion, and WKT to GeoJSON and back
 - **Spatial encoding** — compress coordinates into short GeoHash strings for indexing and sharing
-- **Map and visualisation** — draw points, lines and polygons online and export them, generate radius circles and buffers, preview local vector data on a map, and export XYZ tile coordinates
+- **Map and visualisation** — draw points, lines and polygons online and export them, generate radius circles and buffers, preview local vector data on a map, clip and overlay layers, extract features by attribute, and export XYZ tile coordinates
 
 Each tool is its own page with accompanying documentation explaining what problem it solves, how to read the output, and where the precision limits lie.
 

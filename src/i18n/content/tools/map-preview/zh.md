@@ -1,5 +1,5 @@
 ---
-title: '查看我的数据 — 本地矢量数据地图预览 | 地理工具箱'
+title: '地图速览 — 本地矢量数据地图预览 | 地理工具箱'
 description: '选择 GeoJSON、KML、GPX、Shapefile、Excel 等文件，在浏览器里直接叠加到地图上查看。自动识别格式，识别不了可以手动指定，文件不上传。'
 updated: 2026-11-10
 faq:

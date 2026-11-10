@@ -1,5 +1,5 @@
 ---
-title: 'View My Data — Preview local vector data on a map | GeoToolbox'
+title: 'Map Preview — View local vector data on a map | GeoToolbox'
 description: 'Choose a GeoJSON, KML, GPX, Shapefile or Excel file and see it on a map instantly. Formats are detected automatically, can be picked manually, and files never leave your browser.'
 updated: 2026-11-10
 faq:
