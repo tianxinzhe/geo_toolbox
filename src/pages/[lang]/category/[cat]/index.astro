@@ -1,0 +1,141 @@
+---
+/**
+ * 分类页（FR-01）—— 同类工具聚合 + 分类级科普正文，承载内链权重
+ *
+ * 分类 slug 三语言共用同一套英文标识（PRD 4「slug 不翻译的理由」），
+ * 例如 `/ja/category/coordinate/`。
+ *
+ * 分类级科普正文是**可选**的（docRequired=false）：缺失时只渲染工具聚合，
+ * 不阻塞构建。补齐后自动出现在工具卡片下方。
+ */
+import { LAUNCHED, type Lang } from '../../../../config/i18n'
+import { site } from '../../../../config/site'
+import { t } from '../../../../i18n/ui'
+import { CATEGORIES, CATEGORY_META, type CategoryKey, getToolsByCategory } from '../../../../i18n/tools'
+import { categoryPath, homePath } from '../../../../lib/paths'
+import ContentPage from '../../../../layouts/ContentPage.astro'
+import ToolCard from '../../../../components/ToolCard.astro'
+
+export function getStaticPaths() {
+  return [...LAUNCHED].flatMap((lang) =>
+    CATEGORIES.filter((cat) => getToolsByCategory(cat).length > 0).map((cat) => ({
+      params: { lang, cat },
+      props: { lang, cat }
+    }))
+  )
+}
+
+interface Props {
+  lang: Lang
+  cat: CategoryKey
+}
+
+const { lang, cat } = Astro.props
+const path = categoryPath(lang, cat)
+const meta = CATEGORY_META[cat]
+const tools = getToolsByCategory(cat)
+
+// 跨分类推荐：至少 2 个来自其他分类的工具，避免分类页成为孤岛（FR-03 同源要求）
+const others = CATEGORIES.filter((c) => c !== cat)
+  .flatMap((c) => getToolsByCategory(c))
+  .slice(0, 4)
+---
+
+<ContentPage
+  lang={lang}
+  path={path}
+  title={`${meta.names[lang]} - ${tools.length} ${t(lang, 'nav.allTools')} | ${site.name[lang]}`}
+  description={meta.desc[lang]}
+  h1={meta.names[lang]}
+  lead={meta.desc[lang]}
+  width="tool"
+  headVariant="display"
+  doc={{ collection: 'categories', slug: cat }}
+  docRequired={false}
+  crumbs={[
+    { label: t(lang, 'nav.home'), href: homePath(lang) },
+    { label: meta.names[lang] }
+  ]}
+>
+  <p class="page-meta">{t(lang, 'home.toolCount', { n: tools.length })}</p>
+
+  {/* 分类切换：让分类页成为可达的导航节点，而不是孤岛 */}
+  <nav class="cat-nav" aria-label={t(lang, 'nav.categories')}>
+    {
+      CATEGORIES.filter((c) => getToolsByCategory(c).length > 0).map((c) => (
+        <a class="chip" href={categoryPath(lang, c)} aria-current={c === cat ? 'page' : undefined}>
+          {CATEGORY_META[c].names[lang]}
+        </a>
+      ))
+    }
+    <a class="chip" href={`${homePath(lang)}#tools`}>
+      {t(lang, 'nav.allTools')}
+    </a>
+  </nav>
+
+  <ul class="grid tools-grid">
+    {
+      tools.map((tool) => (
+        <li>
+          <ToolCard lang={lang} tool={tool} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <section class="related" aria-label={t(lang, 'doc.related')}>
+    <div class="section-head">
+      <h2>{t(lang, 'doc.related')}</h2>
+      <a class="section-head__link" href={`${homePath(lang)}#tools`}>
+        {t(lang, 'nav.allTools')} →
+      </a>
+    </div>
+    <ul class="related-grid">
+      {
+        others.map((tool) => (
+          <li>
+            <ToolCard
+              lang={lang}
+              tool={tool}
+              showCategory
+              categoryName={CATEGORY_META[tool.category].names[lang]}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</ContentPage>
+
+<style>
+  .cat-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .tools-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var(--sp-3);
+  }
+
+  .tools-grid li {
+    margin: 0;
+  }
+
+  .related-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--sp-3);
+  }
+
+  .related-grid li {
+    margin: 0;
+  }
+</style>

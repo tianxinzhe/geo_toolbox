@@ -1,0 +1,140 @@
+---
+/**
+ * Cookie 同意横幅（FR-10 / FR-09）
+ *
+ * 只在需要同意的语言（CONSENT_REQUIRED = 投放广告的语言）渲染。
+ *
+ * 关键行为：
+ *   - 选择前不加载任何广告脚本（Base.astro 的 head 脚本已做门控）；
+ *   - 选择写入 localStorage('geo-consent')，值为 'all' | 'necessary'；
+ *   - 选择「全部接受」后立即注入 adsbygoogle.js，无需刷新；
+ *   - 页脚提供「Cookie 设置」，清除记录并刷新，重新显示横幅。
+ *
+ * 横幅本身不依赖框架运行时，纯 HTML + 内联脚本，避免给首屏增加 JS。
+ */
+import type { Lang } from '../config/i18n'
+import { site } from '../config/site'
+import { legalPath } from '../lib/paths'
+import { t } from '../i18n/ui'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const privacy = legalPath(lang, 'privacy')
+---
+
+<aside
+  class="cookie-banner"
+  id="cookie-banner"
+  role="dialog"
+  aria-label={t(lang, 'cookie.aria')}
+  aria-live="polite"
+>
+  <div class="cookie-banner__inner">
+    <p class="cookie-banner__text">
+      {t(lang, 'cookie.text')}
+      <a href={privacy}>{t(lang, 'cookie.privacy')}</a>
+    </p>
+    <div class="cookie-banner__actions">
+      <button type="button" class="btn btn--primary" data-consent="all">
+        {t(lang, 'cookie.acceptAll')}
+      </button>
+      <button type="button" class="btn btn--ghost" data-consent="necessary">
+        {t(lang, 'cookie.necessary')}
+      </button>
+    </div>
+  </div>
+</aside>
+
+<script is:inline define:vars={{ client: site.adsenseClient }}>
+  ;(function () {
+    var KEY = 'geo-consent'
+    var banner = document.getElementById('cookie-banner')
+    if (!banner) return
+
+    function loadAds() {
+      if (!client) return
+      if (document.querySelector('script[data-adsense]')) return
+      var s = document.createElement('script')
+      s.async = true
+      s.crossOrigin = 'anonymous'
+      s.dataset.adsense = '1'
+      s.src =
+        'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + client
+      document.head.appendChild(s)
+    }
+
+    function choose(value) {
+      try {
+        localStorage.setItem(KEY, value)
+      } catch (e) {
+        /* 隐私模式下写不进去也要关闭横幅，本次会话按选择处理 */
+      }
+      document.documentElement.dataset.consent = value
+      banner.hidden = true
+      if (value === 'all') loadAds()
+    }
+
+    banner.querySelectorAll('[data-consent]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        choose(btn.getAttribute('data-consent'))
+      })
+    })
+  })()
+</script>
+
+<style is:global>
+  .cookie-banner {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1000;
+    padding: var(--sp-3);
+    padding-block-end: calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+    border-block-start: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgb(0 0 0 / 8%);
+  }
+
+  html[data-consent] .cookie-banner {
+    display: none;
+  }
+
+  .cookie-banner__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+    max-inline-size: var(--w-doc);
+    margin-inline: auto;
+  }
+
+  .cookie-banner__text {
+    flex: 1 1 320px;
+    margin: 0;
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    color: var(--ink-2);
+  }
+
+  .cookie-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  /* 横幅显示期间给页面底部留出空间，避免盖住页脚链接。
+     必须同时要求 html 上没有 data-consent：回访用户横幅只是被 CSS 隐藏，
+     元素本身没有 hidden 属性，否则会留下一条空白。 */
+  html:not([data-consent]) body:has(.cookie-banner:not([hidden])) {
+    padding-block-end: 136px;
+  }
+
+  @media (min-width: 768px) {
+    html:not([data-consent]) body:has(.cookie-banner:not([hidden])) {
+      padding-block-end: 96px;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+/**
+ * 工具页路由（技术方案 5.3）
+ *
+ * 🔑 `hasDoc()` 过滤是 FR-08「禁止半翻译页面」的机制化落地：
+ * **不存在的语言 × 工具组合根本不会产出 HTML**，
+ * 物理上排除了「界面已翻译、正文仍是英文」的情况。
+ *
+ * 由此产生的连带效果：
+ *   - hreflang 只会指向真实存在的页面（check-hreflang.ts 会再校验一遍）
+ *   - sitemap 不会收录死链
+ *   - 语言切换器中该语言项仍可点，但落到目标语言首页并提示
+ *     「该工具暂无此语言版本」
+ */
+import ToolIsland from '../../../../components/tools/ToolIsland.astro'
+import BatchPanel from '../../../../components/batch/BatchPanel.vue'
+import { LAUNCHED, type Lang } from '../../../../config/i18n'
+import { BATCH_SLUGS } from '../../../../lib/batch/types'
+import { pick } from '../../../../i18n/ui'
+import { BATCH_UI_KEYS } from '../../../../i18n/uiKeys'
+import { TOOLS, type ToolMeta } from '../../../../i18n/tools'
+import { hasDoc } from '../../../../lib/docs'
+import ToolPage from '../../../../layouts/ToolPage.astro'
+
+export async function getStaticPaths() {
+  const langs = [...LAUNCHED]
+
+  // 并行探测 13 工具 × N 语言的文档是否存在
+  const probes = await Promise.all(
+    langs.map(async (lang) => ({
+      lang,
+      flags: await Promise.all(TOOLS.map((tool) => hasDoc('tools', tool.slug, lang)))
+    }))
+  )
+
+  return probes.flatMap(({ lang, flags }) =>
+    TOOLS.filter((_, i) => flags[i]).map((tool) => ({
+      params: { lang, slug: tool.slug },
+      props: { lang, tool }
+    }))
+  )
+}
+
+interface Props {
+  lang: Lang
+  tool: ToolMeta
+}
+
+const { lang, tool } = Astro.props
+
+// FR-13：只有 6 个计算类工具加载批量面板的文案；
+// 其余工具不渲染、也不下载这份文案子集。
+const batchUi = BATCH_SLUGS.has(tool.slug) ? pick(lang, BATCH_UI_KEYS) : null
+---
+
+<ToolPage lang={lang} tool={tool}>
+  <ToolIsland lang={lang} tool={tool} />
+  {
+    batchUi && (
+      <BatchPanel
+        client:visible
+        lang={lang}
+        ui={batchUi}
+        slug={tool.slug}
+        toolId={tool.id}
+      />
+    )
+  }
+</ToolPage>

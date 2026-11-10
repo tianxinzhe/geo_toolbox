@@ -1,0 +1,208 @@
+---
+/**
+ * 全站基础布局（SR-12「SEO 与爬虫友好的 HTML 骨架」）
+ *
+ * 十条硬规则的落地点：
+ *   1. 所有内链必须是真实 <a href>          → 各组件
+ *   2. 正文必须在初始 HTML 中               → output:'static' + <slot />
+ *   3. 广告用 <aside> 且排在工具区之后       → AdSlot.astro + ToolPage.astro
+ *   4. 不用无限滚动加载相关工具              → RelatedTools.astro
+ *   5. 折叠内容用原生 <details>              → 导航、AdvancedOptions
+ *   6. 每页独立的 title/description/canonical/hreflang×3 + x-default → 本文件
+ *   7. 结构化数据三件套                      → jsonLd prop
+ *   8. URL 全小写、连字符分隔、无查询参数     → lib/paths.ts
+ *   9. H1 每页唯一，H2/H3 不跳级             → ToolPage / ContentPage
+ *  10. aria-live="polite" 标注结果区         → 各工具组件
+ *
+ * 样式导入顺序有意义：tokens 定义令牌 → fonts 按 html[lang] 覆盖字体与行高
+ * → base 移动优先基础样式 → components 组件 → device 设备显隐 → print 打印。
+ */
+import type { Lang } from '../config/i18n'
+import { ADS_ENABLED, CONSENT_REQUIRED, LAUNCHED, LOCALE } from '../config/i18n'
+import { site } from '../config/site'
+import { t } from '../i18n/ui'
+import { absolute, swapLang } from '../lib/paths'
+import AdSlot from '../components/AdSlot.astro'
+import CookieConsent from '../components/CookieConsent.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import SiteHeader from '../components/SiteHeader.astro'
+
+import '../styles/tokens.css'
+import '../styles/fonts.css'
+import '../styles/base.css'
+import '../styles/components.css'
+import '../styles/device.css'
+import '../styles/print.css'
+
+interface Props {
+  lang: Lang
+  /** 完整 <title>，由各页面自行套用模板：{核心关键词} - {补充说明} | {站名} */
+  title: string
+  /** meta description，120~160 字符 */
+  description: string
+  /** 本页路径，以 / 开头以 / 结尾，如 /zh/tools/coord-convert/ */
+  path: string
+  /**
+   * 各语言版本的对应路径。缺省按 LAUNCHED 用 swapLang 推导。
+   * 只有真实存在的页面才应出现在这里 —— check-hreflang.ts（M12）会逐一校验，
+   * 指向不存在的文件即构建失败。
+   */
+  alternates?: Partial<Record<Lang, string>>
+  /** JSON-LD 结构化数据数组，每项一个 <script type="application/ld+json"> */
+  jsonLd?: Array<Record<string, unknown>>
+  /** Open Graph 图片，缺省用 /og-default.png */
+  ogImage?: string
+  /** 未上线语言 / 重复内容页设 true */
+  noindex?: boolean
+  /**
+   * 是否启用移动端 Anchor 广告（FR-09）。
+   * 首页必须传 false —— 「首页不启用文中插入与 Anchor，避免干扰工具查找」。
+   * 仅在 anchor=true 时给 body 加 .has-anchor，预留底部高度。
+   */
+  anchor?: boolean
+  /** body 附加 class */
+  bodyClass?: string
+}
+
+const {
+  lang,
+  title,
+  description,
+  path,
+  alternates,
+  jsonLd = [],
+  ogImage = '/og-default.png',
+  noindex = false,
+  anchor = true,
+  bodyClass = ''
+} = Astro.props
+
+const canonical = absolute(site.url, path)
+
+// hreflang：只输出已上线语言的真实页面；x-default 指向根路径 `/`
+// （根路径承担语言检测与 hreflang 中枢职责，见技术方案 5.2）
+const hreflangs = LAUNCHED.map((l) => ({
+  lang: l,
+  href: absolute(site.url, alternates?.[l] ?? swapLang(path, l))
+}))
+
+// 广告脚本注入的三个构建期条件（FR-09）
+// ① 该语言在投放范围内（zh 不投放）② 已开通 AdSense ③ 至少有一个位置已申请到 ID
+const adsPossible = ADS_ENABLED.includes(lang) && site.adsenseClient !== ''
+const showAnchor = adsPossible && anchor
+
+// 需要 Cookie 同意的语言：与广告投放范围一致（zh 不投放，不打扰）
+const needsConsent = CONSENT_REQUIRED.includes(lang)
+---
+
+<!doctype html>
+<html lang={LOCALE[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    {/* viewport-fit=cover 让 env(safe-area-inset-*) 生效（FR-11 Anchor 广告遮挡坑） */}
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    {/* Cookie 同意状态必须在首次绘制前写入 <html>，否则横幅会闪现（FR-10） */}
+    {
+      needsConsent && (
+        <script is:inline>
+          ;(function () {
+            try {
+              var c = localStorage.getItem('geo-consent')
+              if (c === 'all' || c === 'necessary') document.documentElement.dataset.consent = c
+            } catch (e) {
+              /* 隐私模式：无法读取就按未同意处理 */
+            }
+          })()
+        </script>
+      )
+    }
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    {/* hreflang × N + x-default（SR-12 硬规则 6） */}
+    {hreflangs.map((h) => <link rel="alternate" hreflang={h.lang} href={h.href} />)}
+    <link rel="alternate" hreflang="x-default" href={absolute(site.url, '/')} />
+
+    {/* Open Graph / Twitter */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name[lang]} />
+    <meta property="og:locale" content={LOCALE[lang].replace('-', '_')} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={absolute(site.url, ogImage)} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14161a" media="(prefers-color-scheme: dark)" />
+
+    {/* 结构化数据（SR-12 硬规则 7）：SoftwareApplication / BreadcrumbList / FAQPage */}
+    {jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+
+    {
+      /*
+        AdSense 脚本注入 —— 受 Cookie 同意门控（FR-10）：
+        「用户做出选择前**不加载**个性化广告脚本」。
+        因此在 <head> 里只放一段极小的同步判断，真正的 adsbygoogle.js
+        由客户端在确认已同意后再注入。未同意 / 无记录 → 不加载任何广告脚本。
+
+        这段脚本不依赖任何外部资源，体积 <400B，不影响 LCP。
+      */
+      adsPossible && (
+        <script is:inline define:vars={{ client: site.adsenseClient }}>
+          (function () {
+            try {
+              if (localStorage.getItem('geo-consent') !== 'all') return;
+            } catch (e) {
+              return; /* 隐私模式下 localStorage 可能抛异常，直接放弃加载广告 */
+            }
+            var s = document.createElement('script');
+            s.async = true;
+            s.crossOrigin = 'anonymous';
+            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + client;
+            document.head.appendChild(s);
+          })();
+        </script>
+      )
+    }
+
+    <slot name="head" />
+  </head>
+
+  <body class:list={[bodyClass, { 'has-anchor': showAnchor }]}>
+    {/* SR-12 骨架第 1 行：跳转链接 */}
+    <a href="#main" class="skip-link">{t(lang, 'a11y.skip')}</a>
+
+    <SiteHeader lang={lang} path={path} />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <SiteFooter lang={lang} />
+
+    {needsConsent && <CookieConsent lang={lang} />}
+
+    {/* 广告位 C 的移动端 Anchor：仅 <768px 启用，768px 起 CSS 直接 display:none。
+        首页与合规页不启用（FR-09）。 */}
+    {showAnchor && <AdSlot lang={lang} slot="anchor" />}
+  </body>
+</html>
+
+<style is:global>
+  /* Anchor 广告启用时，页面底部预留其高度 + iOS home indicator 安全区，
+     避免遮挡页脚链接（FR-11 必踩坑第 4 条） */
+  body.has-anchor {
+    padding-block-end: calc(var(--ad-h-anchor) + env(safe-area-inset-bottom, 0));
+  }
+
+  /* 未同意前不展示任何广告位，也不保留占位高度（FR-09 / FR-10） */
+  html:not([data-consent='all']) .ad-slot {
+    display: none;
+  }
+</style>

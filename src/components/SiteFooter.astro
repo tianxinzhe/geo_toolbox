@@ -1,0 +1,85 @@
+---
+/**
+ * 全站页脚
+ *
+ * 合规页链接必须齐备且风格统一 —— AdSense 审核员在几分钟内要判断
+ * 「这个站是否有实质内容」，找不到关于页是高概率拒审项（SR-12）。
+ *
+ * 全部是真实 <a href>，触控目标 ≥44px，相邻间距 ≥8px（FR-11 / SR-08）。
+ */
+import type { Lang } from '../config/i18n'
+import { CONSENT_REQUIRED } from '../config/i18n'
+import { site } from '../config/site'
+import { t } from '../i18n/ui'
+import { homePath, legalPath, guideIndexPath, type LegalSlug } from '../lib/paths'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const needsConsent = CONSENT_REQUIRED.includes(lang)
+
+const legalLinks: Array<{ slug: LegalSlug; key: 'nav.about' | 'nav.privacy' | 'nav.contact' | 'nav.disclaimer' }> = [
+  { slug: 'about', key: 'nav.about' },
+  { slug: 'privacy', key: 'nav.privacy' },
+  { slug: 'disclaimer', key: 'nav.disclaimer' },
+  { slug: 'contact', key: 'nav.contact' }
+]
+---
+
+<footer class="site-footer">
+  <div class="container shell">
+    <nav aria-label={t(lang, 'a11y.footerNav')}>
+      <ul>
+        <li><a href={homePath(lang)}>{t(lang, 'nav.home')}</a></li>
+        <li><a href={guideIndexPath(lang)}>{t(lang, 'nav.guide')}</a></li>
+        {legalLinks.map((l) => <li><a href={legalPath(lang, l.slug)}>{t(lang, l.key)}</a></li>)}
+        {
+          needsConsent && (
+            <li>
+              <button type="button" class="footer-linklike" data-cookie-reset>
+                {t(lang, 'cookie.settings')}
+              </button>
+            </li>
+          )
+        }
+      </ul>
+    </nav>
+
+    <p>{t(lang, 'footer.noAccount')}</p>
+    <p>
+      {t(lang, 'footer.rights', { year: site.since, site: site.name[lang] })}
+    </p>
+  </div>
+</footer>
+
+{
+  needsConsent && (
+    <script is:inline>
+      document.querySelectorAll('[data-cookie-reset]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          try {
+            localStorage.removeItem('geo-consent')
+          } catch (e) {
+            /* ignore */
+          }
+          location.reload()
+        })
+      })
+    </script>
+  )
+}
+
+<style>
+  .footer-linklike {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    min-block-size: 44px;
+  }
+</style>

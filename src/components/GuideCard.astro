@@ -1,0 +1,29 @@
+---
+/**
+ * 科普文章卡片 —— 首页「延伸阅读」与 /guide/ 列表共用
+ *
+ * 标题是卡片内唯一的标题层级（H3），因此只在 H2 分组标题下使用。
+ */
+import type { Lang } from '../config/i18n'
+import { t } from '../i18n/ui'
+import { guidePath } from '../lib/paths'
+
+interface Props {
+  lang: Lang
+  slug: string
+  heading: string
+  description: string
+  readingMinutes: number
+}
+
+const { lang, slug, heading, description, readingMinutes } = Astro.props
+---
+
+<a class="card guide-card" href={guidePath(lang, slug)}>
+  <h3 class="card__title">{heading}</h3>
+  <p class="card__desc">{description}</p>
+  <p class="card__more">
+    <span>{t(lang, 'guide.minutes', { count: readingMinutes })}</span>
+    <span class="card__arrow" aria-hidden="true">→</span>
+  </p>
+</a>

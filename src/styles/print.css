@@ -1,0 +1,80 @@
+/* ============================================================
+   打印样式 · 纯白背景对打印友好（SR-12 色彩系统的理由之一）
+   打印时隐藏广告、导航、交互控件，只保留标题、结果与文档正文
+   ============================================================ */
+
+@media print {
+  :root {
+    --bg: #fff;
+    --bg-sub: #fff;
+    --ink: #000;
+    --ink-2: #333;
+    --line: #ccc;
+    --acc: #000;
+  }
+
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .ad-slot,
+  .btn,
+  .btn-row,
+  .lang-switch,
+  .nav-toggle,
+  .map-wrap,
+  .only-mobile,
+  .only-desktop,
+  .gps-entry,
+  .cookie-banner {
+    display: none !important;
+  }
+
+  /* 折叠区在打印时全部展开，否则内容丢失 */
+  details {
+    border: 0;
+  }
+
+  details > summary {
+    display: none;
+  }
+
+  details > * {
+    display: block !important;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* 打印时显示链接的真实 URL，便于纸质留存 */
+  .doc a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #555;
+    overflow-wrap: anywhere;
+  }
+
+  .panel,
+  .result,
+  .card {
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  .container {
+    max-width: none;
+    padding-inline: 0;
+  }
+}

@@ -1,0 +1,31 @@
+---
+/**
+ * 关于我们（FR-10）—— 站点定位、维护者信息、内容更新方式。不投放广告。
+ */
+import { LAUNCHED, type Lang } from '../../../config/i18n'
+import { t } from '../../../i18n/ui'
+import { legalPath } from '../../../lib/paths'
+import ContentPage from '../../../layouts/ContentPage.astro'
+
+export function getStaticPaths() {
+  return [...LAUNCHED].map((lang) => ({ params: { lang }, props: { lang } }))
+}
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const slug = 'about' as const
+---
+
+<ContentPage
+  lang={lang}
+  path={legalPath(lang, slug)}
+  title={t(lang, 'nav.about')}
+  description={t(lang, 'nav.about')}
+  h1={t(lang, 'nav.about')}
+  doc={{ collection: 'legal', slug }}
+  ads={false}
+  anchor={false}
+/>

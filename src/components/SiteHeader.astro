@@ -1,0 +1,65 @@
+---
+/**
+ * 全站唯一的 <header>（SR-12 骨架）
+ *
+ * 汉堡菜单用原生 <details> 实现 —— **零 JS**：
+ * 爬虫可读、无 hydration 风险、无 CLS。
+ */
+import type { Lang } from '../config/i18n'
+import { site } from '../config/site'
+import { t } from '../i18n/ui'
+import { homePath, legalPath, guideIndexPath } from '../lib/paths'
+import LangSwitch from './LangSwitch.astro'
+
+interface Props {
+  lang: Lang
+  /** 当前路径，用于给导航项标 aria-current */
+  path: string
+}
+
+const { lang, path } = Astro.props
+
+const navItems = [
+  { label: t(lang, 'nav.allTools'), href: homePath(lang) + '#tools' },
+  { label: t(lang, 'nav.guide'), href: guideIndexPath(lang) },
+  { label: t(lang, 'nav.about'), href: legalPath(lang, 'about') },
+  { label: t(lang, 'nav.contact'), href: legalPath(lang, 'contact') }
+]
+---
+
+<header class="site-header">
+  <div class="site-header__inner container shell">
+    <a class="site-header__brand" href={homePath(lang)}>
+      <span aria-hidden="true">◎</span>
+      {site.name[lang]}
+    </a>
+
+    <details class="site-nav">
+      <summary class="site-nav__toggle" aria-label={t(lang, 'nav.menu.open')}>
+        <svg class="site-nav__icon-menu" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M3 5h14M3 10h14M3 15h14" stroke-linecap="round" />
+        </svg>
+        <svg class="site-nav__icon-close" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M5 5l10 10M15 5L5 15" stroke-linecap="round" />
+        </svg>
+      </summary>
+      <nav class="site-nav__panel" aria-label={t(lang, 'a11y.mainNav')}>
+        <ul>
+          {
+            navItems.map((item) => (
+              <li>
+                <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
+
+    <span class="site-header__spacer"></span>
+
+    <LangSwitch lang={lang} path={path} />
+  </div>
+</header>

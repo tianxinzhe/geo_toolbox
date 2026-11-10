@@ -1,0 +1,1123 @@
+/* ============================================================
+   组件规范 · PRD SR-12「组件规范」表
+   全部移动优先；触控目标 ≥44×44px，相邻可点击元素间距 ≥8px（FR-11 / SR-08）
+   ============================================================ */
+
+/* ---------- 站点头部 ---------- */
+.site-header {
+  border-block-end: 1px solid var(--line);
+  background: var(--bg);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 56px;
+}
+
+.site-header__brand {
+  font-weight: 650;
+  font-size: var(--fs-h3);
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.site-header__brand:hover {
+  color: var(--acc);
+}
+
+.site-header__spacer {
+  flex: 1 1 auto;
+}
+
+/* ---------- 主导航 ----------
+   用原生 <details> 实现汉堡菜单：**零 JS**。
+   理由（SR-12 硬规则 5）：爬虫可读、无需 JS、无 hydration 风险、无 CLS。
+   菜单紧接品牌名之后；移动端为下拉面板，768px 起平铺成一行。 */
+.site-nav {
+  position: relative;
+}
+
+.site-nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--ctl-h-touch);
+  block-size: var(--ctl-h-touch);
+  padding: 0;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink);
+}
+
+.site-nav__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.site-nav__toggle::marker {
+  content: '';
+}
+
+/* 折叠区的全局 summary::before 加号不适用于导航汉堡按钮（展开态也要覆盖） */
+.site-nav__toggle::before,
+.site-nav[open] > .site-nav__toggle::before {
+  content: none;
+}
+
+.site-nav__toggle:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+.site-nav__toggle svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+/* 收起状态下的图标切换：闭 → 汉堡，开 → 叉 */
+.site-nav__icon-close {
+  display: none;
+}
+
+.site-nav[open] .site-nav__icon-close {
+  display: block;
+}
+
+.site-nav[open] .site-nav__icon-menu {
+  display: none;
+}
+
+/* 面板默认隐藏，展开时浮在内容之上 */
+.site-nav__panel {
+  display: none;
+}
+
+.site-nav[open] > .site-nav__panel {
+  display: block;
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: calc(100% + var(--sp-2));
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: var(--sp-2);
+  z-index: 30;
+  min-inline-size: 220px;
+}
+
+.site-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.site-nav a {
+  display: block;
+  padding: var(--sp-3) var(--sp-2);
+  min-height: var(--ctl-h-touch);
+  color: var(--ink);
+  text-decoration: none;
+  border-radius: var(--r-ctl);
+}
+
+.site-nav a:hover {
+  color: var(--acc);
+  background: var(--acc-soft);
+}
+
+.site-nav a[aria-current='page'] {
+  color: var(--acc);
+  font-weight: 600;
+}
+
+/* 桌面端平铺：隐藏汉堡，导航项横向排在品牌右侧 */
+@media (min-width: 768px) {
+  .site-nav__toggle {
+    display: none;
+  }
+
+  /* Chrome 131+ 会隐藏关闭状态 <details> 的内容槽位，
+     桌面端要平铺就必须把这个槽位恢复成可见 */
+  .site-nav::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+
+  .site-nav__panel,
+  .site-nav[open] > .site-nav__panel {
+    display: block;
+    position: static;
+    background: none;
+    border: 0;
+    padding: 0;
+    min-inline-size: 0;
+  }
+
+  .site-nav ul {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .site-nav a {
+    padding: var(--sp-2) var(--sp-3);
+    min-height: 0;
+  }
+}
+
+/* ---------- 语言切换器 ---------- */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.lang-switch a,
+.lang-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ctl-h-touch);
+  padding-inline: var(--sp-2);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  text-decoration: none;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-tag);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lang-switch a:hover,
+.lang-switch button:hover {
+  color: var(--acc);
+  border-color: var(--line);
+}
+
+.lang-switch [aria-current='true'] {
+  color: var(--acc);
+  background: var(--acc-soft);
+  border-color: var(--acc);
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .lang-switch a,
+  .lang-switch button {
+    min-height: 0;
+    block-size: var(--ctl-h);
+  }
+}
+
+/* ---------- 输入框 ----------
+   1px 边框 + 6px 圆角；focus 边框变强调色 + 3px 半透明外环；无阴影；字号固定 16px
+   ⚠️ 一律 type="text" + inputmode="decimal"，禁止 type="number"（FR-11 必踩坑） */
+label {
+  display: block;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+  margin-block-end: var(--sp-1);
+  font-weight: 500;
+}
+
+input[type='text'],
+input[type='search'],
+input[type='number'],
+select,
+textarea {
+  display: block;
+  inline-size: 100%;
+  /* 移动端触控目标 ≥44px，桌面 36px */
+  min-block-size: var(--ctl-h-touch);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-input);
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  appearance: none;
+}
+
+textarea {
+  min-block-size: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+select {
+  /* 原生箭头，避免引入图标库 */
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%),
+    linear-gradient(135deg, var(--ink-2) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) calc(50% + 1px),
+    calc(100% - 10px) calc(50% + 1px);
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  padding-inline-end: var(--sp-8);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: color-mix(in srgb, var(--ink-2) 45%, var(--line));
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--acc);
+  outline: var(--focus-ring) solid color-mix(in srgb, var(--acc) 30%, transparent);
+  outline-offset: 0;
+}
+
+input[aria-invalid='true'],
+textarea[aria-invalid='true'] {
+  border-color: var(--err);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--ink-2) 70%, transparent);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--bg-sub);
+  color: var(--ink-2);
+  cursor: not-allowed;
+}
+
+/* 字段容器：label + control + hint 的垂直节奏 */
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field__hint {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+  margin-block-start: var(--sp-1);
+}
+
+@media (min-width: 768px) {
+  input[type='text'],
+  input[type='search'],
+  select {
+    min-block-size: var(--ctl-h);
+  }
+}
+
+/* ---------- 按钮 ----------
+   主按钮：实心强调色 + 白字，6px 圆角，高度 36px（移动端 44px）
+   次按钮：白底 + 1px 边框 + 次要文字色；hover 变强调色边框 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-block-size: var(--ctl-h-touch);
+  padding-inline: var(--sp-4);
+  font-size: var(--fs-body);
+  font-weight: 550;
+  line-height: 1.2;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-ctl);
+  cursor: pointer;
+  /* 禁止固定宽度 + 截断省略号（SR-11）：宁可按钮变宽或换行 */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  transition:
+    background-color 120ms ease-out,
+    border-color 120ms ease-out,
+    color 120ms ease-out;
+}
+
+.btn--primary {
+  background: var(--acc);
+  color: #fff;
+  border-color: var(--acc);
+}
+
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--acc) 88%, #000);
+  border-color: color-mix(in srgb, var(--acc) 88%, #000);
+}
+
+.btn--secondary {
+  background: var(--bg);
+  color: var(--ink-2);
+  border-color: var(--line);
+}
+
+.btn--secondary:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+
+.btn--ghost {
+  background: none;
+  color: var(--acc);
+  border-color: transparent;
+}
+
+.btn--ghost:hover {
+  background: var(--acc-soft);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 成功态：仅「已复制」「转换成功」用绿色 */
+.btn.is-success {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+/* 按钮组：相邻可点击元素间距 ≥8px */
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+@media (min-width: 768px) {
+  .btn {
+    min-block-size: var(--ctl-h);
+  }
+}
+
+/* ---------- 卡片 ----------
+   白底 + 1px 边框；hover 只变边框颜色 —— 不加阴影、不位移（位移会导致 CLS） */
+.card {
+  display: block;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: var(--sp-4);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 120ms ease-out;
+}
+
+a.card:hover {
+  border-color: var(--acc);
+}
+
+a.card:hover .card__title {
+  color: var(--acc);
+}
+
+.card__title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 var(--sp-1);
+}
+
+.card__desc {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.card__tag {
+  display: inline-block;
+  font-size: var(--fs-ad);
+  color: var(--ink-2);
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  padding: 0 var(--sp-1);
+  margin-block-end: var(--sp-2);
+}
+
+/* ---------- 面板（工具区 / 结果区大块容器） ---------- */
+.panel {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  padding: var(--sp-4);
+}
+
+@media (min-width: 768px) {
+  .panel {
+    padding: var(--sp-6);
+  }
+}
+
+/* ---------- 结果区 ----------
+   次级表面 + 1px 边框；每行「标签(左) + 数值(等宽) + 附加信息(右，灰色小字)」 */
+.result {
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.result__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+}
+
+.result__row + .result__row {
+  border-block-start: 1px solid var(--line);
+}
+
+.result__label {
+  flex: 0 0 auto;
+  min-inline-size: 7em;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.result__value {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  font-size: var(--fs-num);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  /* 长数值允许换行而不是撑破容器 */
+  overflow-wrap: anywhere;
+}
+
+.result__extra {
+  flex: 0 1 auto;
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+@media (min-width: 768px) {
+  .result__row {
+    flex-wrap: nowrap;
+  }
+}
+
+/* ---------- 错误提示 · SR-06 三段式（原因 / 正确写法 / 示例） ----------
+   就地显示，不清空用户已输入内容，不弹窗打断 */
+.error-box {
+  background: color-mix(in srgb, var(--err) 6%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--err) 35%, var(--line));
+  border-inline-start: 3px solid var(--err);
+  border-radius: var(--r-ctl);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-num);
+}
+
+.error-box__title {
+  color: var(--err);
+  font-weight: 600;
+  margin-block-end: var(--sp-1);
+}
+
+.error-box__hint {
+  color: var(--ink-2);
+  margin-block-end: var(--sp-2);
+}
+
+.error-box__example {
+  font-family: var(--mono);
+  font-size: var(--fs-num);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  padding: var(--sp-1) var(--sp-2);
+}
+
+/* 警告：仅「结果可用但需注意」 */
+.warn-box {
+  background: color-mix(in srgb, var(--warn) 7%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--line));
+  border-inline-start: 3px solid var(--warn);
+  border-radius: var(--r-ctl);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-num);
+  color: var(--ink);
+}
+
+/* ---------- 空状态 · SR-06「空状态即引导」 ---------- */
+.empty-state {
+  background: var(--bg-sub);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-card);
+  padding: var(--sp-8) var(--sp-4);
+  text-align: center;
+  color: var(--ink-2);
+  font-size: var(--fs-num);
+}
+
+.empty-state .btn {
+  margin-block-start: var(--sp-3);
+}
+
+/* ---------- 折叠区：优先用原生 <details>（爬虫可读、无需 JS） ---------- */
+details {
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  background: var(--bg);
+}
+
+details + details {
+  margin-block-start: var(--sp-2);
+}
+
+summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-block-size: var(--ctl-h-touch);
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  font-weight: 550;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::before {
+  content: '+';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.2em;
+  block-size: 1.2em;
+  flex: 0 0 auto;
+  color: var(--acc);
+  font-weight: 600;
+}
+
+details[open] > summary::before {
+  content: '−';
+}
+
+summary:hover {
+  color: var(--acc);
+}
+
+details > :not(summary) {
+  padding-inline: var(--sp-4);
+}
+
+details > :last-child {
+  padding-block-end: var(--sp-4);
+}
+
+@media (min-width: 768px) {
+  summary {
+    min-block-size: var(--ctl-h);
+  }
+}
+
+/* ---------- 表格 ----------
+   表头 sticky + 极浅灰底；数值列右对齐 + 等宽；窄屏横向滚动而非压缩列宽 */
+table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-num);
+}
+
+caption {
+  text-align: start;
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  padding-block-end: var(--sp-2);
+}
+
+th,
+td {
+  text-align: start;
+  padding: var(--sp-2) var(--sp-3);
+  border-block-end: 1px solid var(--line);
+  vertical-align: top;
+}
+
+thead th {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--bg-sub);
+  color: var(--ink-2);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  /* 表头允许两行（SR-11） */
+  white-space: normal;
+  border-block-end: 1px solid var(--line);
+  z-index: 1;
+}
+
+/* 数值列右对齐（三语言通用） */
+td.num,
+th.num {
+  text-align: end;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+tbody tr:hover {
+  background: var(--bg-sub);
+}
+
+/* ---------- 面包屑 ---------- */
+.breadcrumb {
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin: 0;
+}
+
+.breadcrumb li + li::before {
+  content: '/';
+  color: var(--line);
+}
+
+.breadcrumb a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--acc);
+  text-decoration: underline;
+}
+
+.breadcrumb [aria-current='page'] {
+  color: var(--ink);
+}
+
+/* ---------- 隐私声明 · SR-07 常驻 ---------- */
+.privacy-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.privacy-notice svg {
+  flex: 0 0 auto;
+  inline-size: 14px;
+  block-size: 14px;
+  margin-block-start: 2px;
+  color: var(--ok);
+}
+
+/* ---------- 标签 ---------- */
+.tag {
+  display: inline-block;
+  font-size: var(--fs-ad);
+  line-height: 1.6;
+  color: var(--ink-2);
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  padding: 0 var(--sp-2);
+  white-space: nowrap;
+}
+
+/* ---------- 广告位容器 · SR-08 ----------
+   生产环境为纯白 + 顶部 11px 灰色「广告」标记；虚线边框仅用于开发期
+   min-height 固定预留高度 —— CLS 防塌陷是必做项，不是优化项 */
+.ad-slot {
+  margin-block: var(--ad-gap); /* 与内容 ≥32px 隔离 */
+  min-block-size: var(--ad-h-mobile);
+  background: var(--ad-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  padding: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--sp-2);
+  overflow: hidden;
+}
+
+.ad-slot__label {
+  font-size: var(--fs-ad);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad); /* 中性灰，绝不用强调色 */
+  font-weight: 500;
+}
+
+.ad-slot__body {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Anchor 广告：仅视口 <768px 启用，页面底部预留高度避免遮挡页脚链接 */
+.ad-slot--anchor {
+  position: sticky;
+  inset-block-end: 0;
+  margin-block: 0;
+  min-block-size: var(--ad-h-anchor);
+  border-radius: 0;
+  border-inline: 0;
+  border-block-end: 0;
+  padding-block-end: calc(var(--sp-2) + env(safe-area-inset-bottom, 0));
+  z-index: 15;
+}
+
+@media (min-width: 768px) {
+  .ad-slot {
+    min-block-size: var(--ad-h-desktop);
+  }
+
+  /* 768px 起 Anchor 广告关闭 */
+  .ad-slot--anchor {
+    display: none;
+  }
+}
+
+/* 地图容器内及周边 30px 范围内严禁出现广告（SR-08 / FR-06） */
+.map-wrap + .ad-slot,
+.ad-slot:has(+ .map-wrap) {
+  display: none;
+}
+
+/* ---------- 地图容器：写死 aspect-ratio 防 CLS ---------- */
+.map-wrap {
+  inline-size: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .map-wrap {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ---------- 工具区布局 ----------
+   移动端完全纵向堆叠；768px 起双列；地图与工具区可并排 */
+.tool-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+@media (min-width: 768px) {
+  .tool-layout {
+    gap: var(--sp-6);
+  }
+
+  .tool-layout--split {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .tool-layout--split > .tool-layout__main {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+
+  .tool-layout--split > .tool-layout__aside {
+    flex: 0 0 320px;
+  }
+}
+
+/* ---------- 工具页文档区 ----------
+   正文由 Markdown 渲染，元素上没有本项目自定义的 class，
+   因此这里用后代选择器兜住排版；表格窄屏横向滚动而非压缩列宽（SR-11）。 */
+.doc {
+  max-inline-size: var(--w-doc);
+}
+
+.doc h2:first-child {
+  margin-block-start: 0;
+}
+
+.doc details {
+  margin-block: var(--sp-3);
+}
+
+.doc table {
+  display: block;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-block-end: var(--sp-4);
+}
+
+.doc img {
+  block-size: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+}
+
+.doc blockquote {
+  border-inline-start: 3px solid var(--line);
+  padding-inline-start: var(--sp-4);
+  color: var(--ink-2);
+  margin-block-end: var(--sp-4);
+}
+
+/* ---------- 相关工具 ---------- */
+.related {
+  padding-block-start: var(--sp-6);
+}
+
+/* 不用无限滚动 —— 爬虫抓不到，必须是完整 <ul>（SR-12 硬规则 4） */
+.related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-3);
+}
+
+.related li {
+  margin: 0;
+}
+
+/* ---------- 索引页共享元素 ---------- */
+
+/* 页头下方的元信息行：工具数、文章数等，等宽数字便于扫读 */
+.page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-1) var(--sp-3);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.page-meta__link {
+  color: var(--ink-2);
+  text-decoration: none;
+  border-block-end: 1px solid var(--line);
+}
+
+.page-meta__link:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+
+.page-meta__sep {
+  color: var(--line);
+}
+
+/* 页内跳转 / 分类切换共用的胶囊标签，可作用于 button 或 a */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  min-block-size: var(--ctl-h-touch);
+  padding-inline: var(--sp-3);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  text-decoration: none;
+  cursor: pointer;
+  /* 禁止固定宽度 + 截断（SR-11）：分类名可能很长 */
+  white-space: normal;
+  transition:
+    color 120ms ease-out,
+    border-color 120ms ease-out,
+    background-color 120ms ease-out;
+}
+
+.chip:hover {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+
+.chip[aria-pressed='true'],
+.chip[aria-current='page'] {
+  color: var(--acc);
+  background: var(--acc-soft);
+  border-color: var(--acc);
+  font-weight: 600;
+}
+
+.chip__count {
+  font-family: var(--mono);
+  font-size: var(--fs-ad);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.chip[aria-pressed='true'] .chip__count,
+.chip[aria-current='page'] .chip__count {
+  color: var(--acc);
+}
+
+@media (min-width: 768px) {
+  .chip {
+    min-block-size: var(--ctl-h);
+  }
+}
+
+/* 卡片底部的「打开 →」行动区，始终贴在卡片底部 */
+.card__more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-block-start: auto;
+  padding-block-start: var(--sp-3);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.card__arrow {
+  font-family: var(--mono);
+  transition: transform 120ms ease-out;
+}
+
+a.card:hover .card__arrow {
+  transform: translateX(3px);
+  color: var(--acc);
+}
+
+/* 首页 / 分类页共用的工具卡片 */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  block-size: 100%;
+}
+
+/* 文章卡片 */
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  block-size: 100%;
+}
+
+.guide-card .card__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.guide-card .card__desc {
+  margin: 0;
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-4);
+  border-block-start: 1px solid var(--line);
+  padding-block-start: var(--sp-3);
+  margin-block-end: var(--sp-4);
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.section-head__link {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  text-decoration: none;
+}
+
+.section-head__link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- 页脚 ---------- */
+.site-footer {
+  margin-block-start: var(--sp-16);
+  border-block-start: 1px solid var(--line);
+  padding-block: var(--sp-8);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.site-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  /* 相邻可点击元素间距 ≥8px */
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  /* 触控目标 ≥44px（含行高） */
+  min-block-size: var(--ctl-h-touch);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--acc);
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .site-footer a {
+    min-block-size: 0;
+  }
+}

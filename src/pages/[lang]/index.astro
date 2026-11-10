@@ -1,0 +1,223 @@
+---
+/**
+ * 语言首页 —— FR-01 分类索引
+ *
+ * 全部工具按分类分组，构建期渲染成真实 `<a href>` 卡片，
+ * 爬虫可读到全部工具与内链（SR-12 硬规则 1、2），首页本身不含客户端过滤脚本。
+ */
+import { getCollection } from 'astro:content'
+import { LAUNCHED, type Lang } from '../../config/i18n'
+import { site } from '../../config/site'
+import { GUIDE_GROUPS } from '../../i18n/guideGroups'
+import { t } from '../../i18n/ui'
+import { CATEGORIES, CATEGORY_META, getToolsByCategory } from '../../i18n/tools'
+import { guideIndexPath, homePath } from '../../lib/paths'
+import { websiteJsonLd } from '../../lib/seo'
+import ContentPage from '../../layouts/ContentPage.astro'
+import GuideCard from '../../components/GuideCard.astro'
+import ToolCard from '../../components/ToolCard.astro'
+
+export function getStaticPaths() {
+  return LAUNCHED.map((lang) => ({ params: { lang }, props: { lang } }))
+}
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const path = homePath(lang)
+
+const groups = CATEGORIES.map((cat) => ({ cat, tools: getToolsByCategory(cat) })).filter(
+  (g) => g.tools.length > 0
+)
+
+// 延伸阅读：每个分组取第一篇，保证首页能覆盖投影、格式、瓦片三条主线
+const allGuides = (await getCollection('guide'))
+  .filter((entry) => entry.id.endsWith(`/${lang}`))
+  .sort((a, b) => a.data.order - b.data.order)
+
+const featuredGuides = GUIDE_GROUPS.flatMap((group) => {
+  const entry = allGuides.find((item) => item.data.group === group.id)
+  return entry ? [entry] : []
+})
+---
+
+<ContentPage
+  lang={lang}
+  path={path}
+  title={`${site.name[lang]} — ${site.tagline[lang]}`}
+  description={site.tagline[lang]}
+  h1={t(lang, 'home.h1')}
+  lead={t(lang, 'home.intro')}
+  width="tool"
+  headVariant="display"
+  anchor={false}
+  jsonLd={[websiteJsonLd(lang, path)]}
+  crumbs={[{ label: t(lang, 'nav.home') }]}
+>
+  {/* ---------- 工具索引（FR-01：按分类分组展示全部工具卡片） ---------- */}
+  <section id="tools" aria-label={t(lang, 'home.section.tools')}>
+    {
+      groups.map((g, gi) => (
+        <div class="group">
+          <div class="group__head">
+            <span class="group__index" aria-hidden="true">
+              {String(gi + 1).padStart(2, '0')}
+            </span>
+            <h2 class="group__title">{CATEGORY_META[g.cat].names[lang]}</h2>
+            <span class="group__count">{g.tools.length}</span>
+          </div>
+          <p class="group__desc">{CATEGORY_META[g.cat].desc[lang]}</p>
+          <ul class="grid tools-grid">
+            {g.tools.map((tool) => (
+              <li>
+                <ToolCard lang={lang} tool={tool} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </section>
+
+  {/* ---------- 延伸阅读：每个分组各取一篇，覆盖投影 / 格式 / 瓦片 ---------- */}
+  <section class="home-guides" aria-labelledby="home-guides-title">
+    <div class="section-head">
+      <h2 id="home-guides-title">{t(lang, 'home.section.guides')}</h2>
+      <a class="section-head__link" href={guideIndexPath(lang)}>
+        {t(lang, 'home.guides.all')} →
+      </a>
+    </div>
+    <ul class="guide-grid">
+      {
+        featuredGuides.map((entry) => (
+          <li>
+            <GuideCard
+              lang={lang}
+              slug={entry.id.slice(0, -3)}
+              heading={entry.data.heading}
+              description={entry.data.description}
+              readingMinutes={entry.data.readingMinutes}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {/* ---------- 站点定位说明 ---------- */}
+  <section class="why" aria-labelledby="home-why">
+    <h2 id="home-why">{t(lang, 'home.section.why')}</h2>
+    <ul class="why__list">
+      <li>{t(lang, 'home.why.local')}</li>
+      <li>{t(lang, 'home.why.fast')}</li>
+      <li>{t(lang, 'home.why.shareable')}</li>
+    </ul>
+  </section>
+</ContentPage>
+
+<style>
+  .group + .group {
+    margin-block-start: var(--sp-8);
+  }
+
+  /* 分类标题行：序号 / 名称 / 数量，用一条分隔线承接上一组 */
+  .group__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    border-block-start: 1px solid var(--line);
+    padding-block-start: var(--sp-3);
+  }
+
+  .group__index {
+    font-family: var(--mono);
+    font-size: var(--fs-label);
+    font-variant-numeric: tabular-nums;
+    color: var(--acc);
+  }
+
+  .group__title {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .group__count {
+    margin-inline-start: auto;
+    font-family: var(--mono);
+    font-size: var(--fs-label);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .group__desc {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    margin: var(--sp-2) 0 var(--sp-3);
+  }
+
+  .tools-grid {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var(--sp-3);
+  }
+
+  .tools-grid li {
+    margin: 0;
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var(--sp-3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .guide-grid li {
+    margin: 0;
+  }
+
+  /* 站点定位：三条理由并排，序号用等宽数字，替代项目符号 */
+  .why {
+    border-block-start: 1px solid var(--line);
+    padding-block-start: var(--sp-4);
+  }
+
+  .why h2 {
+    margin: 0 0 var(--sp-4);
+  }
+
+  .why__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: var(--sp-4);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: why;
+  }
+
+  .why__list li {
+    counter-increment: why;
+    margin: 0;
+    padding-block-start: var(--sp-3);
+    border-block-start: 1px solid var(--line);
+    font-size: var(--fs-num);
+    color: var(--ink-2);
+  }
+
+  .why__list li::before {
+    content: counter(why, decimal-leading-zero);
+    display: block;
+    margin-block-end: var(--sp-2);
+    font-family: var(--mono);
+    font-size: var(--fs-ad);
+    letter-spacing: 0.08em;
+    color: var(--acc);
+  }
+</style>

@@ -1,0 +1,188 @@
+---
+/**
+ * 工具页布局 —— FR-03 通用框架（技术方案 6.5）
+ *
+ * DOM 顺序严格对应 PRD FR-03 的线框图：
+ *   面包屑 → H1 + 一句话说明 → 工具区（含常驻隐私声明）
+ *   → 广告位 A → 文档区（正文在初始 HTML 中）+ 广告位 B
+ *   → 相关工具 → 广告位 C
+ *
+ * 广告 <aside> 一律排在工具区之后（SR-12 爬虫规则第 3 条）：
+ * 避免爬虫把广告文本当正文提取。
+ *
+ * H1 每页唯一，H2/H3 不跳级（SR-12 硬规则 9）—— 文档区正文的标题层级
+ * 由 Markdown 作者负责，check-content-length.ts 会做静态校验。
+ */
+import type { Lang } from '../config/i18n'
+import { t, toolKey } from '../i18n/ui'
+import { CATEGORY_META, type ToolMeta } from '../i18n/tools'
+import { renderDoc } from '../lib/docs'
+import { categoryPath, homePath, toolPath } from '../lib/paths'
+import { breadcrumbJsonLd, faqJsonLd, softwareApplicationJsonLd, type Crumb } from '../lib/seo'
+import AdSlot from '../components/AdSlot.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+import RelatedTools from '../components/RelatedTools.astro'
+import PrivacyNotice from '../components/ui/PrivacyNotice.astro'
+import Base from './Base.astro'
+
+interface Props {
+  lang: Lang
+  tool: ToolMeta
+}
+
+const { lang, tool } = Astro.props
+const path = toolPath(lang, tool.slug)
+
+// 文档缺失 → 直接构建失败，而不是渲染半翻译页面（PRD FR-08）。
+// getStaticPaths 已经过滤过一次，这里是第二道防线。
+const doc = await renderDoc('tools', tool.slug, lang)
+if (!doc) {
+  throw new Error(`缺少工具文档：src/i18n/content/tools/${tool.slug}/${lang}.md`)
+}
+const { Content, data } = doc
+
+const crumbs: Crumb[] = [
+  { label: t(lang, 'nav.home'), href: homePath(lang) },
+  { label: CATEGORY_META[tool.category].names[lang], href: categoryPath(lang, tool.category) },
+  { label: tool.names[lang] }
+]
+
+const jsonLd = [
+  breadcrumbJsonLd(crumbs),
+  softwareApplicationJsonLd(tool, lang, path, data.description),
+  faqJsonLd(data.faq ?? [])
+].filter((x): x is Record<string, unknown> => x !== undefined)
+
+// C 级工具在窄屏给一句提示，但功能仍必须完全可用（FR-11）
+const needsDesktopHint = tool.mobileTier === 'C'
+---
+
+<Base
+  lang={lang}
+  title={data.title}
+  description={data.description}
+  path={path}
+  jsonLd={jsonLd}
+>
+  <div class="container shell tool-page">
+    <Breadcrumb crumbs={crumbs} label={t(lang, 'a11y.breadcrumb')} />
+
+    <article>
+      <header class="tool-page__head">
+        <h1>{toolKey(lang, tool.slug, 'h1') ?? tool.names[lang]}</h1>
+        <p class="tool-page__lead">{tool.desc[lang]}</p>
+        <p class="page-meta tool-page__meta">
+          <a class="page-meta__link" href={categoryPath(lang, tool.category)}>
+            {CATEGORY_META[tool.category].names[lang]}
+          </a>
+          <span class="page-meta__sep" aria-hidden="true">·</span>
+          <span>{tool.id}</span>
+        </p>
+      </header>
+
+      {
+        needsDesktopHint && (
+          <p class="desktop-recommended warn-box">{t(lang, 'common.desktopRecommended')}</p>
+        )
+      }
+
+      <section id="tool" aria-label={t(lang, 'a11y.tool')} class="tool-page__body">
+        <!--
+          工具岛屿由页面（pages/[lang]/tools/[slug]/index.astro）通过 slot 传入，
+          而不是在这里从注册表动态解析。
+
+          原因：Astro 的模板类型检查要求带 client:* 指令的组件标签
+          在语法上是可静态分析的具体组件；`Record<string, Component>` 里的
+          值被擦成宽泛联合类型后会报 ts(2604)「not a valid component」。
+          把分支放到页面层，组件类型直接来自 .vue 的 import，类型是具体的。
+
+          这也正是技术方案 6.5 的原始写法（`<slot />` ← Vue 工具组件岛屿）。
+        -->
+        <slot />
+
+        <!-- SR-07：常驻在输入区附近，不是藏在隐私政策页里 -->
+        <PrivacyNotice lang={lang} />
+      </section>
+
+      {/* 广告位 A：工具区与文档区之间 */}
+      <AdSlot lang={lang} slot="A" />
+
+      <section id="documentation" class="doc" aria-labelledby="tool-doc-title">
+        <div class="section-head">
+          <h2 id="tool-doc-title">{t(lang, 'doc.howItWorks')}</h2>
+        </div>
+        <Content />
+        {/* 广告位 B：文中插入，正文 ≥800 字时（由内容作者决定是否写入本节） */}
+        <AdSlot lang={lang} slot="B" />
+      </section>
+
+      <RelatedTools
+        lang={lang}
+        slugs={tool.related}
+        current={tool.slug}
+        heading={t(lang, 'doc.related')}
+        categoryLabel={(cat) => CATEGORY_META[cat].names[lang]}
+      />
+
+      {/* 广告位 C：页脚展示 */}
+      <AdSlot lang={lang} slot="C" />
+    </article>
+  </div>
+</Base>
+
+<style>
+  .tool-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding-block: var(--sp-6);
+  }
+
+  .tool-page__head {
+    max-inline-size: var(--w-doc);
+  }
+
+  /* 与文章页共用同一档标题尺寸，工具页不抢工具区的视觉重心 */
+  .tool-page__head h1 {
+    font-size: clamp(28px, 3.4vw, 36px);
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+  }
+
+  .tool-page__lead {
+    color: var(--ink-2);
+    margin-block-start: var(--sp-2);
+    margin-block-end: 0;
+  }
+
+  .tool-page__meta {
+    margin-block-start: var(--sp-3);
+  }
+
+  .tool-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    max-inline-size: var(--w-tool);
+  }
+
+  /* article 自身作为纵向 flex 容器，让面包屑之后的各节共享同一套间距节奏。
+     不用 display:contents —— 那会丢失 article 的盒子，
+     影响 scroll-margin 与打印分页控制。 */
+  article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+
+  @media (min-width: 768px) {
+    .tool-page {
+      gap: var(--sp-6);
+      padding-block: var(--sp-8);
+    }
+
+    article {
+      gap: var(--sp-6);
+    }
+  }
+</style>

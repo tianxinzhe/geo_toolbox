@@ -1,0 +1,168 @@
+---
+/**
+ * 科普文章列表 `/{lang}/guide/`（PRD 3.3 P1 / 4 信息架构）
+ *
+ * 只列出当前语言真实存在的文章：译文缺失的文章不会出现在索引中，
+ * 也不会生成页面（FR-08），避免半翻译内容被搜索引擎收录。
+ */
+import { getCollection } from 'astro:content'
+import { LAUNCHED, type Lang } from '../../../config/i18n'
+import { GUIDE_GROUPS } from '../../../i18n/guideGroups'
+import { t } from '../../../i18n/ui'
+import ContentPage from '../../../layouts/ContentPage.astro'
+import GuideCard from '../../../components/GuideCard.astro'
+import { guideIndexPath, homePath } from '../../../lib/paths'
+
+export function getStaticPaths() {
+  return LAUNCHED.map((lang) => ({ params: { lang } }))
+}
+
+const { lang } = Astro.params as { lang: Lang }
+const heading = t(lang, 'guide.h1')
+
+const articles = (await getCollection('guide'))
+  .filter((entry) => entry.id.endsWith(`/${lang}`))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((entry) => ({
+    slug: entry.id.slice(0, -3),
+    group: entry.data.group,
+    heading: entry.data.heading,
+    description: entry.data.description,
+    readingMinutes: entry.data.readingMinutes
+  }))
+
+/**
+ * 按配置顺序分组，空分组不渲染 —— 某组文章尚未翻译时，
+ * 列表页不会出现只有标题没有卡片的空区块。
+ */
+const groups = GUIDE_GROUPS.map((group) => ({
+  id: group.id,
+  label: t(lang, group.labelKey),
+  desc: t(lang, group.descKey),
+  articles: articles.filter((article) => article.group === group.id)
+})).filter((group) => group.articles.length > 0)
+---
+
+<ContentPage
+  lang={lang}
+  path={guideIndexPath(lang)}
+  title={t(lang, 'guide.title')}
+  description={t(lang, 'guide.description')}
+  h1={heading}
+  lead={t(lang, 'guide.lead')}
+  width="tool"
+  headVariant="display"
+  crumbs={[
+    { label: t(lang, 'nav.home'), href: homePath(lang) },
+    { label: heading }
+  ]}
+>
+  <p class="page-meta">
+    {t(lang, 'guide.meta', { articles: articles.length, groups: groups.length })}
+  </p>
+
+  {/* 页内跳转：长列表的快速定位，不依赖 JS */}
+  <nav class="jump-nav" aria-label={t(lang, 'guide.jump')}>
+    {
+      groups.map((group) => (
+        <a class="chip" href={`#guide-group-${group.id}`}>
+          {group.label}
+          <span class="chip__count">{group.articles.length}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  {
+    groups.map((group, gi) => (
+      <section class="guide-section" aria-labelledby={`guide-group-${group.id}`}>
+        <div class="guide-section__head">
+          <span class="guide-section__index" aria-hidden="true">
+            {String(gi + 1).padStart(2, '0')}
+          </span>
+          <h2 class="guide-section__title" id={`guide-group-${group.id}`}>
+            {group.label}
+          </h2>
+          <span class="guide-section__count">
+            {t(lang, 'guide.count', { n: group.articles.length })}
+          </span>
+        </div>
+        <p class="guide-section__desc">{group.desc}</p>
+        <ul class="guide-grid">
+          {group.articles.map((article) => (
+            <li>
+              <GuideCard
+                lang={lang}
+                slug={article.slug}
+                heading={article.heading}
+                description={article.description}
+                readingMinutes={article.readingMinutes}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</ContentPage>
+
+<style>
+  .jump-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .guide-section + .guide-section {
+    margin-block-start: var(--sp-12);
+  }
+
+  /* 分组标题行：序号 / 名称 / 篇数，用分隔线制造「章节」感 */
+  .guide-section__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    border-block-start: 1px solid var(--line);
+    padding-block-start: var(--sp-3);
+  }
+
+  .guide-section__index {
+    font-family: var(--mono);
+    font-size: var(--fs-label);
+    font-variant-numeric: tabular-nums;
+    color: var(--acc);
+  }
+
+  .guide-section__title {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .guide-section__count {
+    margin-inline-start: auto;
+    font-family: var(--mono);
+    font-size: var(--fs-label);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .guide-section__desc {
+    margin: var(--sp-2) 0 var(--sp-4);
+    font-size: var(--fs-num);
+    color: var(--ink-2);
+    max-inline-size: 68ch;
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .guide-grid li {
+    margin: 0;
+  }
+</style>

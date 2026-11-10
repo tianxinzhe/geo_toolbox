@@ -1,0 +1,61 @@
+---
+/**
+ * 广告位（FR-09 / SR-08）—— **构建期决定，非运行时**（技术方案 6.4）
+ *
+ * `ADS_ENABLED.includes(lang)` 与 `site.adsenseClient` 都是构建期常量，
+ * 因此：
+ *   - zh 页面的 HTML 里**完全不含** `<ins>` 标签，也不含 adsbygoogle.js
+ *     （脚本在 Base.astro 用同样方式条件注入）
+ *   - 因为不渲染，**占位高度也自然不存在** —— 满足 FR-09
+ *     「不预留广告位高度，文档区与相关工具区直接衔接」
+ *
+ * 安全距离（SR-08 硬约束，不因收益考虑放宽）：
+ *   - `margin-block: var(--ad-gap)` = 32px，要求 ≥30px
+ *   - `min-block-size` 固定预留高度：桌面 250px / 移动 200px
+ *     → 广告异步加载完成后不把内容顶下去，CLS < 0.05
+ *   - 地图容器内及周边 30px 内严禁广告（components.css 中用 :has() 兜底）
+ *
+ * 禁止项：不使用自动广告（Auto Ads）—— 工具站交互密集，
+ * 自动投放会把广告插入地图或按钮附近 → 无效点击 → 扣量乃至封号。
+ */
+import type { Lang } from '../config/i18n'
+import { ADS_ENABLED } from '../config/i18n'
+import { AD_SLOTS, site } from '../config/site'
+import { t } from '../i18n/ui'
+
+interface Props {
+  lang: Lang
+  /** A：工具区与文档区之间 / B：文档区第 2 个 H2 之后 / C：页脚 / anchor：移动端 Anchor */
+  slot: 'A' | 'B' | 'C' | 'anchor'
+}
+
+const { lang, slot } = Astro.props
+
+// 三重构建期开关：语言投放范围 + 已开通 AdSense + 已申请到该位置的 slot ID
+const enabled = ADS_ENABLED.includes(lang) && site.adsenseClient !== '' && AD_SLOTS[slot] !== ''
+const isAnchor = slot === 'anchor'
+---
+
+{
+  enabled && (
+    <aside
+      class:list={['ad-slot', { 'ad-slot--anchor': isAnchor }]}
+      aria-label={t(lang, 'a11y.advertisement')}
+    >
+      {/* 广告标记必须用中性灰 --ad，绝不用强调色 --acc（SR-08 视觉落地） */}
+      <span class="ad-slot__label">{t(lang, 'a11y.advertisement')}</span>
+      <div class="ad-slot__body">
+        <ins
+          class="adsbygoogle"
+          style="display:block"
+          data-ad-client={site.adsenseClient}
+          data-ad-slot={AD_SLOTS[slot]}
+          data-ad-format={isAnchor ? undefined : 'auto'}
+          data-full-width-responsive={isAnchor ? undefined : 'true'}
+        />
+      </div>
+      {/* AdSense 要求每个 <ins> 后调用一次 push。is:inline 避免被 Astro 打包进主 bundle */}
+      <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </aside>
+  )
+}

@@ -1,0 +1,99 @@
+---
+/**
+ * 工具岛屿分发器
+ *
+ * 为什么不用「注册表 + 动态组件」：
+ * Astro 的模板类型检查要求带 `client:*` 指令的组件标签在语法上是
+ * **可静态分析的具体组件**。把组件存进 `Record<string, Component>` 之后，
+ * 取出来的值类型被擦成宽泛的 vue `Component` 联合类型，
+ * astro check 会报 ts(2604)「Component is not a valid component」。
+ *
+ * 所以这里改成一工具一行的显式分发：每一行的组件都直接来自 `.vue` 的
+ * import，类型是具体的 SFC 类型，检查能通过；同时 Vite 也能为每个工具页
+ * 单独切分 chunk（体积预算要求，技术方案 2 章）。
+ *
+ * ➕ 新增工具时改两处：加一行 import，加一行分发。
+ */
+import type { Lang } from '../../config/i18n'
+import { pick, t } from '../../i18n/ui'
+import { TOOL_UI_KEYS } from '../../i18n/uiKeys'
+import type { ToolMeta } from '../../i18n/tools'
+import { isRegistered, keysFor } from './registry'
+
+import BufferCircle from './BufferCircle.vue'
+import CoordConvert from './CoordConvert.vue'
+import DataViewer from './DataViewer.vue'
+import DmsDecimal from './DmsDecimal.vue'
+import EpsgConvert from './EpsgConvert.vue'
+import FormatConvert from './FormatConvert.vue'
+import GeoHash from './GeoHash.vue'
+import MapDraw from './MapDraw.vue'
+import TileCoords from './TileCoords.vue'
+
+interface Props {
+  lang: Lang
+  tool: ToolMeta
+}
+
+const { lang, tool } = Astro.props
+
+/**
+ * 交给岛屿的文案子集：公共键 + 该工具专属键。
+ *
+ * 岛屿**不 import 整个字典** —— 那会把三语言全部文案塞进客户端 bundle。
+ * 这里在构建期取好子集，以 props 传入，客户端只含该页真正用到的字符串。
+ */
+const ui = pick(lang, [...TOOL_UI_KEYS, ...keysFor(tool.slug)])
+
+// 未注册 = 尚未实现。渲染占位面板而不是空白，让页面结构完整可验收。
+const registered = isRegistered(tool.slug)
+---
+
+{
+  !registered && (
+    <div class="empty-state">
+      <p>
+        {tool.id} · {tool.names[lang]}
+      </p>
+      <p>{t(lang, 'err.empty.title')}</p>
+    </div>
+  )
+}
+
+{tool.slug === 'coord-convert' && (
+  <CoordConvert client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'dms-decimal' && (
+  <DmsDecimal client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'epsg-convert' && (
+  // T03 是唯一把 proj4 作为首屏计算依赖的工具：用 client:idle 让水合
+  // 让位于 LCP；proj4 本身已在 engine.ts 内动态 import，双保险。
+  <EpsgConvert client:idle lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'format-convert' && (
+  <FormatConvert client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'buffer-circle' && (
+  <BufferCircle client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'geohash' && (
+  <GeoHash client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'map-draw' && (
+  <MapDraw client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'tile-coords' && (
+  <TileCoords client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'data-viewer' && (
+  <DataViewer client:load lang={lang} ui={ui} toolId={tool.id} />
+)}

@@ -1,0 +1,10 @@
+# 分类级说明文档目录（可选）
+#
+# FR-01：分类页承载分类级科普正文与内链权重。
+# 文件命名：{categorySlug}/{lang}.md，例如 coordinate/zh.md
+#
+# 缺失时分类页只渲染工具聚合，不会构建失败
+# （pages/[lang]/category/[cat]/index.astro 传入 docRequired={false}）。
+#
+# 本文件是 .gitkeep，用于让空目录进入版本控制；
+# 扩展名不是 .md，因此不会被 content collection 的 glob loader 收集。

@@ -1,0 +1,91 @@
+/* ============================================================
+   设备显隐 · PRD FR-12 + 技术方案 4.7
+
+   🔴 唯一合法的设备差异实现方式：**两端内容都渲染进 HTML，CSS 控制显隐。**
+
+   这样做的三个理由（PRD FR-12）：
+   1. 无 hydration 问题 —— 服务端与客户端 HTML 完全一致，不会 mismatch
+   2. 爬虫可读 —— 两端内容都在初始 HTML 中，SEO 不受损
+   3. 零 CLS —— 显隐在首次绘制前就确定，不发生布局跳变
+
+   ⛔ 禁止出现任何 isMobile 的 JS 判断。
+      ESLint 规则拦截 navigator.userAgent 与 window.innerWidth 的直接使用。
+      设备错配发生在**功能层**不在工具层：同一 URL 必须在两种设备上都完整可用，
+      隐藏 ≠ 删除（例：移动端隐藏批量入口，但 ?mode=batch 的 URL 仍可访问）。
+   ============================================================ */
+
+/* 默认（桌面）：显示桌面专属，隐藏移动专属 */
+.only-mobile {
+  display: none;
+}
+
+.only-desktop {
+  display: block;
+}
+
+/* <768px 为主分界，与 FR-11 断点体系一致 */
+@media (max-width: 767px) {
+  .only-mobile {
+    display: block;
+  }
+
+  .only-desktop {
+    display: none;
+  }
+}
+
+/* 需要 flex/grid 而非 block 的元素，用修饰类覆盖 display */
+.only-mobile.is-flex,
+.only-desktop.is-flex {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .only-mobile.is-flex {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .only-desktop.is-flex {
+    display: flex;
+  }
+}
+
+/* 行内元素 */
+@media (max-width: 767px) {
+  .only-mobile.is-inline {
+    display: inline;
+  }
+}
+
+@media (min-width: 768px) {
+  .only-desktop.is-inline {
+    display: inline;
+  }
+}
+
+/* ---------- GPS 定位入口（FR-12）：只在移动端出现 ----------
+   定位结果**不写入本地存储**（PRD 8.1 工具偏好），只在当前会话中使用，
+   且必须保留精度半径标注。 */
+.gps-entry {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .gps-entry {
+    display: inline-flex;
+  }
+}
+
+/* ---------- C 级工具的窄屏提示（FR-11） ----------
+   T03/T06/T07/T08 在窄屏给一句「建议在电脑上使用」，但功能仍必须可用 */
+.desktop-recommended {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .desktop-recommended {
+    display: block;
+  }
+}

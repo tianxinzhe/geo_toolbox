@@ -1,0 +1,11 @@
+# robots.txt —— 地理工具箱
+# 允许抓取全部页面；sitemap 由 /sitemap.xml 在构建期生成，
+# 只包含 LAUNCHED 语言下真实产出的 HTML（不含死链）。
+
+User-agent: *
+Allow: /
+
+# 屏蔽广告参数页与开发期路径（当前站点为纯静态，无动态查询页）
+Disallow: /*?mode=batch$
+
+Sitemap: https://geo-toolbox.pages.dev/sitemap.xml

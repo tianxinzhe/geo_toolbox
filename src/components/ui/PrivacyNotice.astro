@@ -1,0 +1,33 @@
+---
+/**
+ * 隐私声明 · SR-07 **常驻**
+ *
+ * 「所有计算在你的浏览器本地完成，数据不会上传到任何服务器。」
+ *
+ * 这不是营销文案，而是产品行为的如实描述 —— 纯静态部署、无后台，
+ * 站点在架构上就不具备上传用户数据的能力。因此它必须常驻在输入区附近，
+ * 而不是藏在隐私政策页里。
+ *
+ * 实现说明：技术方案 3 章列的是 `PrivacyNotice.vue`，这里改为 `.astro`。
+ * 该组件是纯静态文本，没有任何交互，用 Vue 岛屿会白白增加 ~34KB 运行时
+ * 与一次 hydration。改为 Astro 组件后客户端 JS 为 0，与 SR-12
+ * 「零装饰、CWV 达标」的目标一致。
+ */
+import type { Lang } from '../../config/i18n'
+import { t } from '../../i18n/ui'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+---
+
+<p class="privacy-notice">
+  {/* 内联 SVG，不引图标库（SR-12 组件规范） */}
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+    <path d="M8 1.5 2.8 3.6v4.1c0 3.1 2.1 5.6 5.2 6.8 3.1-1.2 5.2-3.7 5.2-6.8V3.6Z" stroke-linejoin="round" />
+    <path d="m5.9 8 1.5 1.5 2.8-3" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  <span>{t(lang, 'privacy.notice')}</span>
+</p>

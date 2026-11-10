@@ -1,0 +1,39 @@
+---
+/**
+ * 隐私政策（FR-10）—— **不投放任何广告**（FR-09 投放位置表）
+ *
+ * AdSense 审核必备页。必须明确声明：
+ *   - 本站不提供账号、不收集用户输入的数据
+ *   - 所有计算在浏览器本地完成、不上传文件内容
+ *   - 第三方服务（广告、底图瓦片、访问统计）及其 Cookie 使用
+ *   - Google AdSense 可能使用 Cookie 投放个性化广告，并提供 Google 广告设置入口
+ *   - 浏览器本地存储用于记忆用户偏好（语言、折叠状态、上次选择的格式）
+ *   - 生效日期与更新记录
+ */
+import { LAUNCHED, type Lang } from '../../../config/i18n'
+import { t } from '../../../i18n/ui'
+import { legalPath } from '../../../lib/paths'
+import ContentPage from '../../../layouts/ContentPage.astro'
+
+export function getStaticPaths() {
+  return [...LAUNCHED].map((lang) => ({ params: { lang }, props: { lang } }))
+}
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const slug = 'privacy' as const
+---
+
+<ContentPage
+  lang={lang}
+  path={legalPath(lang, slug)}
+  title={t(lang, 'nav.privacy')}
+  description={t(lang, 'nav.privacy')}
+  h1={t(lang, 'nav.privacy')}
+  doc={{ collection: 'legal', slug }}
+  ads={false}
+  anchor={false}
+/>

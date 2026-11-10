@@ -1,0 +1,84 @@
+---
+/**
+ * 联系方式（FR-10）—— 至少一个可直达的联系渠道，用于用户反馈与政策问询。
+ * 不投放广告。
+ *
+ * 联系渠道由 config/site.ts 的 contactEmail 单点提供，不写进 Markdown 正文：
+ * 邮箱地址一旦变更，改一处配置即可，不需要同时改 6 个语言的文档
+ * （否则必然出现某个语言版本留着旧地址）。
+ */
+import { LAUNCHED, type Lang } from '../../../config/i18n'
+import { site } from '../../../config/site'
+import { t } from '../../../i18n/ui'
+import { legalPath } from '../../../lib/paths'
+import ContentPage from '../../../layouts/ContentPage.astro'
+
+export function getStaticPaths() {
+  return [...LAUNCHED].map((lang) => ({ params: { lang }, props: { lang } }))
+}
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const slug = 'contact' as const
+
+// 未配置邮箱时给出明确提示，而不是渲染一个空的 mailto 链接。
+// 这是构建期可见的：开发时打开联系页就能看到，不会带着空地址上线。
+const MAILTO_LABEL: Record<Lang, string> = {
+  zh: '发送邮件至',
+  en: 'Send an email to',
+  ja: 'メールを送る：'
+}
+const MISSING_LABEL: Record<Lang, string> = {
+  zh: '联系邮箱尚未配置（src/config/site.ts 的 contactEmail）。',
+  en: 'Contact email is not configured yet (contactEmail in src/config/site.ts).',
+  ja: '連絡先メールアドレスが未設定です（src/config/site.ts の contactEmail）。'
+}
+---
+
+<ContentPage
+  lang={lang}
+  path={legalPath(lang, slug)}
+  title={t(lang, 'nav.contact')}
+  description={t(lang, 'nav.contact')}
+  h1={t(lang, 'nav.contact')}
+  doc={{ collection: 'legal', slug }}
+  ads={false}
+  anchor={false}
+>
+  {/* 直达渠道：放在正文之前，让用户不必读完政策说明就能找到入口 */}
+  <div class="panel contact-channel">
+    {
+      site.contactEmail ? (
+        <>
+          <span>{MAILTO_LABEL[lang]}</span>
+          <a class="contact-channel__mail" href={`mailto:${site.contactEmail}`}>
+            {site.contactEmail}
+          </a>
+        </>
+      ) : (
+        <p class="warn-box">{MISSING_LABEL[lang]}</p>
+      )
+    }
+  </div>
+</ContentPage>
+
+<style>
+  .contact-channel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    align-items: flex-start;
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .contact-channel__mail {
+    font-size: var(--fs-body);
+    font-family: var(--mono);
+    /* 长邮箱地址在窄屏不能撑破容器 */
+    overflow-wrap: anywhere;
+  }
+</style>

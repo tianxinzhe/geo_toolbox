@@ -1,0 +1,155 @@
+---
+/**
+ * 科普文章页 `/{lang}/guide/{slug}/`（PRD 3.3 P1）
+ *
+ * 正文来自 content collection `guide`，与工具文档共用 docSchema；
+ * 页面结构复用 ContentPage，只额外渲染更新时间与阅读时长。
+ */
+import { getCollection } from 'astro:content'
+import { LAUNCHED, type Lang } from '../../../../config/i18n'
+import { GUIDE_GROUPS } from '../../../../i18n/guideGroups'
+import { t } from '../../../../i18n/ui'
+import ContentPage from '../../../../layouts/ContentPage.astro'
+import GuideCard from '../../../../components/GuideCard.astro'
+import { getDoc } from '../../../../lib/docs'
+import { guideIndexPath, guidePath, homePath } from '../../../../lib/paths'
+import { articleJsonLd } from '../../../../lib/seo'
+
+const LOCALE: Record<Lang, string> = { zh: 'zh-CN', en: 'en-GB', ja: 'ja-JP' }
+
+export async function getStaticPaths() {
+  const entries = await getCollection('guide')
+  return LAUNCHED.flatMap((lang) => {
+    const slugs = entries
+      .filter((entry) => entry.id.endsWith(`/${lang}`))
+      .map((entry) => entry.id.slice(0, -3))
+    return slugs.map((slug) => ({ params: { lang, slug } }))
+  })
+}
+
+const { lang, slug } = Astro.params as { lang: Lang; slug: string }
+
+const doc = await getDoc('guide', slug, lang)
+if (!doc) {
+  throw new Error(`缺少科普文章：src/i18n/content/guide/${slug}/${lang}.md`)
+}
+
+const { data } = doc
+const heading = data.heading ?? data.title
+const minutes = t(lang, 'guide.minutes', { count: data.readingMinutes ?? 6 })
+const updated = data.updated
+  ? t(lang, 'guide.updated', {
+      date: new Intl.DateTimeFormat(LOCALE[lang], { dateStyle: 'medium' }).format(data.updated)
+    })
+  : ''
+const path = guidePath(lang, slug)
+const group = GUIDE_GROUPS.find((item) => item.id === data.group)
+
+// 同类文章：同分组、排除当前篇，最多 3 篇
+const related = (await getCollection('guide'))
+  .filter(
+    (entry) =>
+      entry.id.endsWith(`/${lang}`) &&
+      entry.data.group === data.group &&
+      entry.id !== `${slug}/${lang}`
+  )
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3)
+---
+
+<ContentPage
+  lang={lang}
+  path={path}
+  title={data.title}
+  description={data.description}
+  h1={heading}
+  headVariant="article"
+  doc={{ collection: 'guide', slug }}
+  crumbs={[
+    { label: t(lang, 'nav.home'), href: homePath(lang) },
+    { label: t(lang, 'guide.h1'), href: guideIndexPath(lang) },
+    ...(group
+      ? [
+          {
+            label: t(lang, group.labelKey),
+            href: `${guideIndexPath(lang)}#guide-group-${group.id}`
+          }
+        ]
+      : []),
+    { label: heading }
+  ]}
+  jsonLd={[
+    articleJsonLd({
+      headline: heading,
+      description: data.description,
+      lang,
+      path,
+      updated: data.updated
+    })
+  ]}
+>
+  <p class="page-meta">
+    {
+      group && (
+        <a
+          class="page-meta__link"
+          href={`${guideIndexPath(lang)}#guide-group-${group.id}`}
+        >
+          {t(lang, group.labelKey)}
+        </a>
+      )
+    }
+    {group && <span class="page-meta__sep" aria-hidden="true">·</span>}
+    <span>{minutes}</span>
+    {updated && <span class="page-meta__sep" aria-hidden="true">·</span>}
+    {updated && <span>{updated}</span>}
+  </p>
+
+  {/* 正文之后的同类文章：放在 doc 之后，保持正文优先 */}
+  {
+    related.length > 0 && (
+      <Fragment slot="after">
+        <section class="guide-related" aria-labelledby="guide-related-title">
+          <div class="section-head">
+            <h2 id="guide-related-title">{t(lang, 'doc.moreInGroup')}</h2>
+            <a class="section-head__link" href={guideIndexPath(lang)}>
+              {t(lang, 'home.guides.all')} →
+            </a>
+          </div>
+          <ul class="guide-grid">
+            {related.map((entry) => (
+              <li>
+                <GuideCard
+                  lang={lang}
+                  slug={entry.id.slice(0, -3)}
+                  heading={entry.data.heading}
+                  description={entry.data.description}
+                  readingMinutes={entry.data.readingMinutes}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </Fragment>
+    )
+  }
+</ContentPage>
+
+<style>
+  .guide-related {
+    padding-block-start: var(--sp-2);
+  }
+
+  .guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var(--sp-3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .guide-grid li {
+    margin: 0;
+  }
+</style>

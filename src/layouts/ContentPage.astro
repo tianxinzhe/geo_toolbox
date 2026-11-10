@@ -1,0 +1,187 @@
+---
+/**
+ * 内容页布局 —— 合规页、分类页、首页（技术方案 3 章）
+ *
+ * 与 ToolPage 的区别：没有工具区，正文占满 720px 阅读宽度。
+ *
+ * **合规页不投放任何广告**（FR-09 投放位置表）—— 隐私政策、关于、联系、
+ * 免责声明页传入 `ads={false}`，AdSlot 与广告脚本都不会出现在 HTML 中。
+ *
+ * 分类页与首页启用广告位 A（索引下方）与 C；首页**不启用**文中插入
+ * 与 Anchor，避免干扰工具查找（FR-09）。
+ */
+import type { Lang } from '../config/i18n'
+import type { DocCollection } from '../content.config'
+import { t } from '../i18n/ui'
+import { renderDoc } from '../lib/docs'
+import { homePath } from '../lib/paths'
+import { breadcrumbJsonLd, type Crumb } from '../lib/seo'
+import AdSlot from '../components/AdSlot.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+import Base from './Base.astro'
+
+interface Props {
+  lang: Lang
+  /** 本页路径 */
+  path: string
+  title: string
+  description: string
+  h1: string
+  /** H1 下方的一句话说明 */
+  lead?: string
+  /** 面包屑；省略则只显示「首页 / 当前页」 */
+  crumbs?: Crumb[]
+  /** 从 content collection 读取正文（合规页用）。省略则只用 <slot /> */
+  doc?: { collection: DocCollection; slug: string }
+  /**
+   * doc 缺失时的行为：
+   *   'throw'（默认）合规页必须有正文，缺失即构建失败
+   *   'skip'  分类页的科普正文是可选的，缺失时只渲染 <slot />
+   */
+  docRequired?: boolean
+  /** 是否投放广告。合规页必须传 false（FR-09） */
+  ads?: boolean
+  /**
+   * 是否启用移动端 Anchor 广告。首页必须传 false（FR-09：
+   * 首页不启用文中插入与 Anchor，避免干扰工具查找）
+   */
+  anchor?: boolean
+  jsonLd?: Array<Record<string, unknown>>
+  noindex?: boolean
+  /** 宽度：doc = 720px 阅读宽度，tool = 1080px（首页索引与分类网格用） */
+  width?: 'doc' | 'tool'
+  /**
+   * 页头形式：default = 常规内容页；display = 首页与列表页的大标题版式；
+   * article = 长文阅读页，字号介于两者之间。
+   */
+  headVariant?: 'default' | 'display' | 'article'
+}
+
+const {
+  lang,
+  path,
+  title,
+  description,
+  h1,
+  lead,
+  doc: docRef,
+  docRequired = true,
+  ads = true,
+  anchor = true,
+  jsonLd = [],
+  noindex = false,
+  width = 'doc',
+  headVariant = 'default'
+} = Astro.props
+
+const crumbs: Crumb[] = Astro.props.crumbs ?? [
+  { label: t(lang, 'nav.home'), href: homePath(lang) },
+  { label: h1 }
+]
+
+const rendered = docRef ? await renderDoc(docRef.collection, docRef.slug, lang) : undefined
+if (docRef && !rendered && docRequired) {
+  // 合规页正文缺失 → 直接构建失败。AdSense 审核要求四个合规页齐备（FR-10），
+  // 少一页就可能整站被拒，这个错误必须在构建期炸出来而不是上线后才发现。
+  throw new Error(`缺少内容文档：src/i18n/content/${docRef.collection}/${docRef.slug}/${lang}.md`)
+}
+
+const allJsonLd = [breadcrumbJsonLd(crumbs), ...jsonLd]
+
+// Astro 的动态组件必须是首字母大写的标识符，先取出来再条件渲染
+const Doc = rendered?.Content
+---
+
+<Base
+  lang={lang}
+  title={rendered?.data.title ?? title}
+  description={rendered?.data.description ?? description}
+  path={path}
+  jsonLd={allJsonLd}
+  noindex={noindex}
+  anchor={anchor}
+>
+  <div class:list={['container', 'shell', 'content-page', width === 'tool' ? 'content-page--wide' : '']}>
+    <Breadcrumb crumbs={crumbs} label={t(lang, 'a11y.breadcrumb')} />
+
+    <article>
+      <header class:list={['content-page__head', `content-page__head--${headVariant}`]}>
+        <h1>{h1}</h1>
+        {lead && <p class="content-page__lead">{lead}</p>}
+      </header>
+
+      {/* 首页索引 / 分类网格等自定义内容 */}
+      <slot />
+
+      {/* 合规页正文来自 Content Collection，必须在初始 HTML 中（SR-12 硬规则 2） */}
+      {Doc && <div class="doc"><Doc /></div>}
+
+      {/* 正文之后的附加区块（如文章页的同类文章），保持正文在前 */}
+      <slot name="after" />
+
+      {/* 广告位 A：索引下方。首页也启用（FR-09 投放位置表） */}
+      {ads && <AdSlot lang={lang} slot="A" />}
+    </article>
+  </div>
+
+  {ads && <AdSlot lang={lang} slot="C" />}
+</Base>
+
+<style>
+  .content-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding-block: var(--sp-6);
+  }
+
+  .content-page--wide {
+    max-inline-size: var(--w-tool);
+  }
+
+  .content-page article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+  }
+
+  .content-page__lead {
+    color: var(--ink-2);
+    margin-block-start: var(--sp-2);
+    margin-block-end: 0;
+  }
+
+  /* 首页与列表页：把页头当作「扉页」处理，靠字号与字距制造层级 */
+  .content-page__head--display h1 {
+    font-size: clamp(30px, 4.4vw, 42px);
+    line-height: 1.16;
+    letter-spacing: -0.025em;
+    max-inline-size: 24ch;
+  }
+
+  .content-page__head--display .content-page__lead {
+    font-size: 16px;
+    line-height: 1.7;
+    max-inline-size: 62ch;
+    margin-block-start: var(--sp-3);
+  }
+
+  /* 长文页：比列表页克制，避免长中文标题占满首屏 */
+  .content-page__head--article h1 {
+    font-size: clamp(28px, 3.4vw, 36px);
+    line-height: 1.24;
+    letter-spacing: -0.02em;
+    max-inline-size: 30ch;
+  }
+
+  @media (min-width: 768px) {
+    .content-page {
+      gap: var(--sp-6);
+      padding-block: var(--sp-8);
+    }
+
+    .content-page article {
+      gap: var(--sp-6);
+    }
+  }
+</style>

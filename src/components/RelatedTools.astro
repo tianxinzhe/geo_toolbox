@@ -1,0 +1,68 @@
+---
+/**
+ * 相关工具（FR-03：导流与内链）
+ *
+ * 规则：
+ *   - 8~12 个卡片，数据来自 ToolMeta.related（单一真值来源）
+ *   - 至少含 2 个跨分类工具
+ *   - 不显示当前工具自身
+ *   - **不用无限滚动** —— 爬虫抓不到，必须是完整 <ul>（SR-12 硬规则 4）
+ *   - 卡片内不投放任何形式的广告（FR-09 禁止项）
+ *
+ * 卡片 hover 只变边框颜色，不加阴影、不位移（位移会导致 CLS）。
+ */
+import type { Lang } from '../config/i18n'
+import { CATEGORY_META, getTool } from '../i18n/tools'
+import { t } from '../i18n/ui'
+import { homePath } from '../lib/paths'
+import ToolCard from './ToolCard.astro'
+
+interface Props {
+  lang: Lang
+  /** 相关工具 slug 列表，来自 ToolMeta.related */
+  slugs: readonly string[]
+  /** 当前工具 slug，用于过滤自身 */
+  current: string
+  heading: string
+  /** 分类名文案，来自 CATEGORY_META */
+  categoryLabel: (cat: keyof typeof CATEGORY_META) => string
+}
+
+const { lang, slugs, current, heading, categoryLabel } = Astro.props
+
+const currentCat = getTool(current)?.category
+
+const tools = slugs
+  .filter((s) => s !== current)
+  .map((s) => getTool(s))
+  .filter((t): t is NonNullable<typeof t> => t !== undefined)
+
+// 「至少含 2 个跨分类工具」：把跨分类项排到前面再截断。
+// 用稳定排序（先分组再拼接）而不是 sort 比较器，避免依赖排序稳定性。
+const cross = tools.filter((t) => t.category !== currentCat)
+const same = tools.filter((t) => t.category === currentCat)
+const ordered = [...cross, ...same].slice(0, 12)
+---
+
+<section id="related" class="related" aria-label={heading}>
+  <div class="section-head">
+    <h2>{heading}</h2>
+    <a class="section-head__link" href={`${homePath(lang)}#tools`}>
+      {t(lang, 'nav.allTools')} →
+    </a>
+  </div>
+  <ul>
+    {
+      ordered.map((tool) => (
+        <li>
+          <ToolCard
+            lang={lang}
+            tool={tool}
+            showCategory
+            categoryName={categoryLabel(tool.category)}
+          />
+        </li>
+      ))
+    }
+  </ul>
+</section>

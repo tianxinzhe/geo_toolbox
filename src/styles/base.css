@@ -1,0 +1,284 @@
+/* ============================================================
+   基础样式 · 移动优先（PRD FR-11 强制架构约束）
+
+   🔴 基础样式 = 移动端，用 min-width 向上增强。禁止反过来写：
+      ✅ .toolbar { flex-direction: column }
+         @media (min-width:768px) { .toolbar { flex-direction: row } }
+      ❌ .toolbar { flex-direction: row }
+         @media (max-width:767px) { .toolbar { flex-direction: column } }
+
+   优先用 CSS 自适应能力而非断点堆砌。真正需要 @media 的只有四处：
+   导航栏 → 汉堡菜单；工具区与地图的并排↔堆叠；侧栏相关工具 → 底部横排；间距压缩。
+   ============================================================ */
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* 锚点跳转时避开 sticky 头部 */
+  scroll-padding-block-start: var(--sp-16);
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--fs-body);
+  /* 移动端 Anchor 广告与安全区留白，默认 0，启用时由 .has-anchor 覆盖 */
+  padding-block-end: env(safe-area-inset-bottom, 0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* `hidden` 属性必须压过组件自身的 display（如 .ad-slot 的 flex、
+   .grid > li 的 grid item）。首页搜索的无结果状态靠它隐藏广告位（FR-01）。 */
+[hidden] {
+  display: none !important;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* ---------- 排版层级：H1 每页唯一，H2/H3 不跳级 ---------- */
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 620;
+  margin-block-start: var(--sp-12);
+  margin-block-end: var(--sp-3);
+  text-wrap: balance;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h2);
+  font-weight: 600;
+  margin-block-start: var(--sp-8);
+  margin-block-end: var(--sp-2);
+}
+
+p {
+  margin-block-end: var(--sp-4);
+}
+
+ul,
+ol {
+  padding-inline-start: var(--sp-6);
+  margin-block-end: var(--sp-4);
+}
+
+li {
+  margin-block-end: var(--sp-2);
+}
+
+li > ul,
+li > ol {
+  margin-block-start: var(--sp-2);
+  margin-block-end: 0;
+}
+
+/* ---------- 链接：全站唯一强调色 ---------- */
+a {
+  color: var(--acc);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- 代码 ---------- */
+code,
+kbd,
+samp {
+  font-size: 0.9em;
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tag);
+  padding: 0.1em 0.35em;
+}
+
+pre {
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-ctl);
+  padding: var(--sp-4);
+  overflow-x: auto;
+  margin-block-end: var(--sp-4);
+  font-size: var(--fs-num);
+  line-height: 1.6;
+}
+
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ---------- 焦点可见性：边框 + 半透明外环，无阴影 ---------- */
+:focus-visible {
+  outline: var(--focus-ring) solid color-mix(in srgb, var(--acc) 40%, transparent);
+  outline-offset: 1px;
+  border-radius: var(--r-tag);
+}
+
+/* ---------- 跳转链接（SR-12 骨架第 1 行） ---------- */
+.skip-link {
+  position: absolute;
+  inset-inline-start: var(--sp-4);
+  inset-block-start: -100px;
+  z-index: 100;
+  background: var(--acc);
+  color: #fff;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-ctl);
+  font-weight: 600;
+  text-decoration: none;
+  transition: inset-block-start 120ms ease-out;
+}
+
+.skip-link:focus-visible {
+  inset-block-start: var(--sp-2);
+  outline-color: #fff;
+}
+
+/* 无障碍：视觉隐藏但读屏可达 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- 布局容器 ---------- */
+/* 内容区：移动端全宽减去边距 */
+.container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--sp-4);
+}
+
+/* 文档区正文宽度 720px（最佳阅读行宽 65~75 字符） */
+.container-doc {
+  max-width: var(--w-doc);
+}
+
+/* 工具区宽度 1080px（地图需要宽度） */
+.container-tool {
+  max-width: var(--w-tool);
+}
+
+/* 页面外壳最大宽度，1536px+ 不再放大内容宽度，仅增加留白 */
+.shell {
+  max-width: var(--w-page);
+  margin-inline: auto;
+}
+
+/* ---------- 自适应布局原语（替代断点堆砌） ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.row > * {
+  flex: 1 1 240px;
+  min-width: 0; /* 防溢出 */
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* 表格窄屏横向滚动而非压缩列宽 */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- 主区块节奏 ---------- */
+main {
+  display: block;
+}
+
+main > * + * {
+  margin-block-start: var(--sp-6);
+}
+
+section,
+article {
+  scroll-margin-block-start: var(--sp-16);
+}
+
+hr {
+  border: 0;
+  border-block-start: 1px solid var(--line);
+  margin-block: var(--sp-8);
+}
+
+/* ---------- 断点增强（移动优先，只有 min-width） ---------- */
+
+/* 768px 主分界：平板竖屏 */
+@media (min-width: 768px) {
+  .container {
+    padding-inline: var(--sp-8);
+  }
+
+  main > * + * {
+    margin-block-start: var(--sp-8);
+  }
+}
+
+/* 1280px 桌面：内容区达到最大宽度，两侧留白 */
+@media (min-width: 1280px) {
+  h1 {
+    font-size: calc(var(--fs-h1) + 2px);
+  }
+}
