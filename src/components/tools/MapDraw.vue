@@ -423,12 +423,21 @@ function renderDraft(): void {
     return
   }
   if (draft.value.length === 0) return
-  if (draft.value.length >= 2) {
+  const latlngs = draft.value.map(([lng, lat]) => [lat, lng] as [number, number])
+
+  // 面模式下用 L.polygon 渲染草稿：最后一段自动连回起点，所见即所得
+  if (draftMode.value === 'polygon' && draft.value.length >= 3) {
     draftLayer.addLayer(
-      L.polyline(
-        draft.value.map(([lng, lat]) => [lat, lng]),
-        { color: '#d97706', weight: 2, dashArray: '6 4' }
-      )
+      L.polygon(latlngs, {
+        color: '#d97706',
+        weight: 2,
+        dashArray: '6 4',
+        fillOpacity: 0.08
+      })
+    )
+  } else if (draft.value.length >= 2) {
+    draftLayer.addLayer(
+      L.polyline(latlngs, { color: '#d97706', weight: 2, dashArray: '6 4' })
     )
   }
   for (const [lng, lat] of draft.value) {
