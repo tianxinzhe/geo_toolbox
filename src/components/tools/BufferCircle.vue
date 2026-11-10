@@ -27,7 +27,8 @@ import {
   type RadiusUnit
 } from '../../lib/geo/circle'
 import { polygonSummary } from '../../lib/geo/polygon'
-import { parseInput, serializeCollection } from '../../lib/convert/format'
+import { parseInput, serializeCollection, FILE_LIMIT_BYTES, FEATURE_LIMIT } from '../../lib/convert/format'
+import { listFileLayers, splitGeoJsonLayers, type GeoLayerGroup } from '../../lib/convert/layers'
 import type {
   SerializeOutcome,
   VectorFeatureCollection,
@@ -60,6 +61,18 @@ const unit = ref<RadiusUnit>('km')
 const segments = ref(128)
 const pickMode = ref(false)
 const bufferText = ref('')
+
+/** 文件来源：读入后与文本二选一，文件优先 */
+const fileInput = ref<HTMLInputElement | null>(null)
+const fileName = ref('')
+const fileBytes = ref<Uint8Array | null>(null)
+const fileSource = ref<VectorFormat | 'auto'>('auto')
+const layerNames = ref<string[]>([])
+const geoGroups = ref<GeoLayerGroup[]>([])
+const layerChoice = ref('all')
+const fileCollection = ref<VectorFeatureCollection | null>(null)
+const fileErrorKey = ref('')
+const fileLoading = ref(false)
 const exportTarget = ref<VectorFormat>('geojson')
 
 const collection = ref<VectorFeatureCollection | null>(null)
@@ -130,6 +143,172 @@ function parsePointLines(text: string): VectorFeatureCollection | null {
     })
   }
   return { type: 'FeatureCollection', features }
+}
+
+/** 流式/容器格式必须按字节解析，不能先解码成文本 */
+const BINARY_EXT = new Set(['kmz', 'xlsx', 'xls', 'zip', 'shp', 'fgb', 'gpkg'])
+
+const ACCEPT =
+  '.geojson,.json,.topojson,.kml,.kmz,.gpx,.csv,.tsv,.txt,.xlsx,.xls,.gml,.dxf,.gmt,.mif,.mid,.wkt,.zip,.shp,.fgb,.gpkg'
+
+const fullFileCollection = ref<VectorFeatureCollection | null>(null)
+
+function extOf(name: string): string {
+  return name.split('.').pop()?.toLowerCase() ?? ''
+}
+
+/** 图层下拉：容器格式用真实图层名，GeoJSON 用按几何类型拆出的逻辑图层 */
+const layerOptions = computed<Array<{ value: string; label: string }>>(() => {
+  if (layerNames.value.length > 1) {
+    return layerNames.value.map((name) => ({ value: name, label: name }))
+  }
+  if (geoGroups.value.length > 1) {
+    return [
+      { value: 'all', label: props.ui['tool.buffer-circle.layerAll'] },
+      ...geoGroups.value.map((group) => ({
+        value: group.key,
+        // GeoJSON 的分组 label 由语言字典提供，key 固定为 point/line/polygon/other
+        label: props.ui[`tool.buffer-circle.layer.${group.key}`] || group.key
+      }))
+    ]
+  }
+  return []
+})
+
+const showLayerPicker = computed(() => layerOptions.value.length > 1)
+
+function openFilePicker(): void {
+  fileInput.value?.click()
+}
+
+async function parseFileCurrent(): Promise<void> {
+  const bytes = fileBytes.value
+  if (!bytes) return
+
+  const mod = await import('../../lib/convert/format')
+  const binary = BINARY_EXT.has(extOf(fileName.value))
+  const text = binary ? '' : mod.decodeBytes(bytes)
+  const outcome = await mod.parseFileInput(text, {
+    fileName: fileName.value,
+    bytes: binary ? bytes : undefined,
+    source: fileSource.value,
+    layer: layerNames.value.length > 0 ? layerChoice.value || undefined : undefined
+  })
+
+  if (outcome.collection.features.length === 0) throw new Error('empty-file')
+  if (outcome.collection.features.length > FEATURE_LIMIT) throw new Error('too-many')
+
+  fullFileCollection.value = outcome.collection
+
+  if (outcome.format === 'geojson') {
+    geoGroups.value = splitGeoJsonLayers(outcome.collection)
+    if (
+      layerChoice.value !== 'all' &&
+      !geoGroups.value.some((group) => group.key === layerChoice.value)
+    ) {
+      layerChoice.value = 'all'
+    }
+  } else {
+    geoGroups.value = []
+  }
+
+  applyFileLayer()
+}
+
+/** 按当前图层选择切换用于缓冲的集合，不重新读文件 */
+function applyFileLayer(): void {
+  const group = geoGroups.value.find((item) => item.key === layerChoice.value)
+  fileCollection.value = group ? group.collection : fullFileCollection.value
+}
+
+async function readFile(file: File): Promise<void> {
+  const mod = await import('../../lib/convert/format')
+
+  if (file.size === 0) throw new Error('empty-file')
+  if (file.size > FILE_LIMIT_BYTES) throw new Error('too-large')
+
+  const bytes = new Uint8Array(await file.arrayBuffer())
+  const binary = BINARY_EXT.has(extOf(file.name))
+  const text = binary ? '' : mod.decodeBytes(bytes)
+
+  if (!binary && text.trim() === '') throw new Error('empty-file')
+  if (!binary && !mod.detectFormat(text, file.name)) throw new Error('unknown-format')
+
+  fileBytes.value = bytes
+  fileName.value = file.name
+  fileSource.value = binary ? mod.detectFormat('', file.name) || 'auto' : 'auto'
+
+  // GeoPackage / Shapefile ZIP 可能包含多个图层；其余格式返回空数组
+  const { layers } = await listFileLayers({
+    fileName: file.name,
+    bytes,
+    source: fileSource.value
+  })
+  layerNames.value = layers
+  geoGroups.value = []
+  layerChoice.value = layers[0] ?? 'all'
+}
+
+function resetFileState(): void {
+  fileName.value = ''
+  fileBytes.value = null
+  fileSource.value = 'auto'
+  layerNames.value = []
+  geoGroups.value = []
+  layerChoice.value = 'all'
+  fileCollection.value = null
+  fullFileCollection.value = null
+}
+
+function clearFile(): void {
+  resetFileState()
+  fileErrorKey.value = ''
+  if (fileInput.value) fileInput.value.value = ''
+  void recompute()
+}
+
+async function onFilePicked(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  fileErrorKey.value = ''
+  resetFileState()
+  fileLoading.value = true
+
+  try {
+    await readFile(file)
+    await parseFileCurrent()
+    await recompute()
+  } catch (error) {
+    const code = error instanceof Error ? error.message : ''
+    if (code === 'too-large') fileErrorKey.value = 'tool.buffer-circle.errFileTooLarge'
+    else if (code === 'too-many') fileErrorKey.value = 'tool.buffer-circle.errFileTooMany'
+    else if (code === 'unknown-format') fileErrorKey.value = 'tool.buffer-circle.errFileParse'
+    else fileErrorKey.value = 'tool.buffer-circle.errFileParse'
+    resetFileState()
+    await recompute()
+  } finally {
+    fileLoading.value = false
+    input.value = ''
+  }
+}
+
+async function onLayerChange(): Promise<void> {
+  fileLoading.value = true
+  fileErrorKey.value = ''
+  try {
+    if (layerNames.value.length > 0) {
+      await parseFileCurrent()
+    } else {
+      applyFileLayer()
+    }
+    await recompute()
+  } catch {
+    fileErrorKey.value = 'tool.buffer-circle.errFileParse'
+  } finally {
+    fileLoading.value = false
+  }
 }
 
 /**
@@ -273,25 +452,27 @@ async function recompute(): Promise<void> {
     return
   }
 
-  // 缓冲区模式
-  if (bufferText.value.trim() === '') {
-    setError('tool.buffer-circle.errBufferEmpty')
-    return
-  }
-  busy.value = true
-  try {
-    let parsedCollection: VectorFeatureCollection
+  // 缓冲区模式：文件优先，其次解析文本
+  let parsedCollection: VectorFeatureCollection | null = fileCollection.value
+  if (!parsedCollection) {
+    if (bufferText.value.trim() === '') {
+      setError('tool.buffer-circle.errBufferEmpty')
+      return
+    }
     try {
       parsedCollection = parseInput(bufferText.value).collection
     } catch {
       // 不是已知矢量格式时，再按「每行一组经纬度」当作点来缓冲
-      const points = parsePointLines(bufferText.value)
-      if (!points) {
-        setError('tool.buffer-circle.errBufferParse')
-        return
-      }
-      parsedCollection = points
+      parsedCollection = parsePointLines(bufferText.value)
     }
+    if (!parsedCollection) {
+      setError('tool.buffer-circle.errBufferParse')
+      return
+    }
+  }
+
+  busy.value = true
+  try {
     if (parsedCollection.features.length === 0) {
       setError('tool.buffer-circle.errBufferEmpty')
       return
@@ -495,6 +676,46 @@ onMounted(async () => {
       <p class="hint">{{ ui['tool.buffer-circle.segmentsHint'] }}</p>
     </details>
 
+    <div v-if="mode === 'buffer'" class="file-source">
+      <div class="btn-row">
+        <button type="button" class="btn btn--ghost" @click="openFilePicker">
+          {{ ui['tool.buffer-circle.chooseFile'] }}
+        </button>
+        <button v-if="fileName" type="button" class="btn btn--ghost" @click="clearFile">
+          {{ ui['tool.buffer-circle.clearFile'] }}
+        </button>
+      </div>
+      <input
+        ref="fileInput"
+        class="visually-hidden"
+        type="file"
+        :accept="ACCEPT"
+        @change="onFilePicked"
+      />
+
+      <p v-if="fileName" class="hint file-source__name mono">{{ fileName }}</p>
+      <p v-if="fileLoading" class="hint">{{ ui['tool.buffer-circle.fileLoading'] }}</p>
+      <p v-if="fileErrorKey" class="note note--warn" role="alert">{{ ui[fileErrorKey] }}</p>
+
+      <div v-if="showLayerPicker" class="field">
+        <label for="t10-layer">{{ ui['tool.buffer-circle.layerLabel'] }}</label>
+        <select
+          id="t10-layer"
+          v-model="layerChoice"
+          :disabled="fileLoading"
+          @change="onLayerChange"
+        >
+          <option v-for="option in layerOptions" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <p v-if="fileName && !fileErrorKey" class="hint">
+        {{ ui['tool.buffer-circle.fileLoaded'] }}
+      </p>
+    </div>
+
     <div v-if="mode === 'buffer'" class="field">
       <label for="t10-buffer">{{ ui['tool.buffer-circle.bufferInput'] }}</label>
       <textarea
@@ -602,6 +823,18 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
+}
+
+/* 文件来源：按钮、文件名、图层下拉纵向排列，与下方文本框区分 */
+.file-source {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.file-source__name {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .mode-row {

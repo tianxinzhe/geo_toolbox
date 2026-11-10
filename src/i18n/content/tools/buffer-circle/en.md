@@ -24,6 +24,8 @@ There are two modes:
 
 In buffer mode a point does not need to be GeoJSON: write one `longitude, latitude` pair per line in the input box and each line is treated as a point, so coordinate lists can be pasted straight in.
 
+You can also upload a file — GeoJSON, KML, GPX, CSV, Shapefile ZIP, GeoPackage and more. When the file has several layers a “Layer” dropdown appears: GeoPackage and Shapefile ZIP use the real layer names inside the file, while GeoJSON is split into points, lines and polygons that you can pick from before buffering.
+
 ## Inputs and outputs
 
 The centre can be typed as longitude and latitude, or picked from the map after enabling “Pick centre from map”. Radii support metres, kilometres, miles and nautical miles; separate multiple values with commas, spaces or semicolons, for example `1, 3, 5`. Advanced options control the number of boundary segments, 128 by default.
