@@ -1,7 +1,7 @@
 ---
-title: 'Vector Format Converter: GeoJSON, KML, GPX, FGB, GPKG | GeoToolbox'
-description: 'Convert vector data between GeoJSON, KML, GPX, CSV, TopoJSON, WKT, FlatGeobuf and GeoPackage. Files stay in your browser; properties preserved, coordinates rounded.'
-updated: 2026-11-09
+title: 'Vector Format Converter: GeoJSON, KML, GPX, Shapefile, GeoPackage | GeoToolbox'
+description: 'Convert between GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV/Excel, WKT, TopoJSON and more in your browser, with properties preserved.'
+updated: 2026-11-10
 faq:
   - q: 'Are my files uploaded to a server?'
     a: 'No. The browser File API reads the file into the current tab, and the conversion runs locally. There is no upload request. Closing or refreshing the page discards the data, and the file is not written to local storage. That is the fundamental difference between this tool and most online converters.'

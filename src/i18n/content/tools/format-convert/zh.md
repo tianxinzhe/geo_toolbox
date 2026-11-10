@@ -1,7 +1,7 @@
 ---
 title: '矢量格式转换 — GeoJSON / KML / GPX / Shapefile / GeoPackage | 地理工具箱'
-description: '在 GeoJSON、KML/KMZ、GPX、CSV/TSV、TopoJSON、WKT、FlatGeobuf 与 GeoPackage 之间互转矢量数据。文件只在浏览器本地读取，不上传；支持属性保留、坐标取整与部分成功导出。'
-updated: 2026-11-09
+description: '在 GeoJSON、KML/KMZ、GPX、Shapefile、GeoPackage、FlatGeobuf、CSV/Excel、WKT、TopoJSON 等十余种矢量格式之间互转，保留属性，文件不上传、全部本地处理。'
+updated: 2026-11-10
 faq:
   - q: '文件会被上传到服务器吗？'
     a: '不会。文件通过浏览器的 File API 读入当前标签页内存，转换也在本地完成，不存在上传请求。关闭页面或刷新后数据即销毁，本站也不会把内容写入浏览器本地存储。这是本工具与多数在线转换器最根本的区别。'

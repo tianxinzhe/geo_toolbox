@@ -192,9 +192,9 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: { zh: '矢量格式转换', en: 'Vector Format Converter', ja: 'ベクター形式変換' },
     desc: {
-      zh: 'GeoJSON / KML / GPX / GeoPackage 互转',
-      en: 'GeoJSON, KML, GPX and GeoPackage',
-      ja: 'GeoJSON / KML / GPX / GeoPackage の変換'
+      zh: 'GeoJSON、KML、GPX、Shapefile、GeoPackage、FlatGeobuf、CSV、Excel、WKT 等十余种格式互转',
+      en: 'Convert GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV, Excel, WKT and more',
+      ja: 'GeoJSON・KML・GPX・Shapefile・GeoPackage・FlatGeobuf・CSV・Excel・WKT など十数形式の相互変換'
     },
     keywords: {
       all: ['geojson', 'kml', 'kmz', 'gpx', 'topojson', 'wkt', 'well-known text', 'shapefile', 'flatgeobuf', 'fgb', 'gpkg', 'geopackage', 'convert', 'vector'],
