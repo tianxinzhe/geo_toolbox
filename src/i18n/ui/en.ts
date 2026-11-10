@@ -509,9 +509,9 @@ const en = {
     '128 segments is a good default. More segments give a smoother circle but more points.',
   'tool.buffer-circle.bufferInput': 'Features to buffer',
   'tool.buffer-circle.bufferPlaceholder':
-    'Paste GeoJSON, KML, GPX, CSV or WKT features…',
+    'Paste GeoJSON, KML, GPX, CSV or WKT features, or one "longitude, latitude" pair per line…',
   'tool.buffer-circle.bufferHint':
-    'Each feature is buffered by every radius. Paste one or more features.',
+    'Points, lines and polygons are all supported; each feature is buffered once per radius. Points can also be pasted as coordinate lines.',
   'tool.buffer-circle.resultTitle': 'Result',
   'tool.buffer-circle.colRadius': 'Radius',
   'tool.buffer-circle.colArea': 'Area',

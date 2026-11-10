@@ -76,9 +76,61 @@ const busy = ref(false)
 
 const mapCenter = computed<[number, number]>(() => {
   const c = parseCenter(coordInput.value)
-  if (!c) return DEFAULT_CENTER[props.lang]
-  return [c.lat, c.lng]
+  if (c) return [c.lat, c.lng]
+  // 缓冲区模式不填中心点时，跟随缓冲结果的范围，避免停在默认城市
+  const fromData = collection.value ? collectionCenter(collection.value) : null
+  return fromData ?? DEFAULT_CENTER[props.lang]
 })
+
+/** 集合包围盒中心（只用于地图视角，不参与计算） */
+function collectionCenter(fc: VectorFeatureCollection): [number, number] | null {
+  let minLng = Infinity
+  let minLat = Infinity
+  let maxLng = -Infinity
+  let maxLat = -Infinity
+
+  const walk = (coords: unknown): void => {
+    if (!Array.isArray(coords)) return
+    if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+      const [lng, lat] = coords as [number, number]
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return
+      minLng = Math.min(minLng, lng)
+      minLat = Math.min(minLat, lat)
+      maxLng = Math.max(maxLng, lng)
+      maxLat = Math.max(maxLat, lat)
+      return
+    }
+    for (const child of coords) walk(child)
+  }
+
+  for (const f of fc.features) if (f.geometry) walk(f.geometry.coordinates)
+  if (!Number.isFinite(minLng)) return null
+  return [(minLat + maxLat) / 2, (minLng + maxLng) / 2]
+}
+
+/**
+ * 点也可以不写 GeoJSON：整段输入全是「经度, 纬度」行时，每行当作一个点。
+ * 与全站一致，经度在前、纬度在后；全角、度分秒交给 lib/coord/parse。
+ */
+function parsePointLines(text: string): VectorFeatureCollection | null {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+  if (lines.length === 0) return null
+
+  const features: VectorFeature[] = []
+  for (const line of lines) {
+    const r = parseCoord(line, DEFAULT_CTX)
+    if (!r.ok) return null
+    features.push({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [r.lng, r.lat] },
+      properties: {}
+    })
+  }
+  return { type: 'FeatureCollection', features }
+}
 
 /**
  * 解析中心点。经度在前、纬度在后（与全站「经度, 纬度」一致），
@@ -157,13 +209,18 @@ async function recompute(): Promise<void> {
   collection.value = null
   exportResult.value = null
 
-  if (coordInput.value.trim() === '') return
-  const center = parseCenter(coordInput.value)
-  if (!center) {
-    setError('tool.buffer-circle.errCenter')
-    return
+  const isCircle = mode.value === 'circle'
+
+  // 等距圈必须有合法圆心；缓冲区模式不看中心点，只把地图视角对准数据
+  let center: { lng: number; lat: number } | null = null
+  if (isCircle) {
+    if (coordInput.value.trim() === '') return
+    center = parseCenter(coordInput.value)
+    if (!center) {
+      setError('tool.buffer-circle.errCenter')
+      return
+    }
   }
-  const { lat, lng } = center
 
   const values = parseRadiusList(radiiInput.value)
   if (values.length === 0) {
@@ -191,6 +248,7 @@ async function recompute(): Promise<void> {
   }
 
   if (mode.value === 'circle') {
+    const { lat, lng } = center!
     const metrics = values.map((v, i) => ({
       value: v,
       unit: unit.value,
@@ -222,19 +280,24 @@ async function recompute(): Promise<void> {
   }
   busy.value = true
   try {
-    let parsed
+    let parsedCollection: VectorFeatureCollection
     try {
-      parsed = parseInput(bufferText.value)
+      parsedCollection = parseInput(bufferText.value).collection
     } catch {
-      setError('tool.buffer-circle.errBufferParse')
-      return
+      // 不是已知矢量格式时，再按「每行一组经纬度」当作点来缓冲
+      const points = parsePointLines(bufferText.value)
+      if (!points) {
+        setError('tool.buffer-circle.errBufferParse')
+        return
+      }
+      parsedCollection = points
     }
-    if (parsed.collection.features.length === 0) {
+    if (parsedCollection.features.length === 0) {
       setError('tool.buffer-circle.errBufferEmpty')
       return
     }
     const { bufferCollection } = await import('../../lib/geo/buffer')
-    const buffered = bufferCollection(parsed.collection, { radiiM, steps: seg })
+    const buffered = bufferCollection(parsedCollection, { radiiM, steps: seg })
     if (buffered.features.length === 0) {
       setError('tool.buffer-circle.errBufferEmpty')
       return
@@ -377,31 +440,34 @@ onMounted(async () => {
       </button>
     </div>
 
-    <div class="row">
-      <div class="field">
-        <label for="t10-coord">{{ ui['coord.lngLat'] }}</label>
-        <input
-          id="t10-coord"
-          v-model="coordInput"
-          type="text"
-          inputmode="decimal"
-          autocomplete="off"
-          spellcheck="false"
-          :placeholder="ui['coord.pairPlaceholder']"
-        />
+    <!-- 圆心与拾取只属于等距圈；缓冲区用地要素自身的范围定位地图 -->
+    <template v-if="mode === 'circle'">
+      <div class="row">
+        <div class="field">
+          <label for="t10-coord">{{ ui['coord.lngLat'] }}</label>
+          <input
+            id="t10-coord"
+            v-model="coordInput"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            spellcheck="false"
+            :placeholder="ui['coord.pairPlaceholder']"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="btn-row">
-      <button
-        type="button"
-        class="btn"
-        :class="pickMode ? 'btn--primary' : 'btn--ghost'"
-        @click="pickMode = !pickMode"
-      >
-        {{ pickMode ? ui['tool.buffer-circle.pickOn'] : ui['tool.buffer-circle.pickOff'] }}
-      </button>
-    </div>
+      <div class="btn-row">
+        <button
+          type="button"
+          class="btn"
+          :class="pickMode ? 'btn--primary' : 'btn--ghost'"
+          @click="pickMode = !pickMode"
+        >
+          {{ pickMode ? ui['tool.buffer-circle.pickOn'] : ui['tool.buffer-circle.pickOff'] }}
+        </button>
+      </div>
+    </template>
 
     <div class="row">
       <div class="field">

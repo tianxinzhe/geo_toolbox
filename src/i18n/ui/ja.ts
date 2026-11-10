@@ -506,8 +506,9 @@ const ja: Record<UiKey, string> = {
   'tool.buffer-circle.segmentsHint': '既定は 128 分割。増やすと滑らかになりますが点数も増えます。',
   'tool.buffer-circle.bufferInput': 'バッファするフィーチャ',
   'tool.buffer-circle.bufferPlaceholder':
-    'GeoJSON、KML、GPX、CSV、WKT のフィーチャを貼り付け…',
-  'tool.buffer-circle.bufferHint': '各フィーチャを各半径で外側にバッファします。',
+    'GeoJSON、KML、GPX、CSV、WKT のフィーチャ、または 1 行に 1 組の「経度, 緯度」を貼り付け…',
+  'tool.buffer-circle.bufferHint':
+    '点・線・面のいずれにも対応し、各フィーチャを半径ごとに外側へバッファリングします。点は経緯度の行をそのまま貼り付けてもかまいません。',
   'tool.buffer-circle.resultTitle': '結果',
   'tool.buffer-circle.colRadius': '半径',
   'tool.buffer-circle.colArea': '面積',

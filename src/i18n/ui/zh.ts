@@ -467,8 +467,9 @@ const zh: Record<UiKey, string> = {
   'tool.buffer-circle.segments': '边界边数',
   'tool.buffer-circle.segmentsHint': '默认 128 段；段数越多圆越平滑，但点数也越多。',
   'tool.buffer-circle.bufferInput': '待缓冲的要素',
-  'tool.buffer-circle.bufferPlaceholder': '粘贴 GeoJSON、KML、GPX、CSV 或 WKT 要素…',
-  'tool.buffer-circle.bufferHint': '每个要素都会按每个半径生成外扩缓冲区。',
+  'tool.buffer-circle.bufferPlaceholder': '粘贴 GeoJSON、KML、GPX、CSV、WKT 要素，或每行一组「经度, 纬度」…',
+  'tool.buffer-circle.bufferHint':
+    '支持点、线、面要素，每个要素都会按每个半径生成外扩缓冲区；点也可以直接按行粘贴经纬度。',
   'tool.buffer-circle.resultTitle': '结果',
   'tool.buffer-circle.colRadius': '半径',
   'tool.buffer-circle.colArea': '面积',
