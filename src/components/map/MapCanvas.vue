@@ -270,8 +270,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="map-shell">
-    <div ref="container" class="map-canvas" :class="{ 'map-canvas--pick': pick }"></div>
+  <div class="map-shell" :class="{ 'map-shell--pick': pick }">
+    <div ref="container" class="map-canvas"></div>
 
     <p v-if="loading" class="map-note">{{ loadingText }}</p>
     <p v-else-if="failed" class="map-note">{{ tileErrorText }}</p>
@@ -319,11 +319,12 @@ onBeforeUnmount(() => {
   block-size: 100%;
 }
 
-.map-canvas--pick {
-  cursor: crosshair;
-}
-
-.map-canvas--pick :deep(.leaflet-container) {
+/* 拾取态样式挂在 shell 上：
+   Leaflet 会给 .map-canvas 动态加 leaflet-container 等类，
+   若把 :class 绑在同一个元素上，Vue 重渲染时会把这些外部类抹掉，地图直接失效 */
+.map-shell--pick,
+.map-shell--pick .map-canvas,
+.map-shell--pick :deep(.leaflet-container) {
   cursor: crosshair;
 }
 

@@ -1024,9 +1024,17 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
+/* 绘制页以地图为主：画布高度固定为视口比例，不再沿用 16:10 的默认比例，
+   否则在 1080px 容器里地图只有 ~400px 高 */
+.map-wrap :deep(.map-shell) {
+  aspect-ratio: auto;
+  block-size: clamp(460px, 64vh, 720px);
+  min-block-size: 0;
+}
+
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 320px);
   gap: var(--sp-4);
   align-items: start;
 }
