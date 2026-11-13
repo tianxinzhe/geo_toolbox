@@ -4,35 +4,36 @@
  *
  * 分层约束：
  *   ① 状态与逻辑层 → src/lib/draw/state.ts（纯函数，可单测）
- *   ② 交互层 → 本组件：把 Leaflet 事件翻译成状态层调用
+ *   ② 交互层 → 本组件：把 Leaflet-Geoman 事件翻译成状态层调用
  *
  * 实现取舍（如实告知，不假装完成）：
- *   - 桌面与移动共用一套事件处理；移动端提供 ≥44px 按钮、顶点数提示、
- *     拖动开关，但未实现「局部放大镜」与独立的顶点拖动模式。
- *   - 顶点编辑支持拖动顶点与点击边中点插入；顶点数 > 50 时隐藏控制点，
- *     避免圆/复杂面生成上百个 DOM 标记。
+ *   - 绘制与顶点编辑交给 Leaflet-Geoman：工具栏只保留绘制与编辑两组按钮，
+ *     不提供拖拽/切割/删除/旋转/文字/圆点标记，删除仍走右侧要素列表。
+ *   - 要素始终以 features / DrawHistory 为唯一数据源；Geoman 图层只作为
+ *     交互载体，创建后立即移除，编辑结果按 __fid 静默回写。
  *   - 删除与清空使用行内二次确认，不弹 window.confirm。
  */
 
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import type { Lang } from '../../config/i18n'
 import type { ToolUi } from '../../i18n/uiKeys'
 import MapCanvas from '../map/MapCanvas.vue'
+// Geoman 是纯客户端插件：JS 动态加载，样式随组件一起打包
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css'
 import CopyButton from '../ui/CopyButton.vue'
 import FeatureList from './FeatureList.vue'
-import { fmtUnit, std } from '../../lib/coord/format'
+import { fmtUnit } from '../../lib/coord/format'
 import { parseFileInput, parseInput } from '../../lib/convert/format'
 import { FORMAT_LABEL, type VectorFormat } from '../../lib/convert/types'
+import { geodesicRing } from '../../lib/geo/circle'
 import {
   DrawHistory,
   adoptFeatures,
-  circlePolygon,
   exportFeatures,
   measureFeature,
   newFeatureId,
   parseStored,
-  rectanglePolygon,
   serializeForStorage,
   statsOf,
   STORAGE_KEY,
@@ -48,7 +49,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-type Mode = 'select' | 'point' | 'line' | 'polygon' | 'rect' | 'circle'
+/** Geoman 会在每个要素图层上写入 __fid，用来把编辑结果映射回 features */
+type PmLayer = import('leaflet').Layer & { __fid?: string }
 
 const DEFAULT_VIEW: Record<Lang, [number, number]> = {
   zh: [39.9088, 116.3974],
@@ -63,32 +65,13 @@ const history = new DrawHistory({ features: [] })
 const version = ref(0)
 const selectedId = ref<string | null>(null)
 
-const mode = ref<Mode>('select')
-const draft = ref<[number, number][]>([])
-const draftMode = ref<Mode | null>(null)
-const previewGeometry = ref<ReturnType<typeof rectanglePolygon> | null>(null)
-const draftInfo = ref('')
-
 /* ------------------------------------------------------------------ *
  * 移动端交互层（PRD 6.3 T09）
- *   - 触屏设备必须显式选择「拖动地图 / 拖动顶点」，不靠手势猜测；
- *   - 拖动顶点时显示局部放大镜，弥补手指遮挡与 5~10 米精度；
- *   - 桌面端隐藏这些控件，保持鼠标直接拖动顶点。
+ *   - 触屏设备从要素列表选中后自动收起底部抽屉；
+ *   - 绘制与顶点编辑由 Geoman 接管，不再自绘控制点或放大镜。
  * ------------------------------------------------------------------ */
 
-const mapWrap = ref<HTMLDivElement | null>(null)
-const magnifierEl = ref<HTMLDivElement | null>(null)
 const isCoarse = ref(false)
-const interactionMode = ref<'map' | 'vertex'>('map')
-const magnifierOn = ref(false)
-const magnifierPoint = ref({ x: 0, y: 0 })
-
-const magnifierStyle = computed(() => ({
-  left: `${magnifierPoint.value.x}px`,
-  top: `${magnifierPoint.value.y}px`
-}))
-
-let miniMap: import('leaflet').Map | null = null
 
 const exportTarget = ref<VectorFormat>('geojson')
 const exportText = ref('')
@@ -120,42 +103,11 @@ const selected = computed(() => features.value.find((f) => f.id === selectedId.v
 
 const stats = computed(() => statsOf(features.value))
 
-const draftMetrics = computed(() => {
-  if (draftMode.value === 'line' && draft.value.length >= 2) {
-    let m = 0
-    for (let i = 1; i < draft.value.length; i++) {
-      const a = draft.value[i - 1]
-      const b = draft.value[i]
-      m += measureFeature({
-        type: 'Feature',
-        properties: {},
-        geometry: { type: 'LineString', coordinates: [a, b] }
-      }).lengthM ?? 0
-    }
-    return fmtUnit(m, props.lang, 'measure', 'm', 1)
-  }
-  if (draftMode.value === 'polygon' && draft.value.length >= 3) {
-    const m = measureFeature({
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[...draft.value, draft.value[0]]]
-      }
-    })
-    return fmtUnit(m.areaM2 ?? 0, props.lang, 'measure', 'm²', 0)
-  }
-  return ''
-})
-
 let map: import('leaflet').Map | null = null
 let L: typeof import('leaflet') | null = null
 let featureLayer: import('leaflet').LayerGroup | null = null
-let draftLayer: import('leaflet').LayerGroup | null = null
-let vertexLayer: import('leaflet').LayerGroup | null = null
-let dragStart: [number, number] | null = null
-let draggingShape = false
-let lastClickAt = 0
+/** 动态 import Geoman 期间组件可能已卸载，避免继续操作已销毁的地图 */
+let disposed = false
 
 /* ------------------------------------------------------------------ *
  * 格式化
@@ -196,86 +148,82 @@ function commit(nextFeatures: DrawFeature[]): void {
   renderAll()
 }
 
+/**
+ * 静默提交：只更新数据与派生 UI，不重建图层。
+ * Geoman 编辑期间若调用 renderAll() 会销毁正在编辑的图层。
+ */
+function commitQuiet(nextFeatures: DrawFeature[]): void {
+  history.commit({ features: nextFeatures })
+  bump()
+  scheduleSave()
+  renderExport()
+}
+
 /* ------------------------------------------------------------------ *
- * 地图渲染
+ * 地图渲染与 Geoman 对接
  * ------------------------------------------------------------------ */
 
-function onMapReady(): void {
+/** 绘制 / 编辑进行中时，把地图点击事件交还给 Geoman，避免抢事件 */
+function geomanBusy(): boolean {
+  if (!map?.pm) return false
+  return map.pm.globalDrawModeEnabled() || map.pm.globalEditModeEnabled()
+}
+
+async function onMapReady(): Promise<void> {
   map = mapCanvas.value?.getMap() ?? null
   L = mapCanvas.value?.getLeaflet() ?? null
   if (!map || !L) return
 
   featureLayer = L.layerGroup().addTo(map)
-  draftLayer = L.layerGroup().addTo(map)
-  vertexLayer = L.layerGroup().addTo(map)
 
-  map.on('click', onMapClick)
-  map.on('dblclick', onDblClick)
-  map.on('mousemove', onMouseMove)
-  map.on('mousedown', onMouseDown)
-  map.on('mouseup', onMouseUp)
+  map.on('click', onMapEmptyClick)
   // 绘制时双击用于结束图形，不能再同时缩放地图
   map.doubleClickZoom.disable()
 
-  renderAll()
-  if (isCoarse.value && interactionMode.value === 'vertex') map.dragging.disable()
   const center = DEFAULT_VIEW[props.lang]
   map.setView(center, 12)
-}
 
-/* ------------------------------------------------------------------ *
- * 移动端拖动模式与局部放大镜
- * ------------------------------------------------------------------ */
-
-function setInteractionMode(next: 'map' | 'vertex'): void {
-  interactionMode.value = next
-  if (!map) return
-  if (isCoarse.value && next === 'vertex') map.dragging.disable()
-  else map.dragging.enable()
-  hideMagnifier()
   renderAll()
+  await initGeoman()
 }
 
-function ensureMiniMap(center: import('leaflet').LatLng, zoom: number): void {
-  if (!L || !magnifierEl.value) return
-  if (!miniMap) {
-    miniMap = L.map(magnifierEl.value, {
-      zoomControl: false,
-      attributionControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      touchZoom: false,
-      keyboard: false,
-      boxZoom: false
-    })
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap)
+/**
+ * Leaflet 本身是懒加载的，插件也必须在客户端动态 import，避免 SSR 执行 DOM 代码。
+ * 地图实例可能早于插件创建，此时 Geoman 的 init hook 不会自动挂载 pm，手动补一次。
+ */
+async function initGeoman(): Promise<void> {
+  if (!map || !L) return
+  await import('@geoman-io/leaflet-geoman-free')
+  if (disposed || !map || !L) return
+
+  // 地图实例早于插件创建，Geoman 的 init hook 不会执行，手动补挂 pm
+  if (!map.pm) {
+    const pmRuntime = L as unknown as { PM: { reInitLayer: (layer: unknown) => void } }
+    pmRuntime.PM.reInitLayer(map)
   }
-  miniMap.setView(center, zoom, { animate: false })
-  requestAnimationFrame(() => miniMap?.invalidateSize())
-}
+  if (!map.pm) return
 
-function showMagnifier(latlng: import('leaflet').LatLng): void {
-  if (!isCoarse.value || interactionMode.value !== 'vertex' || !map) return
-  magnifierOn.value = true
-  updateMagnifier(latlng)
-  void nextTick(() => {
-    if (map) ensureMiniMap(latlng, map.getZoom() + 3)
+  map.pm.setLang(props.lang === 'zh' ? 'zh' : props.lang === 'ja' ? 'ja' : 'en')
+  map.pm.addControls({
+    position: 'topleft',
+    drawMarker: true,
+    drawPolyline: true,
+    drawPolygon: true,
+    drawRectangle: true,
+    drawCircle: true,
+    drawCircleMarker: false,
+    drawText: false,
+    editMode: true,
+    dragMode: false,
+    cutPolygon: false,
+    removalMode: false,
+    rotateMode: false
   })
-}
 
-function updateMagnifier(latlng: import('leaflet').LatLng): void {
-  if (!magnifierOn.value || !map) return
-  const p = map.latLngToContainerPoint(latlng)
-  const size = map.getSize()
-  const x = Math.min(Math.max(80, p.x), Math.max(80, size.x - 80))
-  // 放大镜放在手指上方，并留出至少 170px，避免贴边被裁掉
-  magnifierPoint.value = { x, y: Math.max(170, p.y - 10) }
-  miniMap?.setView(latlng, map.getZoom() + 3, { animate: false })
-}
+  map.on('pm:create', onPmCreate)
 
-function hideMagnifier(): void {
-  magnifierOn.value = false
+  // 插件加载后重建要素图层，Geoman 的 init hook 才会挂到每个子图层
+  renderAll()
 }
 
 function featureStyle(selectedNow: boolean): import('leaflet').PathOptions {
@@ -287,8 +235,6 @@ function featureStyle(selectedNow: boolean): import('leaflet').PathOptions {
 function renderAll(): void {
   if (!map || !L || !featureLayer) return
   featureLayer.clearLayers()
-  if (!vertexLayer) vertexLayer = L.layerGroup().addTo(map)
-  vertexLayer.clearLayers()
 
   for (const f of features.value) {
     if (!f.geometry) continue
@@ -309,7 +255,13 @@ function renderAll(): void {
             fillOpacity: 0.65
           }),
         onEachFeature: (_feature, layer) => {
+          ;(layer as PmLayer).__fid = f.id
+          // Geoman 的编辑事件发在图层自身与父分组上，直接挂在图层上最可靠
+          layer.on('pm:update', () => syncFromLayer(layer))
+          layer.on('pm:markerdragend', () => syncFromLayer(layer))
           layer.on('click', (e) => {
+            // 绘制 / 编辑期间不抢点击，也不重建图层
+            if (geomanBusy()) return
             L!.DomEvent.stopPropagation(e)
             selectFeature(f.id)
           })
@@ -319,8 +271,6 @@ function renderAll(): void {
     featureLayer.addLayer(geo)
   }
 
-  renderVertices()
-  renderDraft()
   renderExport()
 }
 
@@ -332,119 +282,61 @@ function selectFeature(id: string): void {
   renderAll()
 }
 
-function renderVertices(): void {
-  if (!L || !vertexLayer || !selected.value?.geometry) return
-  const g = selected.value.geometry
-  const isLine = g.type === 'LineString'
-  const isPolygon = g.type === 'Polygon'
-  if (!isLine && !isPolygon) return
+/* ------------------------------------------------------------------ *
+ * Geoman → features 同步
+ * ------------------------------------------------------------------ */
 
-  const ring = isLine ? g.coordinates : g.coordinates[0]
-  if (ring.length > 50) return // 复杂圆/面不生成控制点，避免 DOM 爆炸
-
-  const commitRing = (next: number[][]): void => {
-    const geometry =
-      isLine
-        ? { type: 'LineString' as const, coordinates: next }
-        : { type: 'Polygon' as const, coordinates: [next] }
-    const updated = features.value.map((f) =>
-      f.id === selected.value!.id ? { ...f, geometry } : f
-    )
-    commit(updated)
-  }
-
-  const lastIndex = isPolygon ? ring.length - 2 : ring.length - 1
-  for (let i = 0; i <= lastIndex; i++) {
-    const [lng, lat] = ring[i]
-    // CircleMarker 不支持 draggable；用 divIcon Marker 承载拖动
-    const canDragVertex = !isCoarse.value || interactionMode.value === 'vertex'
-    const marker = L.marker([lat, lng], {
-      draggable: canDragVertex,
-      icon: L.divIcon({
-        className: '',
-        html: '<span style="display:block;width:10px;height:10px;border:2px solid #111827;border-radius:50%;background:#fff;box-sizing:border-box"></span>',
-        iconSize: [10, 10],
-        iconAnchor: [5, 5]
-      })
-    })
-    if (canDragVertex) {
-      marker.on('mousedown', () => {
-        map?.dragging.disable()
-      })
-      marker.on('dragstart', () => {
-        showMagnifier(marker.getLatLng())
-      })
-      marker.on('drag', () => {
-        updateMagnifier(marker.getLatLng())
-      })
-    }
-    marker.on('dragend', () => {
-      hideMagnifier()
-      // 触屏「拖动顶点」模式下地图拖动应保持关闭，只恢复桌面端的拖动
-      if (!isCoarse.value || interactionMode.value === 'map') map?.dragging.enable()
-      const p = marker.getLatLng()
-      const next = ring.map((c, idx) => (idx === i ? [p.lng, p.lat] : c))
-      if (isPolygon) next[next.length - 1] = [...next[0]]
-      commitRing(next)
-    })
-    marker.on('click', (e) => {
-      L!.DomEvent.stopPropagation(e)
-    })
-    vertexLayer.addLayer(marker)
-
-    // 边中点：点击插入顶点。多边形还要补上「末点 → 首点」这一条边
-    if (isPolygon || i < lastIndex) {
-      const nextPoint = ring[i + 1] ?? ring[0]
-      const mid = L.circleMarker(
-        [(lat + nextPoint[1]) / 2, (lng + nextPoint[0]) / 2],
-        { radius: 3, color: '#6b7280', weight: 1, fillOpacity: 0.8 }
-      )
-      mid.on('click', (e) => {
-        L!.DomEvent.stopPropagation(e)
-        const insert = [(lng + nextPoint[0]) / 2, (lat + nextPoint[1]) / 2]
-        const next = [...ring.slice(0, i + 1), insert, ...ring.slice(i + 1)]
-        commitRing(next)
-      })
-      vertexLayer.addLayer(mid)
+/** 读取图层几何；圆按 64 边形近似，保持数据模型里只有标准 GeoJSON 几何 */
+function geometryOfLayer(layer: import('leaflet').Layer): DrawFeature['geometry'] | null {
+  if (!L) return null
+  if (layer instanceof L.Circle) {
+    const center = layer.getLatLng()
+    const radius = layer.getRadius()
+    if (!(radius > 0)) return null
+    try {
+      return {
+        type: 'Polygon',
+        coordinates: [geodesicRing(center.lat, center.lng, radius, 64).ring]
+      }
+    } catch {
+      return null
     }
   }
+  const toGeoJSON = (
+    layer as unknown as { toGeoJSON?: () => { geometry?: DrawFeature['geometry'] } }
+  ).toGeoJSON
+  if (typeof toGeoJSON !== 'function') return null
+  return toGeoJSON.call(layer)?.geometry ?? null
 }
 
-function renderDraft(): void {
-  if (!L || !draftLayer) return
-  draftLayer.clearLayers()
-  if (previewGeometry.value) {
-    draftLayer.addLayer(
-      L.geoJSON(
-        { type: 'Feature', properties: {}, geometry: previewGeometry.value } as never,
-        { style: { color: '#d97706', weight: 2, dashArray: '6 4', fillOpacity: 0.08 } }
-      )
-    )
-    return
-  }
-  if (draft.value.length === 0) return
-  const latlngs = draft.value.map(([lng, lat]) => [lat, lng] as [number, number])
+function onPmCreate(e: { layer: import('leaflet').Layer }): void {
+  const geometry = geometryOfLayer(e.layer)
+  // 先移除 Geoman 图层，避免和自绘图层重复
+  map?.removeLayer(e.layer)
+  if (geometry) addFeature(geometry)
+}
 
-  // 面模式下用 L.polygon 渲染草稿：最后一段自动连回起点，所见即所得
-  if (draftMode.value === 'polygon' && draft.value.length >= 3) {
-    draftLayer.addLayer(
-      L.polygon(latlngs, {
-        color: '#d97706',
-        weight: 2,
-        dashArray: '6 4',
-        fillOpacity: 0.08
-      })
-    )
-  } else if (draft.value.length >= 2) {
-    draftLayer.addLayer(
-      L.polyline(latlngs, { color: '#d97706', weight: 2, dashArray: '6 4' })
-    )
-  }
-  for (const [lng, lat] of draft.value) {
-    draftLayer.addLayer(
-      L.circleMarker([lat, lng], { radius: 4, color: '#d97706', fillOpacity: 1 })
-    )
-  }
+function syncFromLayer(layer: import('leaflet').Layer): void {
+  const fid = (layer as PmLayer).__fid
+  if (typeof fid !== 'string') return
+  const feature = features.value.find((f) => f.id === fid)
+  if (!feature) return
+
+  const geometry = geometryOfLayer(layer)
+  if (!geometry) return
+  // 关闭编辑模式时 Geoman 会对每个图层触发一次 pm:update，未变化的不入历史
+  if (JSON.stringify(geometry) === JSON.stringify(feature.geometry)) return
+
+  commitQuiet(features.value.map((f) => (f.id === fid ? { ...f, geometry } : f)))
+}
+
+/** 点击空白地图取消选中；绘制 / 编辑期间不处理 */
+function onMapEmptyClick(): void {
+  if (geomanBusy()) return
+  if (selectedId.value === null) return
+  selectedId.value = null
+  confirmDeleteId.value = null
+  renderAll()
 }
 
 /* ------------------------------------------------------------------ *
@@ -543,7 +435,7 @@ const exportPreview = computed(() => exportText.value.split('\n').slice(0, 30).j
 const tooManyFeatures = computed(() => features.value.length > 2000)
 
 /* ------------------------------------------------------------------ *
- * 绘制交互
+ * 新增要素（Geoman 绘制完成后调用）
  * ------------------------------------------------------------------ */
 
 function addFeature(geometry: DrawFeature['geometry']): void {
@@ -557,138 +449,6 @@ function addFeature(geometry: DrawFeature['geometry']): void {
   selectedId.value = feature.id
   syncProps()
   renderAll()
-}
-
-function setMode(next: Mode): void {
-  if (draftMode.value && draft.value.length > 0 && next !== draftMode.value) {
-    transientNotice.value = props.ui['tool.map-draw.finishDraftFirst']
-    return
-  }
-  if (next !== 'select') cancelDraft()
-  mode.value = next
-  if (next === 'select') {
-    confirmDeleteId.value = null
-  }
-}
-
-function cancelDraft(): void {
-  draft.value = []
-  draftMode.value = null
-  previewGeometry.value = null
-  draftInfo.value = ''
-  renderDraft()
-}
-
-function finishDraft(): void {
-  if (!draftMode.value || draftMode.value === 'rect' || draftMode.value === 'circle') return
-  const points = draft.value.filter((p, i, arr) => {
-    if (i === 0) return true
-    const prev = arr[i - 1]
-    return distanceAndBearing(prev[1], prev[0], p[1], p[0]).distance > 0.5
-  })
-
-  if (draftMode.value === 'line') {
-    if (points.length < 2) {
-      transientNotice.value = props.ui['tool.map-draw.needTwoPoints']
-      return
-    }
-    addFeature({ type: 'LineString', coordinates: points })
-  } else {
-    if (points.length < 3) {
-      transientNotice.value = props.ui['tool.map-draw.needThreePoints']
-      return
-    }
-    const ring = [...points, points[0]]
-    addFeature({ type: 'Polygon', coordinates: [ring] })
-  }
-  cancelDraft()
-  mode.value = 'select'
-}
-
-function onMapClick(e: import('leaflet').LeafletMouseEvent): void {
-  if (draggingShape) return
-  const point: [number, number] = [e.latlng.lng, e.latlng.lat]
-
-  if (mode.value === 'select') {
-    selectedId.value = null
-    confirmDeleteId.value = null
-    renderAll()
-    return
-  }
-
-  const now = Date.now()
-  const isDouble = now - lastClickAt < 280
-  lastClickAt = now
-
-  if (mode.value === 'point') {
-    addFeature({ type: 'Point', coordinates: point })
-    return
-  }
-
-  if (mode.value === 'line' || mode.value === 'polygon') {
-    draftMode.value = mode.value
-    draft.value = [...draft.value, point]
-    draftInfo.value = draftMetrics.value
-    renderDraft()
-    if (isDouble) {
-      // 双击的第二下会先被 click 捕获，先移除重复点再结束
-      if (draft.value.length > 2) draft.value = draft.value.slice(0, -1)
-      finishDraft()
-    }
-  }
-}
-
-function onDblClick(e: import('leaflet').LeafletMouseEvent): void {
-  if (mode.value !== 'line' && mode.value !== 'polygon') return
-  L?.DomEvent.stop(e)
-  if (draft.value.length > 0) finishDraft()
-}
-
-function onMouseDown(e: import('leaflet').LeafletMouseEvent): void {
-  if (mode.value !== 'rect' && mode.value !== 'circle') return
-  dragStart = [e.latlng.lng, e.latlng.lat]
-  draggingShape = true
-  map?.dragging.disable()
-}
-
-function onMouseMove(e: import('leaflet').LeafletMouseEvent): void {
-  if (!draggingShape || !dragStart) return
-  const p: [number, number] = [e.latlng.lng, e.latlng.lat]
-  if (mode.value === 'rect') {
-    previewGeometry.value = rectanglePolygon(dragStart, p)
-  } else {
-    previewGeometry.value = circlePolygon(dragStart, p, 64).geometry
-  }
-  renderDraft()
-}
-
-function onMouseUp(e: import('leaflet').LeafletMouseEvent): void {
-  if (!draggingShape || !dragStart) return
-  const start = dragStart
-  const end: [number, number] = [e.latlng.lng, e.latlng.lat]
-  draggingShape = false
-  dragStart = null
-  map?.dragging.enable()
-
-  if (mode.value === 'rect') {
-    if (Math.abs(start[0] - end[0]) < 1e-9 || Math.abs(start[1] - end[1]) < 1e-9) {
-      previewGeometry.value = null
-      renderDraft()
-      return
-    }
-    addFeature(rectanglePolygon(start, end))
-  } else if (mode.value === 'circle') {
-    const built = circlePolygon(start, end, 64)
-    if (built.radiusM < 1) {
-      previewGeometry.value = null
-      renderDraft()
-      return
-    }
-    addFeature(built.geometry)
-  }
-  previewGeometry.value = null
-  renderDraft()
-  mode.value = 'select'
 }
 
 /* ------------------------------------------------------------------ *
@@ -731,14 +491,9 @@ function onKeydown(e: KeyboardEvent): void {
     return
   }
   if (e.key === 'Escape') {
-    cancelDraft()
+    // 绘制中的 Esc 由 Geoman 自己处理，这里只关闭行内确认
     confirmClear.value = false
     confirmDeleteId.value = null
-    return
-  }
-  if (e.key === 'Enter' && (draftMode.value === 'line' || draftMode.value === 'polygon')) {
-    e.preventDefault()
-    finishDraft()
     return
   }
   if (e.key === 'Delete' && selectedId.value) {
@@ -993,67 +748,17 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  disposed = true
   window.removeEventListener('keydown', onKeydown)
   clearTimeout(saveTimer)
   clearTimeout(noticeTimer)
-  miniMap?.remove()
-  miniMap = null
 })
 </script>
 
 <template>
   <form class="t09" @submit.prevent>
     <p class="hint">{{ ui['tool.map-draw.lead'] }}</p>
-
-    <div class="toolbar" role="toolbar">
-      <button
-        v-for="item in [
-          ['select', 'modeSelect'],
-          ['point', 'modePoint'],
-          ['line', 'modeLine'],
-          ['polygon', 'modePolygon'],
-          ['rect', 'modeRect'],
-          ['circle', 'modeCircle']
-        ]"
-        :key="item[0]"
-        type="button"
-        class="btn"
-        :class="mode === item[0] ? 'btn--primary' : 'btn--ghost'"
-        @click="setMode(item[0] as Mode)"
-      >
-        {{ ui[`tool.map-draw.${item[1]}`] }}
-      </button>
-    </div>
-
-    <p class="hint">{{ ui[`tool.map-draw.hint.${mode}`] }}</p>
-
-    <!-- 触屏专属：显式切换「拖动地图 / 拖动顶点」，不靠手势猜测 -->
-    <div
-      class="drag-mode"
-      role="group"
-      :aria-label="ui['tool.map-draw.dragModeTitle']"
-    >
-      <span class="drag-mode__label">{{ ui['tool.map-draw.dragModeTitle'] }}</span>
-      <button
-        type="button"
-        class="btn btn--small"
-        :class="interactionMode === 'map' ? 'btn--primary' : 'btn--ghost'"
-        @click="setInteractionMode('map')"
-      >
-        {{ ui['tool.map-draw.dragModeMap'] }}
-      </button>
-      <button
-        type="button"
-        class="btn btn--small"
-        :class="interactionMode === 'vertex' ? 'btn--primary' : 'btn--ghost'"
-        @click="setInteractionMode('vertex')"
-      >
-        {{ ui['tool.map-draw.dragModeVertex'] }}
-      </button>
-    </div>
-    <p v-if="selected && interactionMode === 'map'" class="hint vertex-hint">
-      {{ ui['tool.map-draw.vertexModeHint'] }}
-    </p>
+    <p class="hint">{{ ui['tool.map-draw.hint.select'] }}</p>
 
     <div class="toolbar toolbar--actions">
       <button type="button" class="btn btn--ghost" :disabled="!canUndo" @click="undo">
@@ -1086,7 +791,7 @@ onBeforeUnmount(() => {
 
     <div class="layout">
       <div class="map-col">
-        <div ref="mapWrap" class="map-wrap">
+        <div class="map-wrap">
           <MapCanvas
             ref="mapCanvas"
             :center="defaultView"
@@ -1102,17 +807,6 @@ onBeforeUnmount(() => {
             :basemap-terrain="ui['common.basemapTerrain']"
             @ready="onMapReady"
           />
-
-          <!-- 移动端拖动顶点时的局部放大镜；桌面端永远不显示 -->
-          <div
-            ref="magnifierEl"
-            class="magnifier"
-            :class="{ 'magnifier--on': magnifierOn }"
-            :style="magnifierStyle"
-            aria-hidden="true"
-          >
-            <span class="magnifier__cross"></span>
-          </div>
         </div>
 
         <div class="stats">
@@ -1126,10 +820,6 @@ onBeforeUnmount(() => {
             </span>
           </span>
         </div>
-
-        <p v-if="draftInfo" class="hint draft-info">
-          {{ ui['tool.map-draw.draftPrefix'] }} {{ draftInfo }}
-        </p>
       </div>
 
       <aside class="side">
@@ -1330,73 +1020,8 @@ onBeforeUnmount(() => {
   border-block-start: 1px solid var(--line);
 }
 
-.drag-mode {
-  display: none;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.vertex-hint {
-  display: none;
-}
-
-/* 只在触屏显示；用 CSS 而不是 v-if，避免水合后突然插入导致布局跳动 */
-@media (pointer: coarse) {
-  .drag-mode {
-    display: flex;
-  }
-
-  .vertex-hint {
-    display: block;
-  }
-}
-
-.drag-mode__label {
-  font-size: var(--fs-label);
-  line-height: var(--lh-label);
-  color: var(--ink-2);
-}
-
 .map-wrap {
   position: relative;
-}
-
-/* 移动端拖动顶点时的局部放大镜：圆形镜头 + 中心十字 */
-.magnifier {
-  position: absolute;
-  inline-size: 140px;
-  block-size: 140px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid #fff;
-  box-shadow: 0 6px 20px rgb(0 0 0 / 28%);
-  background: var(--bg-sub);
-  transform: translate(-50%, -100%) translateY(-20px);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  z-index: 700;
-  transition: opacity 120ms ease;
-}
-
-.magnifier--on {
-  opacity: 1;
-  visibility: visible;
-}
-
-.magnifier__cross {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 50%;
-  inline-size: 18px;
-  block-size: 18px;
-  transform: translate(-50%, -50%);
-  border: 1px solid #dc2626;
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px #fff;
-  pointer-events: none;
-  z-index: 800;
 }
 
 .layout {
@@ -1443,10 +1068,6 @@ onBeforeUnmount(() => {
   font-size: var(--fs-label);
   line-height: var(--lh-label);
   color: var(--ink-2);
-}
-
-.draft-info {
-  color: var(--warn);
 }
 
 .kv-row {

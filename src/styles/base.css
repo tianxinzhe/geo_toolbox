@@ -207,9 +207,10 @@ pre code {
   max-width: var(--w-tool);
 }
 
-/* 页面外壳最大宽度，1536px+ 不再放大内容宽度，仅增加留白 */
+/* 页面外壳最大宽度：页头、页脚、正文共用同一容器宽度，
+   避免窄内容页（首页 1080）与外层 1280 的页脚左右不对齐 */
 .shell {
-  max-width: var(--w-page);
+  max-width: var(--w-tool);
   margin-inline: auto;
 }
 
