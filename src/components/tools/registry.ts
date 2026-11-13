@@ -22,7 +22,10 @@
  */
 import type { Key } from '../../i18n/ui'
 import AttributeExtract from './AttributeExtract.vue'
+import AttributeJoin from './AttributeJoin.vue'
 import BufferCircle from './BufferCircle.vue'
+import Dissolve from './Dissolve.vue'
+import MergeLayers from './MergeLayers.vue'
 import ClipOverlay from './ClipOverlay.vue'
 import CoordConvert from './CoordConvert.vue'
 import MapPreview from './MapPreview.vue'
@@ -607,6 +610,133 @@ export const TOOL_KEYS = {
     'tool.attribute-extract.errParse',
     'tool.attribute-extract.errNoMatch',
     'tool.attribute-extract.errGeneric'
+  ],
+  'attribute-join': [
+    'tool.attribute-join.vectorTitle',
+    'tool.attribute-join.chooseVector',
+    'tool.attribute-join.changeVector',
+    'tool.attribute-join.parsing',
+    'tool.attribute-join.featuresCount',
+    'tool.attribute-join.noFile',
+    'tool.attribute-join.layerLabel',
+    'tool.attribute-join.layerAll',
+    // GeoJSON 逻辑图层名由组件按 group.key 动态查，四个键必须齐全
+    'tool.attribute-join.layer.point',
+    'tool.attribute-join.layer.line',
+    'tool.attribute-join.layer.polygon',
+    'tool.attribute-join.layer.other',
+    'tool.attribute-join.tableTitle',
+    'tool.attribute-join.chooseTable',
+    'tool.attribute-join.changeTable',
+    'tool.attribute-join.tableSummary',
+    'tool.attribute-join.matchTitle',
+    'tool.attribute-join.vectorFieldLabel',
+    'tool.attribute-join.tableFieldLabel',
+    'tool.attribute-join.fieldPlaceholder',
+    'tool.attribute-join.keepUnmatched',
+    'tool.attribute-join.keepUnmatchedHint',
+    'tool.attribute-join.run',
+    'tool.attribute-join.running',
+    'tool.attribute-join.resultTitle',
+    'tool.attribute-join.matchedLabel',
+    'tool.attribute-join.unmatchedLabel',
+    'tool.attribute-join.conflictsLabel',
+    'tool.attribute-join.conflictHint',
+    'tool.attribute-join.duplicateHint',
+    'tool.attribute-join.download',
+    'tool.attribute-join.clear',
+    'tool.attribute-join.privacy',
+    'tool.attribute-join.popupTitle',
+    'tool.attribute-join.errNeedVector',
+    'tool.attribute-join.errNeedTable',
+    'tool.attribute-join.errNeedVectorField',
+    'tool.attribute-join.errNeedTableField',
+    'tool.attribute-join.errTooLarge',
+    'tool.attribute-join.errUnknownFormat',
+    'tool.attribute-join.errTooMany',
+    'tool.attribute-join.errEmpty',
+    'tool.attribute-join.errTableEmpty',
+    'tool.attribute-join.errTableParse',
+    'tool.attribute-join.errParse',
+    'tool.attribute-join.errNoMatch',
+    'tool.attribute-join.errGeneric'
+  ],
+  'merge-layers': [
+    'tool.merge-layers.filesTitle',
+    'tool.merge-layers.addFiles',
+    'tool.merge-layers.addMoreFiles',
+    'tool.merge-layers.clear',
+    'tool.merge-layers.emptyHint',
+    'tool.merge-layers.parsing',
+    'tool.merge-layers.featuresCount',
+    'tool.merge-layers.layerLabel',
+    'tool.merge-layers.layerAll',
+    // 同上：四个逻辑图层名由 group.key 动态查
+    'tool.merge-layers.layer.point',
+    'tool.merge-layers.layer.line',
+    'tool.merge-layers.layer.polygon',
+    'tool.merge-layers.layer.other',
+    'tool.merge-layers.remove',
+    'tool.merge-layers.merge',
+    'tool.merge-layers.merging',
+    'tool.merge-layers.resultTitle',
+    'tool.merge-layers.statFiles',
+    'tool.merge-layers.statFeatures',
+    'tool.merge-layers.statTypes',
+    // 几何类型分布由 typeKey() 动态查，五个键必须齐全
+    'tool.merge-layers.geom.point',
+    'tool.merge-layers.geom.line',
+    'tool.merge-layers.geom.polygon',
+    'tool.merge-layers.geom.other',
+    'tool.merge-layers.geom.none',
+    'tool.merge-layers.download',
+    'tool.merge-layers.privacy',
+    'tool.merge-layers.errNeedFiles',
+    'tool.merge-layers.errTooLarge',
+    'tool.merge-layers.errUnknownFormat',
+    'tool.merge-layers.errTooMany',
+    'tool.merge-layers.errEmpty',
+    'tool.merge-layers.errParse'
+  ],
+  'dissolve': [
+    'tool.dissolve.fileTitle',
+    'tool.dissolve.chooseFile',
+    'tool.dissolve.changeFile',
+    'tool.dissolve.parsing',
+    'tool.dissolve.featuresCount',
+    'tool.dissolve.noFile',
+    'tool.dissolve.layerLabel',
+    'tool.dissolve.layerAll',
+    // 同上：四个逻辑图层名由 group.key 动态查
+    'tool.dissolve.layer.point',
+    'tool.dissolve.layer.line',
+    'tool.dissolve.layer.polygon',
+    'tool.dissolve.layer.other',
+    'tool.dissolve.fieldTitle',
+    'tool.dissolve.fieldLabel',
+    'tool.dissolve.fieldPlaceholder',
+    'tool.dissolve.sampleHint',
+    'tool.dissolve.run',
+    'tool.dissolve.running',
+    'tool.dissolve.resultTitle',
+    'tool.dissolve.resultGroups',
+    'tool.dissolve.groupWarn',
+    'tool.dissolve.tableValue',
+    'tool.dissolve.tableCount',
+    'tool.dissolve.tableType',
+    'tool.dissolve.emptyValue',
+    'tool.dissolve.download',
+    'tool.dissolve.clear',
+    'tool.dissolve.privacy',
+    'tool.dissolve.errNeedFile',
+    'tool.dissolve.errNeedField',
+    'tool.dissolve.errTooLarge',
+    'tool.dissolve.errUnknownFormat',
+    'tool.dissolve.errTooMany',
+    'tool.dissolve.errEmpty',
+    'tool.dissolve.errParse',
+    'tool.dissolve.errNoGroups',
+    'tool.dissolve.errGeneric'
   ]
 } as const satisfies Record<string, readonly Key[]>
 
@@ -622,7 +752,10 @@ export const TOOL_COMPONENTS = {
   'tile-coords': TileCoords,
   'map-preview': MapPreview,
   'clip-overlay': ClipOverlay,
-  'attribute-extract': AttributeExtract
+  'attribute-extract': AttributeExtract,
+  'attribute-join': AttributeJoin,
+  'merge-layers': MergeLayers,
+  dissolve: Dissolve
 } as const
 
 /** 已注册（即已实现）的工具 slug */

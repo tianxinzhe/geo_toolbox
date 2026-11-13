@@ -464,6 +464,99 @@ export const TOOLS: ToolMeta[] = [
       'buffer-circle',
       'tile-coords'
     ]
+  },
+  {
+    id: 'T18',
+    slug: 'attribute-join',
+    category: 'map',
+    map: 'primary',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: { zh: '属性连接', en: 'Attribute Join', ja: '属性結合' },
+    desc: {
+      zh: '按字段把属性表连接到矢量要素',
+      en: 'Join a table to features by a shared field',
+      ja: '属性表をキーでベクターに結合'
+    },
+    keywords: {
+      all: ['join', 'attribute', 'table', 'csv', 'excel', 'vlookup', 'property'],
+      zh: ['属性连接', '连接', '属性表', '字段匹配', '表格', 'Excel'],
+      ja: ['属性結合', '結合', '属性テーブル', 'キー結合', 'CSV']
+    },
+    related: [
+      'attribute-extract',
+      'merge-layers',
+      'dissolve',
+      'map-preview',
+      'format-convert',
+      'clip-overlay',
+      'buffer-circle',
+      'coord-convert'
+    ]
+  },
+  {
+    id: 'T19',
+    slug: 'merge-layers',
+    category: 'map',
+    map: 'primary',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: { zh: '合并图层', en: 'Merge Layers', ja: 'レイヤー統合' },
+    desc: {
+      zh: '把多个矢量文件合并为一个图层',
+      en: 'Merge several vector files into one layer',
+      ja: '複数のベクターファイルを1つに統合'
+    },
+    keywords: {
+      all: ['merge', 'append', 'combine', 'concat', 'layer', 'vector'],
+      zh: ['合并图层', '合并', '追加', '拼接', '多文件', '图层'],
+      ja: ['レイヤー統合', '結合', 'マージ', '追記', '複数ファイル']
+    },
+    related: [
+      'format-convert',
+      'map-preview',
+      'attribute-join',
+      'dissolve',
+      'clip-overlay',
+      'buffer-circle',
+      'geohash',
+      'coord-convert'
+    ]
+  },
+  {
+    id: 'T20',
+    slug: 'dissolve',
+    category: 'map',
+    map: 'primary',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: { zh: '按字段融合', en: 'Dissolve by Field', ja: 'フィールドで融合' },
+    desc: {
+      zh: '按字段值融合相邻要素',
+      en: 'Dissolve features that share a field value',
+      ja: '同じ属性値のフィーチャを融合'
+    },
+    keywords: {
+      all: ['dissolve', 'aggregate', 'group', 'union', 'field', 'merge'],
+      zh: ['按字段融合', '融合', '融合面', '分组', '聚合', '字段'],
+      ja: ['融合', 'ディゾルブ', '集約', 'グループ化', '属性値']
+    },
+    related: [
+      'attribute-join',
+      'merge-layers',
+      'clip-overlay',
+      'buffer-circle',
+      'attribute-extract',
+      'map-preview',
+      'format-convert',
+      'coord-convert'
+    ]
   }
 ]
 

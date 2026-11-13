@@ -21,10 +21,13 @@ import type { ToolMeta } from '../../i18n/tools'
 import { isRegistered, keysFor } from './registry'
 
 import AttributeExtract from './AttributeExtract.vue'
+import AttributeJoin from './AttributeJoin.vue'
 import BufferCircle from './BufferCircle.vue'
 import ClipOverlay from './ClipOverlay.vue'
 import CoordConvert from './CoordConvert.vue'
+import Dissolve from './Dissolve.vue'
 import MapPreview from './MapPreview.vue'
+import MergeLayers from './MergeLayers.vue'
 import DmsDecimal from './DmsDecimal.vue'
 import EpsgConvert from './EpsgConvert.vue'
 import FormatConvert from './FormatConvert.vue'
@@ -104,4 +107,16 @@ const registered = isRegistered(tool.slug)
 
 {tool.slug === 'attribute-extract' && (
   <AttributeExtract client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'attribute-join' && (
+  <AttributeJoin client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'merge-layers' && (
+  <MergeLayers client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'dissolve' && (
+  <Dissolve client:load lang={lang} ui={ui} toolId={tool.id} />
 )}
