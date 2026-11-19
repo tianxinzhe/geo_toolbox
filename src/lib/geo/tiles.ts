@@ -108,6 +108,23 @@ export function tileBounds(z: number, x: number, y: number): BBox {
 }
 
 /**
+ * 瓦片 → GeoJSON 外环（西南 → 东南 → 东北 → 西北 → 西南）。
+ *
+ * 顺序为逆时针，符合 RFC 7946 对外环的建议；首尾点相同，可直接作为
+ * Polygon 的第一个环使用。
+ */
+export function tileRing(tile: Tile): [number, number][] {
+  const b = tileBounds(tile.z, tile.x, tile.y)
+  return [
+    [b.west, b.south],
+    [b.east, b.south],
+    [b.east, b.north],
+    [b.west, b.north],
+    [b.west, b.south]
+  ]
+}
+
+/**
  * 由坐标点计算最小包围盒。
  *
  * 经度跨度超过 180° 时取跨 180° 经线的那一侧（更短的区间），

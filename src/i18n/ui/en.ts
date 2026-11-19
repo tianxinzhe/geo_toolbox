@@ -120,7 +120,7 @@ const en = {
   /* ---------- 首页与索引 ---------- */
   'home.h1': 'Geospatial tools that never leave your browser',
   'home.intro':
-    'Eleven focused utilities for coordinates, projections and vector formats. No sign-up, no upload — every calculation happens on your own device.',
+    'Fifteen focused utilities for coordinates, projections and vector formats. No sign-up, no upload — every calculation happens on your own device.',
   'home.section.tools': 'All tools',
   'home.section.why': 'Why this site',
   'home.why.local': 'Nothing is uploaded. Sensitive boundaries and tracks stay on your machine.',
@@ -151,17 +151,6 @@ const en = {
   'footer.rights': '© {year} {site}. All calculations run locally.',
   'footer.noAccount': 'No account. No upload. No tracking of your data.',
 
-  /* ---------- T01 坐标系转换 ----------
-     注意：SEO 的 <title> 与 meta description 放在文档 frontmatter 里
-     （src/i18n/content/tools/coord-convert/{lang}.md），不在本字典中。
-     这里只放界面上可见的文案。 */
-  'tool.coord-convert.h1': 'WGS84 / CGCS2000 Coordinate Converter',
-  'tool.coord-convert.lead': 'Convert between WGS84 and CGCS2000, which are equivalent at practical precision.',
-  'tool.coord-convert.identity': 'Source and target are the same system, so the value is returned unchanged.',
-  'tool.coord-convert.cgcs2000': 'CGCS2000 is treated as equivalent to WGS84 here. The two differ only at centimetre level.',
-  'tool.coord-convert.allTargets': 'All target systems',
-  'tool.coord-convert.precisionNote': 'WGS84 and CGCS2000 differ by less than a centimetre in practice. This tool treats them as equivalent and applies no offset in either direction.',
-
   /* ---------- T02 经纬度格式转换 ----------
      SEO 的 <title> 与 meta description 同样放在文档 frontmatter 里
      （src/i18n/content/tools/dms-decimal/{lang}.md），不在本字典中。
@@ -175,7 +164,7 @@ const en = {
   'tool.dms-decimal.target.dmsSymbolic': 'DMS (symbolic)',
   'tool.dms-decimal.target.dmsTextual': 'DMS (spelled out)',
   'tool.dms-decimal.coordHint':
-    'Longitude first, latitude second. One pair per line — paste several lines at once.',
+    'Longitude first, latitude second. One coordinate pair at a time.',
   'tool.dms-decimal.lineError': 'Line {n}: {message}',
   'tool.dms-decimal.errFormat':
     'The input does not match the selected source format ({name}).',
@@ -203,7 +192,7 @@ const en = {
   'tool.dms-decimal.partialHint':
     'Filling in a single field is fine — the other side is reported as not provided instead of raising an error.',
   'tool.dms-decimal.precisionNote':
-    'Decimal places applies to the fractional part of all three formats. For scale: the 8th decimal place of a degree is about 1 mm, one arcsecond is about 31 m, and 0.01 of an arcsecond is about 0.3 m.',
+    'Decimal degrees keep 8 decimal places (about 1 mm); degrees-and-minutes keep 4 decimals of a minute, and DMS keeps 2 decimals of a second (about 0.3 m).',
 
   /* ---------- T03 Projected CRS conversion (EPSG) ---------- */
   'tool.epsg-convert.h1': 'Projected CRS Converter (EPSG)',
@@ -600,6 +589,11 @@ const en = {
   'tool.tile-coords.downloadZip': 'Download ZIP (one CSV per zoom)',
   'tool.tile-coords.downloadHint':
     'One CSV per zoom level with the header x, y, z; multiple levels are packed into a ZIP so no single huge table has to be parsed.',
+  'tool.tile-coords.downloadGeoJson': 'Download GeoJSON polygons',
+  'tool.tile-coords.geojsonHint':
+    'One closed polygon per tile with z / x / y properties; multiple zoom levels are packed into a ZIP.',
+  'tool.tile-coords.geojsonTooLarge':
+    'GeoJSON export is limited to {limit} tiles; narrow the area or use fewer zoom levels.',
   'tool.tile-coords.errZoomRange': 'Zoom levels must be integers between 0 and 22.',
   'tool.tile-coords.errZoomOrder': 'The minimum zoom level cannot be greater than the maximum.',
   'tool.tile-coords.errEmptyFile': 'The file is empty or contains nothing readable.',
@@ -900,6 +894,94 @@ const en = {
   'guide.readMore': 'Read the guide',
   'guide.minutes': '{count} min read',
   'guide.updated': 'Updated {date}',
+  'guide.cta.title': 'Try it in the browser',
+  'guide.cta.body':
+    'No upload, no install: open the tool and files are parsed locally in your browser.',
+  'guide.cta.all': 'All tools',
+
+  /* ---------- T21 Plus Codes ---------- */
+  'tool.plus-codes.h1': 'Plus Codes (Open Location Code)',
+  'tool.plus-codes.lead':
+    'Convert between latitude/longitude and Plus Codes, an open location encoding. Everything is computed locally in your browser.',
+  'tool.plus-codes.mode': 'Input type',
+  'tool.plus-codes.mode.encode': 'Coordinates → Plus Code',
+  'tool.plus-codes.mode.decode': 'Plus Code → Coordinates',
+  'tool.plus-codes.length': 'Code length',
+  'tool.plus-codes.length.10': '10 digits (about 14 m)',
+  'tool.plus-codes.length.11': '11 digits (about 3 m)',
+  'tool.plus-codes.codeLabel': 'Plus Code',
+  'tool.plus-codes.codePlaceholder': '8FVC9G8F+6X',
+  'tool.plus-codes.coordHint':
+    'Longitude first, for example 116.3974, 39.9088. DMS notation is also accepted.',
+  'tool.plus-codes.codeHint':
+    'Enter a full code such as 8FVC9G8F+6X. Short codes need a reference locality and are not supported here.',
+  'tool.plus-codes.size': '{length} digits · about {lat} × {lng}',
+  'tool.plus-codes.note':
+    'A full code is 8 characters, a “+” separator, then 2 or 3 more characters. 10 digits covers roughly a 14 m square; 11 digits refines it to about 3 m. Short codes require a reference place, so this tool only handles full codes.',
+  'tool.plus-codes.errCoordTitle': 'Cannot read this coordinate',
+  'tool.plus-codes.errCoordHint':
+    'Enter longitude and latitude separated by a comma. DMS such as 116°23′50.64″E, 39°54′31.68″N is also accepted.',
+  'tool.plus-codes.errCoordExample': '116.3974, 39.9088',
+  'tool.plus-codes.errCodeTitle': 'Not a valid Plus Code',
+  'tool.plus-codes.errCodeHint':
+    'Enter a full code with the separator after the 8th character. Codes with fewer than 8 characters before “+” need a reference locality and cannot be decoded on their own.',
+  'tool.plus-codes.errCodeExample': '8FVC9G8F+6X',
+
+  /* ---------- T22 MVT vector tile ---------- */
+  'tool.mvt.h1': 'MVT Vector Tile Decoder',
+  'tool.mvt.lead':
+    'Upload a .pbf/.mvt tile or paste its Base64, then read every layer, feature count and geometry as GeoJSON. Runs entirely in your browser.',
+  'tool.mvt.modeFile': 'File',
+  'tool.mvt.modePaste': 'Base64',
+  'tool.mvt.fileHint': 'A .pbf / .mvt tile; gzip is detected automatically. Max 20 MB.',
+  'tool.mvt.chooseFile': 'Choose a PBF or MVT file',
+  'tool.mvt.replaceFile': 'Choose another file',
+  'tool.mvt.base64Label': 'Base64',
+  'tool.mvt.base64Placeholder': 'Paste Base64, a data URL or base64url here',
+  'tool.mvt.base64Hint': 'Whitespace, line breaks and the data: prefix are ignored.',
+  'tool.mvt.tileZ': 'Zoom z',
+  'tool.mvt.tileX': 'Tile x',
+  'tool.mvt.tileY': 'Tile y',
+  'tool.mvt.tileHint': 'Fill z/x/y to get longitude and latitude; leave all three empty to keep tile units.',
+  'tool.mvt.tileAuto': 'Filled from the file name: {tile}',
+  'tool.mvt.emptyTitle': 'No tile decoded yet',
+  'tool.mvt.emptyHint': 'Choose a tile file or paste Base64, then press Decode.',
+  'tool.mvt.summary': 'Layers {layers} · Features {features} · {size}',
+  'tool.mvt.colLayer': 'Layer',
+  'tool.mvt.colVersion': 'Version',
+  'tool.mvt.colExtent': 'Extent',
+  'tool.mvt.colFeatures': 'Features',
+  'tool.mvt.colTypes': 'Point / Line / Area',
+  'tool.mvt.geoHint': 'Output is WGS84 longitude and latitude (EPSG:4326).',
+  'tool.mvt.tileCoordHint': 'No z/x/y given, so coordinates stay in tile units (0 to extent).',
+  'tool.mvt.previewTruncated': 'Preview shows the first {n} lines; copy or download for the full GeoJSON.',
+  'tool.mvt.note':
+    'MVT stores geometry as tile-local integers and carries no z/x/y. Layer version, extent, attributes and ring winding follow the Mapbox Vector Tile 2.x spec.',
+  'tool.mvt.errEmptyTitle': 'Nothing to decode',
+  'tool.mvt.errEmptyHint': 'Choose a tile file or paste Base64 first.',
+  'tool.mvt.errSizeTitle': 'Tile is too large',
+  'tool.mvt.errSizeHint': 'The limit is 20 MB per file. Split the tile or export a smaller extent.',
+  'tool.mvt.errBase64Title': 'Base64 could not be decoded',
+  'tool.mvt.errBase64Hint':
+    'Check for characters outside A–Z a–z 0–9 + / and make sure the string is complete.',
+  'tool.mvt.errGzipTitle': 'gzip payload is broken',
+  'tool.mvt.errGzipHint':
+    'The file starts with a gzip header but cannot be inflated. Re-export the tile.',
+  'tool.mvt.errProtobufTitle': 'Not a valid MVT tile',
+  'tool.mvt.errProtobufHint':
+    'The bytes are not valid protobuf, or the geometry commands are incomplete. Make sure this is a single tile, not a whole mbtiles or pmtiles file.',
+  'tool.mvt.errNoLayersTitle': 'No layers in this tile',
+  'tool.mvt.errNoLayersHint':
+    'The protobuf parsed but contains no vector layers, which usually means a truncated or empty export.',
+  'tool.mvt.errTileTitle': 'Tile index is invalid',
+  'tool.mvt.errTileHint':
+    'Use integers with 0 ≤ z ≤ 22 and 0 ≤ x,y < 2^z, or clear all three fields.',
+  'tool.mvt.warn.gzip': 'gzip detected and inflated automatically.',
+  'tool.mvt.warn.unknown': '{count} feature(s) have no geometry type and were skipped.',
+  'tool.mvt.warn.badGeom': '{count} feature(s) had malformed geometry and were skipped.',
+  'tool.mvt.warn.tags': '{count} feature(s) had an odd tag count; the trailing tag was ignored.',
+  'tool.mvt.warn.noTile': 'No tile index given; coordinates stay in tile units.',
+  'tool.mvt.warn.missingClose': '{count} polygon ring(s) lacked ClosePath and were closed automatically.',
 
   /* ---------- T09 Map drawing ---------- */
   'tool.map-draw.h1': 'Online Map Drawing Tool',
@@ -941,9 +1023,6 @@ const en = {
   'tool.map-draw.statTypes': 'Types',
   'tool.map-draw.delete': 'Delete',
   'tool.map-draw.propsTitle': 'Attributes',
-  'tool.map-draw.nameLabel': 'Name',
-  'tool.map-draw.descLabel': 'Description',
-  'tool.map-draw.customTitle': 'Custom properties',
   'tool.map-draw.addProperty': 'Add property',
   'tool.map-draw.removeProperty': 'Remove',
   'tool.map-draw.keyPlaceholder': 'key',

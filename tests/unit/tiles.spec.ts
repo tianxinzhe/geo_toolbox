@@ -18,6 +18,7 @@ import {
   lngToTileX,
   tileBounds,
   tileOf,
+  tileRing,
   tilesForBbox,
   tilesForGeometries,
   type BBox
@@ -80,6 +81,39 @@ describe('tileBounds', () => {
 
   it('越界瓦片抛 tile-range', () => {
     expect(() => tileBounds(1, 2, 0)).toThrowError(TileError)
+  })
+})
+
+describe('tileRing', () => {
+  it('返回闭合的 5 点外环，且覆盖瓦片四角', () => {
+    const ring = tileRing({ z: 1, x: 0, y: 0 })
+    const b = tileBounds(1, 0, 0)
+    expect(ring).toHaveLength(5)
+    expect(ring[0]).toEqual(ring[4])
+    expect(ring[0]).toEqual([b.west, b.south])
+    expect(ring[1]).toEqual([b.east, b.south])
+    expect(ring[2]).toEqual([b.east, b.north])
+    expect(ring[3]).toEqual([b.west, b.north])
+  })
+
+  it('外环为逆时针（有向面积为正）', () => {
+    const ring = tileRing({ z: 1, x: 1, y: 1 })
+    let area = 0
+    for (let i = 0; i < ring.length - 1; i++) {
+      area += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]
+    }
+    expect(area / 2).toBeGreaterThan(0)
+  })
+
+  it('每个环点都落在瓦片包围盒内', () => {
+    const tile = { z: 10, x: 843, y: 388 }
+    const b = tileBounds(tile.z, tile.x, tile.y)
+    for (const [lng, lat] of tileRing(tile)) {
+      expect(lng).toBeGreaterThanOrEqual(b.west)
+      expect(lng).toBeLessThanOrEqual(b.east)
+      expect(lat).toBeGreaterThanOrEqual(b.south)
+      expect(lat).toBeLessThanOrEqual(b.north)
+    }
   })
 })
 

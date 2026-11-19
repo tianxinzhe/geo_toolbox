@@ -71,11 +71,6 @@ const needsDesktopHint = tool.mobileTier === 'C'
       <header class="tool-page__head">
         <h1>{toolKey(lang, tool.slug, 'h1') ?? tool.names[lang]}</h1>
         <p class="tool-page__lead">{tool.desc[lang]}</p>
-        <p class="page-meta tool-page__meta">
-          <a class="page-meta__link" href={categoryPath(lang, tool.category)}>
-            {CATEGORY_META[tool.category].names[lang]}
-          </a>
-        </p>
       </header>
 
       {
@@ -150,10 +145,6 @@ const needsDesktopHint = tool.mobileTier === 'C'
     color: var(--ink-2);
     margin-block-start: var(--sp-2);
     margin-block-end: 0;
-  }
-
-  .tool-page__meta {
-    margin-block-start: var(--sp-3);
   }
 
   .tool-page__body {

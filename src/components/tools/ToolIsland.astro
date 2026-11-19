@@ -24,7 +24,6 @@ import AttributeExtract from './AttributeExtract.vue'
 import AttributeJoin from './AttributeJoin.vue'
 import BufferCircle from './BufferCircle.vue'
 import ClipOverlay from './ClipOverlay.vue'
-import CoordConvert from './CoordConvert.vue'
 import Dissolve from './Dissolve.vue'
 import MapPreview from './MapPreview.vue'
 import MergeLayers from './MergeLayers.vue'
@@ -32,6 +31,8 @@ import DmsDecimal from './DmsDecimal.vue'
 import EpsgConvert from './EpsgConvert.vue'
 import FormatConvert from './FormatConvert.vue'
 import GeoHash from './GeoHash.vue'
+import PlusCodes from './PlusCodes.vue'
+import MvtTile from './MvtTile.vue'
 import MapDraw from './MapDraw.vue'
 import TileCoords from './TileCoords.vue'
 
@@ -63,10 +64,6 @@ const registered = isRegistered(tool.slug)
   )
 }
 
-{tool.slug === 'coord-convert' && (
-  <CoordConvert client:load lang={lang} ui={ui} toolId={tool.id} />
-)}
-
 {tool.slug === 'dms-decimal' && (
   <DmsDecimal client:load lang={lang} ui={ui} toolId={tool.id} />
 )}
@@ -87,6 +84,14 @@ const registered = isRegistered(tool.slug)
 
 {tool.slug === 'geohash' && (
   <GeoHash client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'plus-codes' && (
+  <PlusCodes client:load lang={lang} ui={ui} toolId={tool.id} />
+)}
+
+{tool.slug === 'mvt' && (
+  <MvtTile client:load lang={lang} ui={ui} toolId={tool.id} />
 )}
 
 {tool.slug === 'map-draw' && (

@@ -56,7 +56,6 @@ export interface BatchConfig {
 
 /** PRD FR-13：首期接入的计算类工具 */
 export const BATCH_SLUGS = new Set([
-  'coord-convert',
   'dms-decimal',
   'epsg-convert',
   'geohash'

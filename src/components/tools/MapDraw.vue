@@ -85,9 +85,22 @@ const transientNotice = ref('')
 const errorKey = ref('')
 const shareNote = ref('')
 
-const propName = ref('')
-const propDesc = ref('')
-const customRows = ref<{ k: string; v: string }[]>([])
+/**
+ * 属性行。所有属性统一用键 / 值展示，不再单列「名称」「描述」。
+ *
+ * 额外记住导入时的显示文本与原始值：用户只改值、不改键时直接写回原始值，
+ * 避免把对象 / 数组 / 数字这类属性统一 String() 后破坏数据。
+ */
+interface CustomRow {
+  k: string
+  v: string
+  /** 载入（或上次保存）时的显示文本，用来判断值是否被改过 */
+  originalDisplay: string
+  /** 原始值，可能是对象、数组、数字或布尔 */
+  raw: unknown
+}
+
+const customRows = ref<CustomRow[]>([])
 const propsError = ref('')
 const confirmDeleteId = ref<string | null>(null)
 const confirmClear = ref(false)
@@ -343,48 +356,82 @@ function onMapEmptyClick(): void {
  * 属性面板
  * ------------------------------------------------------------------ */
 
-function syncProps(): void {
-  const f = selected.value
-  propName.value = typeof f?.properties.name === 'string' ? f.properties.name : ''
-  propDesc.value = typeof f?.properties.description === 'string' ? f.properties.description : ''
-  customRows.value = Object.entries(f?.properties ?? {})
-    .filter(([k]) => k !== 'name' && k !== 'description' && k !== 'Name')
-    .map(([k, v]) => ({ k, v: v === null || v === undefined ? '' : String(v) }))
-  propsError.value = ''
+/** 属性值 → 编辑框文本。对象 / 数组用 JSON 展示，不再出现 [object Object] */
+function displayPropValue(v: unknown): string {
+  if (v === null || v === undefined) return ''
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  try {
+    return JSON.stringify(v)
+  } catch {
+    return String(v)
+  }
 }
 
-const RESERVED = new Set(['type', 'coordinates', 'geometry', 'properties', 'features', '__id'])
+function syncProps(): void {
+  const f = selected.value
+  const properties = f?.properties ?? {}
+  // 所有属性一律作为键 / 值行展示，name、Name、description 也不例外，
+  // 保证导入的字段既不改名、也不会在保存时被过滤掉。
+  customRows.value = Object.entries(properties).map(([k, v]) => {
+    const text = displayPropValue(v)
+    return { k, v: text, originalDisplay: text, raw: v }
+  })
+  propsError.value = ''
+}
 
 function applyProps(): void {
   const f = selected.value
   if (!f) return
-  const names = customRows.value.map((r) => r.k.trim())
-  if (names.some((n) => n === '')) {
-    propsError.value = 'tool.map-draw.propsEmptyKey'
-    return
-  }
+
+  // 空键行只是「添加属性」后的占位，未填写时跳过，不阻塞其他字段保存
+  const rows = customRows.value.filter((r) => r.k.trim() !== '')
+  const names = rows.map((r) => r.k.trim())
   if (new Set(names).size !== names.length) {
     propsError.value = 'tool.map-draw.propsDuplicate'
     return
   }
-  if (names.some((n) => RESERVED.has(n))) {
-    propsError.value = 'tool.map-draw.propsReserved'
-    return
-  }
   propsError.value = ''
-  const properties: Record<string, unknown> = {}
-  if (propName.value.trim() !== '') properties.name = propName.value.trim()
-  if (propDesc.value.trim() !== '') properties.description = propDesc.value.trim()
-  for (const row of customRows.value) {
-    if (row.k.trim() === '') continue
-    properties[row.k.trim()] = row.v
+
+  // 用无原型对象承接，避免 __proto__ 之类的属性名改写原型
+  const next: Record<string, unknown> = Object.assign(Object.create(null), f.properties)
+
+  // 面板里已经不存在的键 = 被删除或重命名，需要从属性中移除
+  const keep = new Set(names)
+  for (const key of Object.keys(f.properties)) {
+    if (!keep.has(key)) delete next[key]
   }
-  const updated = features.value.map((item) => (item.id === f.id ? { ...item, properties } : item))
-  commit(updated)
+
+  for (const row of rows) {
+    const key = row.k.trim()
+    if (row.v !== row.originalDisplay) {
+      next[key] = row.v
+    } else if (!(key in next)) {
+      // 重命名但值没动：沿用原始值，保留对象 / 数组结构
+      next[key] = row.raw
+    }
+  }
+
+  // 写入成功后把面板基准同步到新值，下次失焦不会重复写入
+  for (const row of rows) {
+    const key = row.k.trim()
+    row.originalDisplay = row.v
+    row.raw = next[key]
+  }
+
+  // 属性没有实质变化：不产生撤销记录，也不重建图层
+  if (JSON.stringify(next) === JSON.stringify(f.properties)) return
+
+  commit(features.value.map((item) => (item.id === f.id ? { ...item, properties: next } : item)))
 }
 
 function addCustomRow(): void {
-  customRows.value.push({ k: '', v: '' })
+  customRows.value.push({
+    k: '',
+    v: '',
+    originalDisplay: '',
+    raw: undefined
+  })
 }
 
 function removeCustomRow(i: number): void {
@@ -842,27 +889,6 @@ onBeforeUnmount(() => {
 
         <section v-if="selected" class="panel">
           <h2 class="panel__title">{{ ui['tool.map-draw.propsTitle'] }}</h2>
-          <div class="field field--small">
-            <label :for="`md-name-${selected.id}`">{{ ui['tool.map-draw.nameLabel'] }}</label>
-            <input
-              :id="`md-name-${selected.id}`"
-              v-model="propName"
-              type="text"
-              autocomplete="off"
-              @blur="applyProps"
-            />
-          </div>
-          <div class="field field--small">
-            <label :for="`md-desc-${selected.id}`">{{ ui['tool.map-draw.descLabel'] }}</label>
-            <textarea
-              :id="`md-desc-${selected.id}`"
-              v-model="propDesc"
-              rows="2"
-              @blur="applyProps"
-            ></textarea>
-          </div>
-
-          <p class="field__hint">{{ ui['tool.map-draw.customTitle'] }}</p>
           <div v-for="(row, i) in customRows" :key="i" class="kv-row">
             <input
               v-model="row.k"

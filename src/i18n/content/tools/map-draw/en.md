@@ -1,12 +1,12 @@
 ---
 title: 'Online Map Drawing Tool: Points, Lines, Polygons | GeoToolbox'
 description: 'Draw points, lines, polygons, rectangles and circles on a map, measure length and area, edit attributes, and export GeoJSON, KML, GPX, WKT or CSV.'
-updated: 2026-11-09
+updated: 2026-11-16
 faq:
   - q: 'Is my drawing uploaded to a server?'
     a: 'No. Drawing, measuring, attribute editing and export all run in the browser, with no upload request. To recover your work after an accidental page close, this tool writes features to the browser’s localStorage. It is the only tool on this site that persists user content, and the privacy policy says so explicitly. You can clear it at any time with “Clear local save”.'
   - q: 'Which coordinate system do exports use?'
-    a: 'Everything is exported as WGS 84 longitude and latitude. GeoJSON, KML, GPX, WKT and CSV all follow WGS 84 semantics, and the Shapefile .prj declares WGS 84 as well. If a receiving system needs another coordinate system, convert it separately with the coordinate or projected CRS converter.'
+    a: 'Everything is exported as WGS 84 longitude and latitude. GeoJSON, KML, GPX, WKT and CSV all follow WGS 84 semantics, and the Shapefile .prj declares WGS 84 as well. If a receiving system needs another coordinate system, convert it separately with the projected CRS converter.'
   - q: 'Why does deleting a feature require confirmation?'
     a: 'Deletion is irreversible, and losing a polygon you spent time on is frustrating. Single deletes and “clear all” both use an inline confirmation that states how many features are affected. After deleting, you can still undo with Ctrl+Z or the undo button; the history holds 50 steps.'
   - q: 'Does it work on a phone?'
@@ -27,7 +27,7 @@ There are five drawing modes:
 
 ## Editing, measuring and attributes
 
-In select mode, click a feature to select it. The side panel shows its name, description and custom properties. Property names cannot be empty or duplicated, and reserved names such as `type` and `coordinates` are rejected.
+In select mode, click a feature to select it. The side panel lists every property as a key/value row, so you can rename, edit, delete or add fields directly. Property names cannot be empty or duplicated, and reserved names such as `type` and `coordinates` are rejected.
 
 Line vertices can be dragged to reshape the line. For polygons you can drag vertices and click an edge midpoint to insert a new vertex. The feature list shows live measurements: coordinates for points, length for lines, area and perimeter for polygons. The statistics bar summarises feature count, type counts, total length and total area.
 

@@ -109,7 +109,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- 首页与索引 ---------- */
   'home.h1': '数据不出浏览器的地理信息工具箱',
   'home.intro':
-    '11 个专注的小工具，覆盖坐标、投影与矢量格式。无需注册、无需上传，所有计算都在你自己的设备上完成。',
+    '15 个专注的小工具，覆盖坐标、投影与矢量格式。无需注册、无需上传，所有计算都在你自己的设备上完成。',
   'home.section.tools': '全部工具',
   'home.section.why': '为什么用这个站',
   'home.why.local': '数据不上传。地块边界、门店位置、轨迹数据始终留在你的设备上。',
@@ -140,15 +140,6 @@ const zh: Record<UiKey, string> = {
   'footer.rights': '© {year} {site}。所有计算均在浏览器本地完成。',
   'footer.noAccount': '无需账号，无需上传，不追踪你的数据。',
 
-  /* ---------- T01 坐标系转换 ----------
-     SEO 的 <title> 与 meta description 在文档 frontmatter 中，不在本字典 */
-  'tool.coord-convert.h1': 'WGS84 / CGCS2000 坐标系转换',
-  'tool.coord-convert.lead': 'WGS84 与 CGCS2000 互转，两者在实用精度内等价，转换只做校验与回显。',
-  'tool.coord-convert.identity': '源坐标系与目标坐标系相同，直接回显原值，无需转换。',
-  'tool.coord-convert.cgcs2000': 'CGCS2000 在此按与 WGS84 等值处理，两者差异仅在厘米级。',
-  'tool.coord-convert.allTargets': '全部目标坐标系',
-  'tool.coord-convert.precisionNote': 'WGS84 与 CGCS2000 的椭球参数差异在厘米级以下，本工具按等值处理，不做任何人为偏移。',
-
   /* ---------- T02 经纬度格式转换 ----------
      SEO 的 <title> 与 meta description 在文档 frontmatter 中，不在本字典。
      带 {name} / {value} 的键由组件做字面替换插值 */
@@ -160,7 +151,7 @@ const zh: Record<UiKey, string> = {
   'tool.dms-decimal.format.auto': '自动识别',
   'tool.dms-decimal.target.dmsSymbolic': '度分秒（符号式）',
   'tool.dms-decimal.target.dmsTextual': '度分秒（文本式）',
-  'tool.dms-decimal.coordHint': '经度在前、纬度在后；每行一组，可一次粘贴多行坐标。',
+  'tool.dms-decimal.coordHint': '经度在前、纬度在后，一次一组坐标。',
   'tool.dms-decimal.lineError': '第 {n} 行：{message}',
   'tool.dms-decimal.errFormat': '输入与所选原格式（{name}）不符。',
   'tool.dms-decimal.errFormatHint': '把原格式改为「自动识别」，或按所选格式重写坐标。',
@@ -184,7 +175,7 @@ const zh: Record<UiKey, string> = {
   'tool.dms-decimal.alternative': '这个值也可以按{name}解读，那样结果是 {value}。请自行确认你要的是哪一种。',
   'tool.dms-decimal.partialHint': '两个框可以只填一个，缺失的一侧显示为未提供，不会报错。',
   'tool.dms-decimal.precisionNote':
-    '小数位数同时作用于三种格式的小数部分。量级参考：十进制度第 8 位约 1 毫米，1 角秒约 31 米，0.01 角秒约 0.3 米。',
+    '十进制度保留 8 位小数（约 1 毫米）；度分按分保留 4 位，度分秒按秒保留 2 位（约 0.3 米）。',
 
   /* ---------- T03 投影坐标转换（EPSG） ---------- */
   'tool.epsg-convert.h1': '投影坐标转换（EPSG）',
@@ -551,6 +542,11 @@ const zh: Record<UiKey, string> = {
   'tool.tile-coords.downloadZip': '下载 ZIP（每层一个 CSV）',
   'tool.tile-coords.downloadHint':
     '每个缩放级别生成一个 CSV（表头 x, y, z）；多个级别会打包成 ZIP，避免单个大表解析变慢。',
+  'tool.tile-coords.downloadGeoJson': '下载 GeoJSON 面',
+  'tool.tile-coords.geojsonHint':
+    '每张瓦片导出一个闭合矩形面，属性含 z / x / y；多个层级会按层打包成 ZIP。',
+  'tool.tile-coords.geojsonTooLarge':
+    'GeoJSON 导出上限为 {limit} 张瓦片，请缩小范围或减少层级。',
   'tool.tile-coords.errZoomRange': '缩放级别必须是 0–22 之间的整数。',
   'tool.tile-coords.errZoomOrder': '最小缩放级别不能大于最大缩放级别。',
   'tool.tile-coords.errEmptyFile': '文件是空的，或没有任何可读取的内容。',
@@ -827,6 +823,89 @@ const zh: Record<UiKey, string> = {
   'guide.readMore': '阅读全文',
   'guide.minutes': '约 {count} 分钟',
   'guide.updated': '更新于 {date}',
+  'guide.cta.title': '在线试一试',
+  'guide.cta.body': '打开工具即可解析与转换，文件只在浏览器本地处理，不上传。',
+  'guide.cta.all': '全部工具',
+
+  /* ---------- T21 Plus Codes ---------- */
+  'tool.plus-codes.h1': 'Plus Codes 位置编码',
+  'tool.plus-codes.lead':
+    '经纬度与 Plus Code 双向转换。Plus Codes 是开放的地址编码，全部在浏览器本地计算，坐标不会上传。',
+  'tool.plus-codes.mode': '输入类型',
+  'tool.plus-codes.mode.encode': '坐标 → Plus Code',
+  'tool.plus-codes.mode.decode': 'Plus Code → 坐标',
+  'tool.plus-codes.length': '编码长度',
+  'tool.plus-codes.length.10': '10 位（约 14 米）',
+  'tool.plus-codes.length.11': '11 位（约 3 米）',
+  'tool.plus-codes.codeLabel': 'Plus Code 编码',
+  'tool.plus-codes.codePlaceholder': '8FVC9G8F+6X',
+  'tool.plus-codes.coordHint':
+    '经度在前，例如 116.3974, 39.9088；也接受度分秒写法。',
+  'tool.plus-codes.codeHint':
+    '输入完整编码，例如 8FVC9G8F+6X。短码需要参考地点，本站不支持。',
+  'tool.plus-codes.size': '{length} 位 · 约 {lat} × {lng}',
+  'tool.plus-codes.note':
+    '完整编码由 8 个字符、一个「+」和 2~3 个字符组成。10 位约 14 米见方，11 位约 3 米。短码必须配合参考地点才能解码，因此这里只处理完整编码。',
+  'tool.plus-codes.errCoordTitle': '无法识别这个坐标',
+  'tool.plus-codes.errCoordHint':
+    '请按「经度, 纬度」输入，也接受 116°23′50.64″E, 39°54′31.68″N 这样的度分秒写法。',
+  'tool.plus-codes.errCoordExample': '116.3974, 39.9088',
+  'tool.plus-codes.errCodeTitle': '不是有效的 Plus Code',
+  'tool.plus-codes.errCodeHint':
+    '请输入完整编码：「+」之前 8 个字符、之后 2~3 个字符。不足 8 个字符的短码需要参考地点，无法单独解码。',
+  'tool.plus-codes.errCodeExample': '8FVC9G8F+6X',
+
+  /* ---------- T22 MVT 矢量瓦片 ---------- */
+  'tool.mvt.h1': 'MVT 矢量瓦片解析',
+  'tool.mvt.lead':
+    '上传 .pbf/.mvt 瓦片或粘贴 Base64，读出每个图层、要素数量与几何，并导出 GeoJSON。全部在浏览器本地完成。',
+  'tool.mvt.modeFile': '文件',
+  'tool.mvt.modePaste': '粘贴 Base64',
+  'tool.mvt.fileHint': '支持 .pbf / .mvt，自动识别 gzip 压缩，单文件上限 20 MB。',
+  'tool.mvt.chooseFile': '选择 PBF / MVT 文件',
+  'tool.mvt.replaceFile': '重新选择文件',
+  'tool.mvt.base64Label': 'Base64 字符串',
+  'tool.mvt.base64Placeholder': '粘贴 Base64、data URL 或 base64url',
+  'tool.mvt.base64Hint': '空格、换行与 data: 前缀会被自动忽略。',
+  'tool.mvt.tileZ': '缩放级别 z',
+  'tool.mvt.tileX': '瓦片 x',
+  'tool.mvt.tileY': '瓦片 y',
+  'tool.mvt.tileHint': '填写 z/x/y 才能换算成经纬度；三个都留空则保留瓦片内坐标。',
+  'tool.mvt.tileAuto': '已从文件名填入 {tile}',
+  'tool.mvt.emptyTitle': '还没有解析结果',
+  'tool.mvt.emptyHint': '选择瓦片文件或粘贴 Base64，然后点「转换」。',
+  'tool.mvt.summary': '图层 {layers} · 要素 {features} · {size}',
+  'tool.mvt.colLayer': '图层',
+  'tool.mvt.colVersion': '版本',
+  'tool.mvt.colExtent': '范围',
+  'tool.mvt.colFeatures': '要素',
+  'tool.mvt.colTypes': '点 / 线 / 面',
+  'tool.mvt.geoHint': '输出为 WGS84 经纬度（EPSG:4326）。',
+  'tool.mvt.tileCoordHint': '未填 z/x/y，坐标保留瓦片内整数（0 到 extent）。',
+  'tool.mvt.previewTruncated': '预览只显示前 {n} 行，复制或下载可拿到完整 GeoJSON。',
+  'tool.mvt.note':
+    'MVT 用瓦片内整数坐标存储几何，本身不含 z/x/y。图层版本、extent、属性与环方向按 Mapbox Vector Tile 2.x 规范解析。',
+  'tool.mvt.errEmptyTitle': '没有可解析的内容',
+  'tool.mvt.errEmptyHint': '请先选择瓦片文件，或粘贴 Base64 字符串。',
+  'tool.mvt.errSizeTitle': '瓦片太大',
+  'tool.mvt.errSizeHint': '单文件上限 20 MB，请拆分瓦片或先裁出需要的范围。',
+  'tool.mvt.errBase64Title': 'Base64 解码失败',
+  'tool.mvt.errBase64Hint': '检查是否混入了 A–Z a–z 0–9 + / 之外的字符，以及字符串是否被截断。',
+  'tool.mvt.errGzipTitle': 'gzip 数据损坏',
+  'tool.mvt.errGzipHint': '文件以 gzip 头开始但无法解压，请重新导出这块瓦片。',
+  'tool.mvt.errProtobufTitle': '不是有效的 MVT 瓦片',
+  'tool.mvt.errProtobufHint':
+    '字节不是合法 protobuf，或几何命令不完整。确认这是单张瓦片，而不是整个 mbtiles / pmtiles 文件。',
+  'tool.mvt.errNoLayersTitle': '瓦片里没有图层',
+  'tool.mvt.errNoLayersHint': 'protobuf 结构能读通，但没有任何矢量图层，通常是导出被截断或内容为空。',
+  'tool.mvt.errTileTitle': '瓦片编号不合法',
+  'tool.mvt.errTileHint': '请填写整数：0 ≤ z ≤ 22，0 ≤ x,y < 2^z；或者把三个输入框都清空。',
+  'tool.mvt.warn.gzip': '检测到 gzip 压缩，已自动解压。',
+  'tool.mvt.warn.unknown': '有 {count} 个要素没有几何类型，已跳过。',
+  'tool.mvt.warn.badGeom': '有 {count} 个要素的几何损坏，已跳过。',
+  'tool.mvt.warn.tags': '有 {count} 个要素的属性标签数量为奇数，末尾标签已忽略。',
+  'tool.mvt.warn.noTile': '未提供瓦片编号，坐标保留为瓦片内单位。',
+  'tool.mvt.warn.missingClose': '有 {count} 个面环缺少 ClosePath，已自动闭合。',
 
   /* ---------- T09 在线地图绘制器 ---------- */
   'tool.map-draw.h1': '在线地图绘制器',
@@ -867,9 +946,6 @@ const zh: Record<UiKey, string> = {
   'tool.map-draw.statTypes': '类型',
   'tool.map-draw.delete': '删除',
   'tool.map-draw.propsTitle': '属性',
-  'tool.map-draw.nameLabel': '名称',
-  'tool.map-draw.descLabel': '描述',
-  'tool.map-draw.customTitle': '自定义属性',
   'tool.map-draw.addProperty': '添加属性',
   'tool.map-draw.removeProperty': '移除',
   'tool.map-draw.keyPlaceholder': '键',

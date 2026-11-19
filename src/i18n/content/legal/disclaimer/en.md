@@ -1,7 +1,7 @@
 ---
 title: 'Disclaimer | GeoToolbox'
 description: 'GeoToolbox disclaimer: accuracy and fitness-for-purpose of results, why nothing here is a legally valid survey output, and attribution of third-party basemap, EPSG and algorithm sources.'
-updated: 2026-11-07
+updated: 2026-11-16
 ---
 
 Effective date: 7 November 2026
@@ -18,15 +18,14 @@ The precision of each tool is bounded by the algorithm itself, the quality of th
 
 | Tool | Accuracy | Main limiting factor |
 |---|---|---|
-| Coordinate conversion | WGS84 and CGCS2000 treated as equivalent | Ellipsoid parameters differ below a centimetre; not valid for millimetre-level surveying |
 | DMS conversion | Exact, limited only by input digits | The significant figures present in your input |
 | Projected CRS conversion | Depends on the datum-shift parameters used | Regional applicability of 7-parameter / 4-parameter shifts; epoch differences such as JGD2000 vs JGD2011 amount to centimetres or decimetres |
 
-Anything marked "about", "approximate" or "reference" is labelled as such in the interface and never presented as exact. **Display precision is configurable; computation precision is not.** Changing the decimal places from 6 to 10 does not make a result more accurate.
+Anything marked "about", "approximate" or "reference" is labelled as such in the interface and never presented as exact. **Display digits are not computation precision.** Changing the decimal places from 6 to 10 does not make a result more accurate.
 
 ## Notes specific to coordinate systems
 
-**CGCS2000 treated as equivalent to WGS84.** Within practical precision this site treats CGCS2000 as equivalent to WGS84 and labels that assumption in the UI. The two ellipsoids do differ. If your work is sensitive to that difference (accuracy requirements at the centimetre level or better), apply a full datum transformation yourself.
+**CGCS2000 vs WGS84.** The two are equivalent at practical precision, and the EPSG converter follows the definition of whichever CRS you select. The ellipsoids do differ. If your work is sensitive to that difference (accuracy requirements at the centimetre level or better), apply a full datum transformation yourself.
 
 **X/Y axis order in Japan's plane-rectangular system.** In Japan's plane-rectangular coordinate system X points north and Y points east, the opposite of the common mathematical convention. This site labels the axis meaning of every field explicitly, but **you still need to confirm axis order when reading results** — getting it wrong shifts the answer by hundreds of kilometres and produces no error message.
 

@@ -14,7 +14,7 @@
  *   ④ 同格式提交等同「格式化 + 校验」，并明确说明。
  */
 
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 
 import type { Lang } from '../../config/i18n'
 import type { ToolUi } from '../../i18n/uiKeys'
@@ -41,7 +41,6 @@ import {
   type VectorFormat
 } from '../../lib/convert/types'
 import { FORMAT_LABEL, OUTPUT_FORMATS } from '../../lib/convert/types'
-import { buildShareUrl, readShareState, T06_PARAMS, type ShareState } from '../../lib/share'
 import CopyButton from '../ui/CopyButton.vue'
 
 interface Props {
@@ -140,7 +139,6 @@ const result = ref<SerializeOutcome | null>(null)
 const resultError = ref('')
 const unsupported = ref<{ count: number; types: string[] } | null>(null)
 
-const shareNote = ref('')
 const dragActive = ref(false)
 
 const options = reactive({
@@ -533,68 +531,6 @@ function download(): void {
   a.remove()
   URL.revokeObjectURL(url)
 }
-
-async function onShare(): Promise<void> {
-  if (mode.value !== 'paste' || text.value.trim() === '') return
-  const state: ShareState = {
-    text: text.value,
-    target: target.value,
-    indent: options.indent,
-    digits: options.digits,
-    empty: options.removeEmpty,
-    gpx: options.gpxAttrs
-  }
-  // 自动识别是默认值，不写入 URL
-  if (source.value !== 'auto') state.src = source.value
-  const link = await buildShareUrl(globalThis.location.pathname, state, T06_PARAMS, {
-    target: 'geojson',
-    indent: true,
-    digits: 7,
-    empty: false,
-    gpx: 'name-desc'
-  })
-  if (link.mode === 'tooLarge') {
-    shareNote.value = props.ui['common.shareTooLarge']
-    return
-  }
-  const abs = new URL(link.url, globalThis.location.origin).href
-  try {
-    await navigator.clipboard.writeText(abs)
-    shareNote.value = props.ui['common.shared']
-  } catch {
-    shareNote.value = abs
-  }
-  setTimeout(() => {
-    if (shareNote.value === props.ui['common.shared']) shareNote.value = ''
-  }, 2500)
-}
-
-onMounted(async () => {
-  const restored = await readShareState(
-    { search: globalThis.location.search, hash: globalThis.location.hash },
-    T06_PARAMS
-  )
-  if (restored.hadProblems) shareNote.value = props.ui['common.shareReset']
-  const s = restored.state
-  if (typeof s.text === 'string' && s.text.trim() !== '') {
-    mode.value = 'paste'
-    text.value = s.text
-  }
-  if (typeof s.target === 'string' && (OUTPUT_FORMATS as string[]).includes(s.target)) {
-    target.value = s.target as VectorFormat
-  }
-  if (typeof s.src === 'string' && (SOURCE_FORMATS as readonly string[]).includes(s.src)) {
-    source.value = s.src as VectorFormat
-  }
-  if (typeof s.indent === 'boolean') options.indent = s.indent
-  if (typeof s.digits === 'number') options.digits = s.digits
-  if (typeof s.empty === 'boolean') options.removeEmpty = s.empty
-  if (s.gpx === 'name' || s.gpx === 'name-desc') options.gpxAttrs = s.gpx
-  if (mode.value === 'paste' && text.value !== '') {
-    pinnedTarget = true
-    void run()
-  }
-})
 </script>
 
 <template>
@@ -854,24 +790,13 @@ onMounted(async () => {
         <button type="button" class="btn btn--primary" @click="download">
           {{ ui['common.download'] }}
         </button>
-        <button
-          v-if="mode === 'paste'"
-          type="button"
-          class="btn btn--ghost"
-          @click="onShare"
-        >
-          {{ ui['common.share'] }}
-        </button>
       </div>
-      <p v-if="mode === 'paste'" class="hint">{{ ui['common.shareWarning'] }}</p>
     </template>
 
     <div v-if="!hasInput && !parseError" class="empty-state">
       <p>{{ ui['tool.format-convert.emptyTitle'] }}</p>
       <p>{{ ui['tool.format-convert.emptyBody'] }}</p>
     </div>
-
-    <p v-if="shareNote" class="note note--dim share-note">{{ shareNote }}</p>
   </form>
 </template>
 
@@ -1042,11 +967,6 @@ onMounted(async () => {
 
 .note--dim {
   opacity: 0.85;
-}
-
-.share-note {
-  overflow-wrap: anywhere;
-  font-family: var(--mono);
 }
 
 .hint {

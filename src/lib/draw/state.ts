@@ -208,19 +208,18 @@ export function statsOf(features: readonly VectorFeature[]): DrawStats {
  * 导入 / 导出
  * ------------------------------------------------------------------ */
 
-/** 把 T06/T07 的解析结果转成带 id 的绘制要素 */
+/**
+ * 把 T06/T07 的解析结果转成带 id 的绘制要素。
+ *
+ * 属性原样保留，不额外合成 name 字段：GeoJSON 里 Name / 标题 等键名各不相同，
+ * 合并成一个键会让导出结果凭空多出一列。展示层需要名称时按 name → Name 回退。
+ */
 export function adoptFeatures(features: readonly VectorFeature[]): DrawFeature[] {
   return features.map((f) => ({
     type: 'Feature',
     id: newFeatureId(),
     geometry: f.geometry,
-    properties: {
-      ...f.properties,
-      name:
-        (f.properties.name as string | undefined) ??
-        (f.properties.Name as string | undefined) ??
-        undefined
-    }
+    properties: { ...f.properties }
   }))
 }
 

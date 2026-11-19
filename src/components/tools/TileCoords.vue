@@ -22,6 +22,7 @@ import {
   iterateTilesForGeometries,
   MAX_ZOOM,
   MIN_ZOOM,
+  tileRing,
   type BBox,
   type Tile
 } from '../../lib/geo/tiles'
@@ -516,6 +517,11 @@ const zoomError = computed<string>(() => {
 
 /** 超过这个数量时红字提示用户：计算与下载会明显变慢，浏览器可能卡顿 */
 const LARGE_WARNING = 1_000_000
+/**
+ * GeoJSON 导出的上限。每张瓦片是一个约 200 字节的面要素，
+ * 20 万张已经是几十 MB 的字符串，再多容易让标签页内存吃紧。
+ */
+const GEOJSON_MAX_TILES = 200_000
 /** 每批处理多少张瓦片后让出主线程，用于刷新进度 */
 const BATCH_SIZE = 20_000
 
@@ -612,6 +618,9 @@ const downloadLabel = computed(() =>
 const canGenerate = computed(
   () => Boolean(bbox.value) && !zoomError.value && estimate.value.total > 0
 )
+
+/** 只禁用 GeoJSON 这一个导出方式，CSV 不受影响 */
+const geoJsonTooLarge = computed(() => result.value.total > GEOJSON_MAX_TILES)
 
 /** 让浏览器有机会绘制进度条，再继续下一批 */
 function nextFrame(): Promise<void> {
@@ -752,6 +761,94 @@ async function download(): Promise<void> {
       })
     })
     saveBlob(new Blob([zipped], { type: 'application/zip' }), `tile-coords-${stamp}.zip`)
+  } finally {
+    packing.value = false
+    progressDone.value = 0
+    progressTotal.value = 0
+  }
+}
+
+/** 去掉浮点噪声：9 位小数约 0.1 毫米，足够描述瓦片边界 */
+function num(value: number): string {
+  return String(Number(value.toFixed(9)))
+}
+
+/**
+ * 每张瓦片转成一个闭合矩形面，属性保留 z / x / y，
+ * 便于在 QGIS 等软件里按层级筛选或反查瓦片地址。
+ */
+async function buildGeoJson(tiles: readonly Tile[], base: number): Promise<string> {
+  const parts: string[] = []
+  for (let i = 0; i < tiles.length; i++) {
+    const tile = tiles[i]
+    const ring = tileRing(tile)
+      .map(([lng, lat]) => `[${num(lng)},${num(lat)}]`)
+      .join(',')
+    parts.push(
+      `{"type":"Feature","properties":{"z":${tile.z},"x":${tile.x},"y":${tile.y}},` +
+        `"geometry":{"type":"Polygon","coordinates":[[${ring}]]}}`
+    )
+    if ((i + 1) % BATCH_SIZE === 0) {
+      progressDone.value = base + i + 1
+      await nextFrame()
+    }
+  }
+  return `{"type":"FeatureCollection","features":[${parts.join(',')}]}`
+}
+
+/**
+ * 导出 GeoJSON：单层级一个 .geojson，多层级按 z 分包成 ZIP，
+ * 与 CSV 导出的分包规则保持一致。
+ */
+async function downloadGeoJson(): Promise<void> {
+  if (resultTiles.value.length === 0 || packing.value || geoJsonTooLarge.value) return
+
+  const byZoom = new Map<number, Tile[]>()
+  for (const tile of resultTiles.value) {
+    const list = byZoom.get(tile.z)
+    if (list) list.push(tile)
+    else byZoom.set(tile.z, [tile])
+  }
+  const levels = [...byZoom.keys()].sort((a, b) => a - b)
+
+  packing.value = true
+  progressDone.value = 0
+  progressTotal.value = resultTiles.value.length
+
+  try {
+    const now = new Date()
+    const pad = (n: number): string => String(n).padStart(2, '0')
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+
+    if (levels.length === 1) {
+      const z = levels[0]
+      const text = await buildGeoJson(byZoom.get(z) ?? [], 0)
+      saveBlob(
+        new Blob([text], { type: 'application/geo+json' }),
+        `tile-coords-z${z}-${stamp}.geojson`
+      )
+      return
+    }
+
+    const { strToU8, zip } = await import('fflate')
+    const files: Record<string, Uint8Array> = {}
+    let base = 0
+    for (const z of levels) {
+      const levelTiles = byZoom.get(z) ?? []
+      files[`tile-coords-z${z}.geojson`] = strToU8(await buildGeoJson(levelTiles, base))
+      base += levelTiles.length
+      progressDone.value = base
+    }
+    const zipped = await new Promise<Uint8Array>((resolve, reject) => {
+      zip(files, { level: 6 }, (error, data) => {
+        if (error) reject(error)
+        else resolve(data)
+      })
+    })
+    saveBlob(
+      new Blob([zipped], { type: 'application/zip' }),
+      `tile-coords-geojson-${stamp}.zip`
+    )
   } finally {
     packing.value = false
     progressDone.value = 0
@@ -946,8 +1043,24 @@ async function download(): Promise<void> {
             >
               {{ downloadLabel }}
             </button>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              :disabled="packing || geoJsonTooLarge"
+              @click="downloadGeoJson"
+            >
+              {{ ui['tool.tile-coords.downloadGeoJson'] }}
+            </button>
           </div>
           <p class="hint">{{ ui['tool.tile-coords.downloadHint'] }}</p>
+          <p class="hint">{{ ui['tool.tile-coords.geojsonHint'] }}</p>
+          <p v-if="geoJsonTooLarge" class="note note--warn" role="alert">
+            {{
+              msg('tool.tile-coords.geojsonTooLarge', {
+                limit: countText(GEOJSON_MAX_TILES)
+              })
+            }}
+          </p>
         </div>
       </div>
 

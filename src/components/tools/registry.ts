@@ -27,12 +27,13 @@ import BufferCircle from './BufferCircle.vue'
 import Dissolve from './Dissolve.vue'
 import MergeLayers from './MergeLayers.vue'
 import ClipOverlay from './ClipOverlay.vue'
-import CoordConvert from './CoordConvert.vue'
 import MapPreview from './MapPreview.vue'
 import DmsDecimal from './DmsDecimal.vue'
 import EpsgConvert from './EpsgConvert.vue'
 import FormatConvert from './FormatConvert.vue'
 import GeoHash from './GeoHash.vue'
+import PlusCodes from './PlusCodes.vue'
+import MvtTile from './MvtTile.vue'
 import MapDraw from './MapDraw.vue'
 import TileCoords from './TileCoords.vue'
 
@@ -42,19 +43,6 @@ import TileCoords from './TileCoords.vue'
  * 客户端 bundle 里只包含该页真正用到的字符串。
  */
 export const TOOL_KEYS = {
-  'coord-convert': [
-    'tool.coord-convert.h1',
-    'tool.coord-convert.lead',
-    'tool.coord-convert.identity',
-    'tool.coord-convert.cgcs2000',
-    'tool.coord-convert.allTargets',
-    'tool.coord-convert.precisionNote',
-    // 轴序歧义时的「交换」按钮（SR-01）。漏掉这一项按钮会渲染成空标签
-    'common.swap',
-    'common.shareWarning',
-    'common.shareTooLarge',
-    'common.shareReset'
-  ],
   'epsg-convert': [
     'tool.epsg-convert.h1',
     'tool.epsg-convert.lead',
@@ -115,10 +103,7 @@ export const TOOL_KEYS = {
     // PRD 6.4：三条精度声明必须常驻
     'tool.epsg-convert.precisionNote1',
     'tool.epsg-convert.precisionNote2',
-    'tool.epsg-convert.precisionNote3',
-    'common.shareWarning',
-    'common.shareTooLarge',
-    'common.shareReset'
+    'tool.epsg-convert.precisionNote3'
   ],
   'dms-decimal': [
     'tool.dms-decimal.h1',
@@ -144,10 +129,7 @@ export const TOOL_KEYS = {
     'tool.dms-decimal.normalized.seconds',
     'tool.dms-decimal.normalized.minutes',
     'tool.dms-decimal.alternative',
-    'tool.dms-decimal.precisionNote',
-    'common.shareWarning',
-    'common.shareTooLarge',
-    'common.shareReset'
+    'tool.dms-decimal.precisionNote'
   ],
   'geohash': [
     'tool.geohash.h1',
@@ -205,6 +187,80 @@ export const TOOL_KEYS = {
     'common.shareTooLarge',
     'common.shareReset'
   ],
+  'plus-codes': [
+    'tool.plus-codes.h1',
+    'tool.plus-codes.lead',
+    'tool.plus-codes.mode',
+    'tool.plus-codes.mode.encode',
+    'tool.plus-codes.mode.decode',
+    'tool.plus-codes.length',
+    'tool.plus-codes.length.10',
+    'tool.plus-codes.length.11',
+    'tool.plus-codes.codeLabel',
+    'tool.plus-codes.codePlaceholder',
+    'tool.plus-codes.coordHint',
+    'tool.plus-codes.codeHint',
+    'tool.plus-codes.size',
+    'tool.plus-codes.note',
+    // 错误就地显示（SR-06 三段式）：坐标与编码各一组
+    'tool.plus-codes.errCoordTitle',
+    'tool.plus-codes.errCoordHint',
+    'tool.plus-codes.errCoordExample',
+    'tool.plus-codes.errCodeTitle',
+    'tool.plus-codes.errCodeHint',
+    'tool.plus-codes.errCodeExample'
+  ],
+  'mvt': [
+    'tool.mvt.h1',
+    'tool.mvt.lead',
+    'tool.mvt.modeFile',
+    'tool.mvt.modePaste',
+    'tool.mvt.fileHint',
+    'tool.mvt.chooseFile',
+    'tool.mvt.replaceFile',
+    'tool.mvt.base64Label',
+    'tool.mvt.base64Placeholder',
+    'tool.mvt.base64Hint',
+    'tool.mvt.tileZ',
+    'tool.mvt.tileX',
+    'tool.mvt.tileY',
+    'tool.mvt.tileHint',
+    'tool.mvt.tileAuto',
+    'tool.mvt.emptyTitle',
+    'tool.mvt.emptyHint',
+    'tool.mvt.summary',
+    'tool.mvt.colLayer',
+    'tool.mvt.colVersion',
+    'tool.mvt.colExtent',
+    'tool.mvt.colFeatures',
+    'tool.mvt.colTypes',
+    'tool.mvt.geoHint',
+    'tool.mvt.tileCoordHint',
+    'tool.mvt.previewTruncated',
+    'tool.mvt.note',
+    // 错误就地显示（SR-06 三段式），按 MvtErrorCode 逐条列出
+    'tool.mvt.errEmptyTitle',
+    'tool.mvt.errEmptyHint',
+    'tool.mvt.errSizeTitle',
+    'tool.mvt.errSizeHint',
+    'tool.mvt.errBase64Title',
+    'tool.mvt.errBase64Hint',
+    'tool.mvt.errGzipTitle',
+    'tool.mvt.errGzipHint',
+    'tool.mvt.errProtobufTitle',
+    'tool.mvt.errProtobufHint',
+    'tool.mvt.errNoLayersTitle',
+    'tool.mvt.errNoLayersHint',
+    'tool.mvt.errTileTitle',
+    'tool.mvt.errTileHint',
+    // 六种警告由 WARN_KEYS 表动态查，六个键必须齐全
+    'tool.mvt.warn.gzip',
+    'tool.mvt.warn.unknown',
+    'tool.mvt.warn.badGeom',
+    'tool.mvt.warn.tags',
+    'tool.mvt.warn.noTile',
+    'tool.mvt.warn.missingClose'
+  ],
   'map-draw': [
     'tool.map-draw.h1',
     'tool.map-draw.lead',
@@ -245,9 +301,6 @@ export const TOOL_KEYS = {
     'tool.map-draw.statTypes',
     'tool.map-draw.delete',
     'tool.map-draw.propsTitle',
-    'tool.map-draw.nameLabel',
-    'tool.map-draw.descLabel',
-    'tool.map-draw.customTitle',
     'tool.map-draw.addProperty',
     'tool.map-draw.removeProperty',
     'tool.map-draw.keyPlaceholder',
@@ -368,6 +421,9 @@ export const TOOL_KEYS = {
     'tool.tile-coords.downloadCsv',
     'tool.tile-coords.downloadZip',
     'tool.tile-coords.downloadHint',
+    'tool.tile-coords.downloadGeoJson',
+    'tool.tile-coords.geojsonHint',
+    'tool.tile-coords.geojsonTooLarge',
     'tool.tile-coords.errZoomRange',
     'tool.tile-coords.errZoomOrder',
     'tool.tile-coords.errEmptyFile',
@@ -488,10 +544,7 @@ export const TOOL_KEYS = {
     'tool.format-convert.warnGpkgMulti',
     'tool.format-convert.warnGpkgCrs',
     'tool.format-convert.warnGpkgGeometrySkipped',
-    'tool.format-convert.warnGpkgEmptyGeometry',
-    'common.shareWarning',
-    'common.shareTooLarge',
-    'common.shareReset'
+    'tool.format-convert.warnGpkgEmptyGeometry'
   ],
   'map-preview': [
     'tool.map-preview.fileTitle',
@@ -742,10 +795,11 @@ export const TOOL_KEYS = {
 
 /** slug → Vue 组件。M4 起逐个填入其余 10 个工具 */
 export const TOOL_COMPONENTS = {
-  'coord-convert': CoordConvert,
   'dms-decimal': DmsDecimal,
   'epsg-convert': EpsgConvert,
   geohash: GeoHash,
+  'plus-codes': PlusCodes,
+  mvt: MvtTile,
   'map-draw': MapDraw,
   'buffer-circle': BufferCircle,
   'format-convert': FormatConvert,

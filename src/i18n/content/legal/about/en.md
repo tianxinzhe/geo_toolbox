@@ -1,16 +1,16 @@
 ---
 title: 'About | GeoToolbox'
-description: 'What GeoToolbox is, who it is for and how it is maintained. Ten geospatial utilities, all computed locally in your browser, no sign-up, no upload, deployed on Cloudflare Pages.'
-updated: 2026-11-07
+description: 'What GeoToolbox is, who it is for and how it is maintained. Fifteen geospatial utilities, all computed locally in your browser, no sign-up, no upload, deployed on Cloudflare Pages.'
+updated: 2026-11-16
 ---
 
 ## What this site is
 
-GeoToolbox is a collection of **online geospatial utilities**. The first batch of eleven tools covers four recurring needs:
+GeoToolbox is a collection of **online geospatial utilities**. Fifteen tools cover four recurring needs:
 
-- **Coordinates and conversion** — WGS84 and CGCS2000 conversion, degrees-minutes-seconds to decimal degrees, and projected coordinate conversion by EPSG code
-- **Data formats** — GeoJSON / KML / KMZ / GPX / TopoJSON conversion, and WKT to GeoJSON and back
-- **Spatial encoding** — compress coordinates into short GeoHash strings for indexing and sharing
+- **Coordinates and conversion** — degrees-minutes-seconds to decimal degrees, and projected coordinate conversion by EPSG code
+- **Data formats** — GeoJSON / KML / KMZ / GPX / TopoJSON conversion, WKT to GeoJSON and back, and MVT vector tile decoding
+- **Spatial encoding** — compress coordinates into GeoHash strings or Plus Codes for indexing, sharing and dictation
 - **Map and visualisation** — draw points, lines and polygons online and export them, generate radius circles and buffers, preview local vector data on a map, clip and overlay layers, extract features by attribute, and export XYZ tile coordinates
 
 Each tool is its own page with accompanying documentation explaining what problem it solves, how to read the output, and where the precision limits lie.

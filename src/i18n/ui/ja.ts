@@ -111,7 +111,7 @@ const ja: Record<UiKey, string> = {
   /* ---------- ホームと索引 ---------- */
   'home.h1': 'ブラウザの外に出ない地理情報ツール',
   'home.intro':
-    '座標・投影・ベクター形式に対応した 11 のツール。登録もアップロードも不要で、すべての計算はお手元のデバイス上で完結します。',
+    '座標・投影・ベクター形式に対応した 15 のツール。登録もアップロードも不要で、すべての計算はお手元のデバイス上で完結します。',
   'home.section.tools': 'ツール一覧',
   'home.section.why': 'このサイトの特徴',
   'home.why.local': 'データは送信されません。区画境界や位置情報は端末内に留まります。',
@@ -142,15 +142,6 @@ const ja: Record<UiKey, string> = {
   'footer.rights': '© {year} {site}。すべての計算はブラウザ内で実行されます。',
   'footer.noAccount': 'アカウント不要・アップロード不要・データ追跡なし。',
 
-  /* ---------- T01 座標系変換 ----------
-     SEO の <title> と meta description はドキュメントの frontmatter に置く */
-  'tool.coord-convert.h1': 'WGS84 / CGCS2000 座標系変換',
-  'tool.coord-convert.lead': 'WGS84 と CGCS2000 の相互変換。実用精度では両者は等価です。',
-  'tool.coord-convert.identity': '変換元と変換先の座標系が同じため、値はそのまま返されます。',
-  'tool.coord-convert.cgcs2000': 'CGCS2000 はここでは WGS84 と等価として扱います。両者の差はセンチメートル程度です。',
-  'tool.coord-convert.allTargets': 'すべての変換先座標系',
-  'tool.coord-convert.precisionNote': 'WGS84 と CGCS2000 の楕円体パラメータの差はセンチメートル未満で、本ツールは等価として扱い、オフセットは適用しません。',
-
   /* ---------- T02 経度緯度の形式変換 ----------
      SEO の <title> と meta description はドキュメントの frontmatter に置く。
      {name} / {value} を含むキーはコンポーネント側で文字列置換する */
@@ -162,7 +153,7 @@ const ja: Record<UiKey, string> = {
   'tool.dms-decimal.target.dmsSymbolic': '度分秒（記号形式）',
   'tool.dms-decimal.target.dmsTextual': '度分秒（テキスト形式）',
   'tool.dms-decimal.coordHint':
-    '経度が先、緯度が後です。1 行に 1 組、複数行まとめて貼り付けられます。',
+    '経度が先、緯度が後です。1 回に 1 組の座標を入力します。',
   'tool.dms-decimal.lineError': '{n} 行目：{message}',
   'tool.dms-decimal.errFormat': '入力が選択した元の形式（{name}）と一致しません。',
   'tool.dms-decimal.errFormatHint':
@@ -187,7 +178,7 @@ const ja: Record<UiKey, string> = {
   'tool.dms-decimal.alternative': '{name} として解釈することもできます。その場合の結果は {value} です。どちらの意味かご確認ください。',
   'tool.dms-decimal.partialHint': '2 つの欄は片方だけでも使えます。未入力の方はエラーにならず「未入力」と表示されます。',
   'tool.dms-decimal.precisionNote':
-    '小数点以下の桁数は 3 形式すべての小数部に適用されます。目安：10進度の小数第 8 位は約 1 mm、1 秒は約 31 m、0.01 秒は約 0.3 m です。',
+    '10進度は小数第 8 位まで（約 1 mm）、度分は分の小数第 4 位まで、度分秒は秒の小数第 2 位まで（約 0.3 m）表示します。',
 
   /* ---------- T03 投影座標変換（EPSG） ---------- */
 
@@ -597,6 +588,11 @@ const ja: Record<UiKey, string> = {
   'tool.tile-coords.downloadZip': 'ZIP をダウンロード（ズームごとに CSV）',
   'tool.tile-coords.downloadHint':
     'ズームレベルごとに 1 つの CSV（見出しは x, y, z）を出力します。複数レベルは ZIP にまとめ、巨大な表の解析を避けます。',
+  'tool.tile-coords.downloadGeoJson': 'GeoJSON ポリゴンをダウンロード',
+  'tool.tile-coords.geojsonHint':
+    'タイルごとに閉じた矩形ポリゴンを出力し、属性に z / x / y を含めます。複数ズームは ZIP にまとめます。',
+  'tool.tile-coords.geojsonTooLarge':
+    'GeoJSON の出力は {limit} タイルまでです。範囲を狭めるかズームを減らしてください。',
   'tool.tile-coords.errZoomRange': 'ズームレベルは 0〜22 の整数で指定してください。',
   'tool.tile-coords.errZoomOrder': '最小ズームレベルは最大ズームレベル以下にしてください。',
   'tool.tile-coords.errEmptyFile': 'ファイルが空か、読み取れる内容がありません。',
@@ -890,6 +886,90 @@ const ja: Record<UiKey, string> = {
   'guide.readMore': '記事を読む',
   'guide.minutes': '約 {count} 分',
   'guide.updated': '{date} 更新',
+  'guide.cta.title': 'ブラウザで試す',
+  'guide.cta.body': 'ツールを開けば解析・変換できます。ファイルはアップロードされず、端末内で処理されます。',
+  'guide.cta.all': 'すべてのツール',
+
+  /* ---------- T21 Plus Codes ---------- */
+  'tool.plus-codes.h1': 'Plus Codes（Open Location Code）',
+  'tool.plus-codes.lead':
+    '緯度経度と Plus Code を相互変換します。オープンな位置コードで、計算はすべてブラウザ内で完結します。',
+  'tool.plus-codes.mode': '入力タイプ',
+  'tool.plus-codes.mode.encode': '座標 → Plus Code',
+  'tool.plus-codes.mode.decode': 'Plus Code → 座標',
+  'tool.plus-codes.length': 'コード長',
+  'tool.plus-codes.length.10': '10 桁（約 14 m）',
+  'tool.plus-codes.length.11': '11 桁（約 3 m）',
+  'tool.plus-codes.codeLabel': 'Plus Code',
+  'tool.plus-codes.codePlaceholder': '8FVC9G8F+6X',
+  'tool.plus-codes.coordHint':
+    '経度を先に、例：116.3974, 39.9088。度分秒表記にも対応します。',
+  'tool.plus-codes.codeHint':
+    '8FVC9G8F+6X のような完全なコードを入力してください。短縮コードは基準地点が必要なため未対応です。',
+  'tool.plus-codes.size': '{length} 桁 · 約 {lat} × {lng}',
+  'tool.plus-codes.note':
+    '完全なコードは 8 文字＋「+」＋2〜3 文字です。10 桁で約 14 m 四方、11 桁で約 3 m になります。短縮コードは基準地点が必要なため、ここでは完全なコードのみ扱います。',
+  'tool.plus-codes.errCoordTitle': '座標を読み取れません',
+  'tool.plus-codes.errCoordHint':
+    '「経度, 緯度」の順で入力してください。116°23′50.64″E, 39°54′31.68″N のような度分秒も使えます。',
+  'tool.plus-codes.errCoordExample': '116.3974, 39.9088',
+  'tool.plus-codes.errCodeTitle': '有効な Plus Code ではありません',
+  'tool.plus-codes.errCodeHint':
+    '「+」の前に 8 文字、後に 2〜3 文字の完全なコードを入力してください。8 文字未満の短縮コードは基準地点が必要なため単独ではデコードできません。',
+  'tool.plus-codes.errCodeExample': '8FVC9G8F+6X',
+
+  /* ---------- T22 MVT ベクタタイル ---------- */
+  'tool.mvt.h1': 'MVT ベクタタイル解析',
+  'tool.mvt.lead':
+    '.pbf/.mvt タイルをアップロードするか Base64 を貼り付けて、レイヤー・地物数・ジオメトリを読み取り、GeoJSON として出力します。すべてブラウザ内で完結します。',
+  'tool.mvt.modeFile': 'ファイル',
+  'tool.mvt.modePaste': 'Base64',
+  'tool.mvt.fileHint': '.pbf / .mvt に対応。gzip は自動判定、1 ファイル 20 MB まで。',
+  'tool.mvt.chooseFile': 'PBF / MVT ファイルを選択',
+  'tool.mvt.replaceFile': 'ファイルを選び直す',
+  'tool.mvt.base64Label': 'Base64 文字列',
+  'tool.mvt.base64Placeholder': 'Base64・data URL・base64url を貼り付け',
+  'tool.mvt.base64Hint': '空白・改行・data: プレフィックスは無視されます。',
+  'tool.mvt.tileZ': 'ズーム z',
+  'tool.mvt.tileX': 'タイル x',
+  'tool.mvt.tileY': 'タイル y',
+  'tool.mvt.tileHint': 'z/x/y を入れると経緯度に変換します。3 つとも空欄ならタイル内座標のままです。',
+  'tool.mvt.tileAuto': 'ファイル名から {tile} を入力しました',
+  'tool.mvt.emptyTitle': 'まだ解析結果がありません',
+  'tool.mvt.emptyHint': 'タイルファイルを選ぶか Base64 を貼り付けて「変換」を押してください。',
+  'tool.mvt.summary': 'レイヤー {layers} · 地物 {features} · {size}',
+  'tool.mvt.colLayer': 'レイヤー',
+  'tool.mvt.colVersion': 'バージョン',
+  'tool.mvt.colExtent': '範囲',
+  'tool.mvt.colFeatures': '地物',
+  'tool.mvt.colTypes': '点 / 線 / 面',
+  'tool.mvt.geoHint': '出力は WGS84 の経緯度（EPSG:4326）です。',
+  'tool.mvt.tileCoordHint': 'z/x/y がないため、座標はタイル内の整数（0〜extent）のままです。',
+  'tool.mvt.previewTruncated': 'プレビューは先頭 {n} 行のみ。コピーかダウンロードで全体を取得できます。',
+  'tool.mvt.note':
+    'MVT はジオメトリをタイル内の整数座標で保持し、z/x/y は含みません。レイヤーのバージョン・extent・属性・リングの向きは Mapbox Vector Tile 2.x 仕様に従って解析します。',
+  'tool.mvt.errEmptyTitle': '解析するデータがありません',
+  'tool.mvt.errEmptyHint': 'タイルファイルを選ぶか、Base64 を貼り付けてください。',
+  'tool.mvt.errSizeTitle': 'タイルが大きすぎます',
+  'tool.mvt.errSizeHint': '1 ファイル 20 MB までです。タイルを分割するか範囲を絞ってください。',
+  'tool.mvt.errBase64Title': 'Base64 をデコードできません',
+  'tool.mvt.errBase64Hint':
+    'A–Z a–z 0–9 + / 以外の文字が混ざっていないか、途中で切れていないか確認してください。',
+  'tool.mvt.errGzipTitle': 'gzip データが壊れています',
+  'tool.mvt.errGzipHint': 'gzip ヘッダーはあるものの展開できません。タイルを再出力してください。',
+  'tool.mvt.errProtobufTitle': '有効な MVT タイルではありません',
+  'tool.mvt.errProtobufHint':
+    'protobuf として不正か、ジオメトリ命令が欠けています。mbtiles / pmtiles 全体ではなく、1 枚のタイルか確認してください。',
+  'tool.mvt.errNoLayersTitle': 'レイヤーがありません',
+  'tool.mvt.errNoLayersHint': 'protobuf は読めましたがベクタレイヤーが入っていません。出力が途中で切れた可能性があります。',
+  'tool.mvt.errTileTitle': 'タイル番号が不正です',
+  'tool.mvt.errTileHint': '整数で 0 ≤ z ≤ 22、0 ≤ x,y < 2^z を指定するか、3 つとも空にしてください。',
+  'tool.mvt.warn.gzip': 'gzip 圧縮を検出し、自動で展開しました。',
+  'tool.mvt.warn.unknown': 'ジオメトリ種別のない地物が {count} 件あり、スキップしました。',
+  'tool.mvt.warn.badGeom': 'ジオメトリが壊れた地物が {count} 件あり、スキップしました。',
+  'tool.mvt.warn.tags': 'タグ数が奇数の地物が {count} 件あり、末尾のタグを無視しました。',
+  'tool.mvt.warn.noTile': 'タイル番号がないため、座標はタイル内単位のままです。',
+  'tool.mvt.warn.missingClose': 'ClosePath のない面リングが {count} 件あり、自動で閉じました。',
 
   /* ---------- T09 オンライン地図描画 ---------- */
   'tool.map-draw.h1': 'オンライン地図描画ツール',
@@ -931,9 +1011,6 @@ const ja: Record<UiKey, string> = {
   'tool.map-draw.statTypes': '種類',
   'tool.map-draw.delete': '削除',
   'tool.map-draw.propsTitle': '属性',
-  'tool.map-draw.nameLabel': '名前',
-  'tool.map-draw.descLabel': '説明',
-  'tool.map-draw.customTitle': 'カスタム属性',
   'tool.map-draw.addProperty': '属性を追加',
   'tool.map-draw.removeProperty': '削除',
   'tool.map-draw.keyPlaceholder': 'キー',

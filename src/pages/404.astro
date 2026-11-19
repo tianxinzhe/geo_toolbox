@@ -10,7 +10,7 @@ import { TOOLS } from '../i18n/tools'
 import { guideIndexPath, homePath, toolPath } from '../lib/paths'
 import ContentPage from '../layouts/ContentPage.astro'
 
-const popularTools = ['coord-convert', 'tile-coords', 'format-convert', 'epsg-convert']
+const popularTools = ['tile-coords', 'format-convert', 'epsg-convert']
   .map((slug) => TOOLS.find((tool) => tool.slug === slug))
   .filter((tool): tool is NonNullable<typeof tool> => tool !== undefined)
 ---

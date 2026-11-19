@@ -1,12 +1,12 @@
 ---
 title: 'DMS to Decimal Degrees Converter — Lat/Lon Formats | GeoToolbox'
-description: 'Convert latitude and longitude between decimal degrees, degrees-minutes and DMS. Auto-detects the input format and flags any carry-over. Runs entirely in your browser.'
-updated: 2026-11-08
+description: 'Convert latitude and longitude between decimal degrees, degrees-minutes and DMS. Auto-detects the input format. Runs entirely in your browser.'
+updated: 2026-11-16
 faq:
   - q: 'Is 39.54 decimal degrees, or 39 degrees 54 minutes?'
-    a: 'On its own the string is genuinely ambiguous, and both readings fall inside the valid range. This tool treats it as decimal degrees (39.54) by default and then shows the degrees-and-minutes reading (39 degrees 54 minutes, which is 39.9) underneath so you can confirm which one you meant. Your input is never silently rewritten. To remove the ambiguity entirely, write the structure explicitly, for example 39°54′ or 39.54N.'
+    a: 'On its own the string is genuinely ambiguous, and both readings fall inside the valid range. This tool treats it as decimal degrees (39.54) by default. To read it as degrees and minutes, select that source format or write the structure explicitly, for example 39°54′.'
   - q: 'Why did my 39°54′90″ come out as 39°55′30″?'
-    a: 'Because seconds cannot be 60 or more. The tool performed carry-over normalisation, turning 90 seconds into 1 minute 30 seconds. Both notations describe exactly the same point, 39.925 degrees. Normalisation is never silent: the result area states that the seconds value was 60 or more and has been carried into minutes, so you can go back and check whether the source figure was a typo.'
+    a: 'Because seconds cannot be 60 or more. The tool performs carry-over normalisation, turning 90 seconds into 1 minute 30 seconds. Both notations describe exactly the same point, 39.925 degrees. If the result does not match your source record, check whether a value such as 89.999… was transcribed as 90 seconds.'
   - q: 'Where does the minus sign go for west longitudes and south latitudes?'
     a: 'On the degrees only. Minutes and seconds are always non-negative. So −116.3974 degrees is the same as 116°23′50.64″W, and writing the minus across all three parts is a mistake. When a W or S symbol is present the tool takes the absolute value first and then applies the negative sign, which means W−0.1276 and W0.1276 produce the same result instead of cancelling each other out.'
   - q: 'Why do west longitudes smaller than one degree go wrong so often?'
@@ -29,14 +29,6 @@ Decimal degrees is the **computational** format: one number that can be added, c
 
 The real job of this tool is therefore not arithmetic but **bridging**: the DMS figure you copied off a paper sheet has to become a decimal number before it can enter a database, and the decimal number your API returned has to become DMS before it can go into a report.
 
-## Converting several points at once
-
-The input box accepts several lines, one longitude/latitude pair per line. Results come back in the same order, one line per successful input, and the copy button takes the whole block.
-
-- Blank lines are ignored and do not shift the line numbers.
-- A bad line fails on its own: the message names the original line and shows an example, while the other lines still return results.
-- The share button is hidden for multi-line input, because a share link can only carry one coordinate pair.
-
 ## Sign convention: west and south are negative
 
 This is where tools disagree with each other most often, so the convention used here is stated explicitly.
@@ -53,13 +45,13 @@ One more detail: zero itself has no direction. On the equator and on the prime m
 
 In a well-formed DMS value, minutes and seconds both lie in the half-open interval from 0 (inclusive) to 60 (exclusive). Real data violates this constantly: hand-summed angles, spreadsheet fill handles and raw device counters all produce things like `39°54'90"` or `39°75'0"`.
 
-The behaviour here is to **normalise by carrying over**, and to **say so**:
+The behaviour here is to **normalise by carrying over**:
 
 - Seconds of 60 or more carry into minutes, so `39°54'90"` becomes `39°55'30"`. Both are 39.925 degrees.
 - Minutes of 60 or more carry into degrees, so `39°75'0"` becomes `40°15'0"`. Both are 40.25 degrees.
 - Carrying seconds can push minutes to 60, which then carries into degrees. The loop continues until all three parts are legal.
 
-The notice matters. Normalisation is, in effect, a rewrite of what the user typed, and if it happens silently the result will not match the source record and the user will have no idea where the discrepancy came from. Whenever a carry occurs, a line appears in the result area stating whether it was seconds or minutes that carried.
+Normalisation does not move the point: `39°54'90"` and `39°55'30"` describe the same location and convert to the same result. If the carry makes you suspect a transcription error, compare the two spellings by hand.
 
 ## How the `39.54` ambiguity is resolved
 
@@ -70,19 +62,19 @@ The notice matters. Normalisation is, in effect, a rewrite of what the user type
 
 The gap is 0.36 degrees, roughly 40 km on the ground — enough to move a point from one city to another. Any tool facing this has two options: guess, or show both.
 
-This tool shows both, under these rules:
+The rules here are:
 
 1. **Decimal degrees wins by default.** Bare numbers arriving from an API, a CSV export or a database are overwhelmingly decimal degrees.
-2. **The alternative reading is displayed underneath** with its own value, so you can confirm.
-3. **Nothing is rewritten silently.** The chosen interpretation appears on the "read as" line, and the alternative follows immediately after it.
+2. **The other reading is never guessed**, and two answers are never shown at once.
+3. To read it as degrees and minutes, select that source format explicitly, or write `39°54'`.
 
-The ambiguity notice only fires under narrow conditions: the input is a single bare number, it has a fractional part, that fraction is at most two digits and below 60, and the degrees-and-minutes reading still lands inside the valid range. So `39` does not trigger it (an integer has no second reading), `89.99` does not either (99 minutes is illegal and the result would exceed the latitude range), and `39°32.4` certainly does not, because writing a separator already declares the format.
+This judgement only happens in the automatic source-format mode. Once a source format is selected, the input is parsed strictly under that format.
 
 To avoid the question altogether, make the structure explicit in your input: `39°54'`, `39 54`, `39.54N` and `N39.54` all have exactly one reading.
 
 ## The two DMS spellings and when to use each
 
-Every DMS result is given on two lines.
+With the symbolic or textual DMS target format, the same value is written as:
 
 - **Symbolic**: `39°54'31.68"N`. The three parts are separated by `°`, `'` and `"`, with the hemisphere letter at the end. This is the internationally common form — map margins, journal articles, GPS screens — and it pastes cleanly into most GIS software.
 - **Spelled out**: the local-language words for degrees, minutes and seconds, with the direction written as a word rather than a letter. On the Chinese page this reads as a full sentence-like string. It is meant for body text, reports and documentation, and above all for speech output and screen readers, which frequently swallow or mispronounce `°` and `"`.
@@ -96,26 +88,26 @@ A few inputs either fail or produce something other than what you expected:
 - **Latitude of 95.** Latitude is valid from −90 to +90, longitude from −180 to +180. The error names the offending field and suggests checking whether the two were transposed, which is the cause in the overwhelming majority of cases.
 - **`E116.3974` typed into the latitude field.** A hemisphere symbol that contradicts the axis is not quietly ignored; the input is reported as unreadable. Ignoring it would let a swapped pair of fields pass unnoticed.
 - **Negative DMS with no hemisphere symbol.** `-39°54'31.68"` is fine and means south. `39°54'31.68"` carries no direction information at all, so it is taken as positive, that is, north. Direction has to be stated.
-- **Comma as a decimal separator** (`116,3974`). By default the comma is a field separator, so this reads as 116 degrees 3974 minutes and fails the range check. Switch "meaning of commas" to "decimal point" under advanced options.
+- **Comma as a decimal separator** (`116,3974`). By default the comma is a field separator, so this reads as 116 degrees 3974 minutes and fails the range check. Replace the comma with a decimal point (`116.3974`).
 - **Full-width digits and punctuation**, common when pasting from a Japanese input method or from a PDF. The input is normalised to half-width before the format is recognised, so these parse correctly.
 - **Curly quotes.** Word processors turn `'` into `’` and `"` into `”`. Both variants are accepted as minute and second marks.
 
 ## Precision: how many decimal places to keep
 
-The decimal-places option applies to the fractional part of all three formats. The ground resolution each setting buys you is shown below, measured along a meridian; for longitude, multiply by the cosine of the latitude, about 0.77 at 40°.
+The tool uses fixed decimals per format: 8 for decimal degrees, 4 for minutes, and 2 for seconds. The ground resolution this buys you is shown below, measured along a meridian; for longitude, multiply by the cosine of the latitude, about 0.77 at 40°.
 
 | Decimal degrees | Ground resolution | Seconds digits | Ground resolution |
 |---|---|---|---|
 | 2 | 1.1 km | whole seconds | 31 m |
 | 4 | 11 m | 2 (0.01″) | 0.31 m |
 | 6 | 0.11 m | 3 (0.001″) | 3.1 cm |
-| 8 (default) | 1.1 mm | 4 | 3.1 mm |
+| 8 | 1.1 mm | 4 | 3.1 mm |
 
-Three practical recommendations. **Store and exchange decimal degrees at eight places.** That is this site's default, roughly a millimetre, which is far finer than any consumer GPS actually achieves (typically two to five metres), so it never becomes the limiting factor and never accumulates rounding error across repeated conversions. **Do not display more than two seconds digits** unless your data comes from geodetic-grade GNSS processing; quoting a coordinate to three millimetres when the measurement is accurate to three metres is misleading. **Never write the display format back into storage.** DMS has carry boundaries, and repeated cycles of formatting, copying and re-parsing introduce rounding. Keep decimal degrees in the database and format only at presentation time.
+Three practical recommendations. **Store and exchange decimal degrees at eight places.** This tool always outputs eight places for decimal degrees, roughly a millimetre, which is far finer than any consumer GPS actually achieves (typically two to five metres), so it never becomes the limiting factor and never accumulates rounding error across repeated conversions. **Do not display more than two seconds digits** unless your data comes from geodetic-grade GNSS processing; quoting a coordinate to three millimetres when the measurement is accurate to three metres is misleading. **Never write the display format back into storage.** DMS has carry boundaries, and repeated cycles of formatting, copying and re-parsing introduce rounding. Keep decimal degrees in the database and format only at presentation time.
 
 ## Where to go next
 
-If you need more than a format change: datum equivalence checks between WGS84 and CGCS2000 belong in the coordinate system converter; projected coordinates go to the EPSG converter; and short string encodings are GeoHash.
+If you need more than a format change: projected coordinates go to the EPSG converter, and short string encodings are GeoHash.
 
 Every calculation runs locally in your browser. The coordinates you type never leave your device.
 

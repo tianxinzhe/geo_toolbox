@@ -6,7 +6,7 @@
  * 需要带坐标系的场合一律用 `Coordinate`，而不是 `[number, number]`。
  */
 
-/** 坐标系标识。T01 的 WGS84 / CGCS2000（实用精度内等值）+ EPSG 代码 */
+/** 坐标系标识。EPSG 代码 */
 export type CrsId = 'WGS84' | 'CGCS2000' | `EPSG:${number}` | (string & {})
 
 /** 坐标来源（PRD 8.1）。GPS 来源需保留精度半径 */

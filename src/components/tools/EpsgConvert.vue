@@ -23,7 +23,7 @@
  * ⛔ 不直接调用 toFixed / 手工拼数字：显示走 fmt / fmtUnit / stdFixed。
  */
 
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 
 import type { Lang } from '../../config/i18n'
 import type { ToolUi } from '../../i18n/uiKeys'
@@ -52,7 +52,6 @@ import {
   defaultPoint,
   CUSTOM_ID
 } from '../../lib/crs/shortlist'
-import { buildShareUrl, readShareState, T03_PARAMS, type ShareState } from '../../lib/share'
 import CopyButton from '../ui/CopyButton.vue'
 
 interface Props {
@@ -68,7 +67,6 @@ const props = defineProps<Props>()
  * ------------------------------------------------------------------ */
 
 const groups = crsGroups(props.lang)
-const allOptionIds = new Set(groups.flatMap((g) => g.options.map((o) => o.id)))
 
 const defaults = defaultPair(props.lang)
 const example = defaultPoint(props.lang)
@@ -112,7 +110,6 @@ const custom7 = reactive<Record<string, string>>({
   rz: '',
   s: ''
 })
-const shareNote = ref('')
 const busy = ref(false)
 const loadNote = ref('')
 
@@ -410,106 +407,6 @@ const custom7Incomplete = computed(() => {
 const sameCrs = computed(() => effectiveId(fromId.value, fromCode.value) === effectiveId(toId.value, toCode.value))
 
 /* ------------------------------------------------------------------ *
- * 分享
- * ------------------------------------------------------------------ */
-
-async function onShare(): Promise<void> {
-  const state: ShareState = {}
-  state.from = effectiveId(fromId.value, fromCode.value) || fromId.value
-  state.to = effectiveId(toId.value, toCode.value) || toId.value
-  const x = parseNum(xInput.value)
-  const y = parseNum(yInput.value)
-  if (x !== null) state.x = Number(std(x, 8))
-  if (y !== null) state.y = Number(std(y, 8))
-  if (allowMissing.value) state.rev = true
-  if (custom7Enabled.value) {
-    const tow = normalizeTowgs84(CUSTOM7_FIELDS.map(([k]) => custom7[k]).join(','))
-    if (tow) state.f7 = tow
-  }
-
-  const link = await buildShareUrl(globalThis.location.pathname, state, T03_PARAMS, {
-    from: defaults.from,
-    to: defaults.to
-  })
-  if (link.mode === 'tooLarge') {
-    shareNote.value = props.ui['common.shareTooLarge']
-    return
-  }
-  const abs = new URL(link.url, globalThis.location.origin).href
-  try {
-    await navigator.clipboard.writeText(abs)
-    shareNote.value = props.ui['common.shared']
-  } catch {
-    shareNote.value = abs
-  }
-  setTimeout(() => {
-    if (shareNote.value === props.ui['common.shared']) shareNote.value = ''
-  }, 2500)
-}
-
-/* ------------------------------------------------------------------ *
- * 偏好 / URL 恢复
- * ------------------------------------------------------------------ */
-
-function applyRestoredId(target: 'from' | 'to', id: string): void {
-  if (allOptionIds.has(id)) {
-    if (target === 'from') fromId.value = id
-    else toId.value = id
-    return
-  }
-  // 不在常用列表里：切到「自定义 EPSG 代码」，把代码填进去
-  try {
-    const code = parseEpsgId(id)
-    if (target === 'from') {
-      fromId.value = CUSTOM_ID
-      fromCode.value = String(code)
-    } else {
-      toId.value = CUSTOM_ID
-      toCode.value = String(code)
-    }
-  } catch {
-    // 非法 id 直接忽略，以默认状态加载
-  }
-}
-
-onMounted(async () => {
-  const restored = await readShareState(
-    { search: globalThis.location.search, hash: globalThis.location.hash },
-    T03_PARAMS
-  )
-  if (restored.hadProblems) shareNote.value = props.ui['common.shareReset']
-
-  const s = restored.state
-  if (typeof s.from === 'string') applyRestoredId('from', s.from)
-  if (typeof s.to === 'string') applyRestoredId('to', s.to)
-  if (typeof s.x === 'number') xInput.value = std(s.x, 8)
-  if (typeof s.y === 'number') yInput.value = std(s.y, 8)
-  if (s.rev === true) allowMissing.value = true
-  if (typeof s.f7 === 'string') {
-    const tow = normalizeTowgs84(s.f7)
-    if (tow) {
-      const parts = tow.split(',')
-      while (parts.length < 7) parts.push('0')
-      CUSTOM7_FIELDS.forEach(([k], i) => (custom7[k] = parts[i]))
-      custom7Enabled.value = true
-    }
-  }
-
-  settled.value = {
-    fromId: fromId.value,
-    toId: toId.value,
-    fromCode: fromCode.value,
-    toCode: toCode.value,
-    x: xInput.value,
-    y: yInput.value,
-    allowMissing: allowMissing.value,
-    custom7Enabled: custom7Enabled.value,
-    custom7: { ...custom7 }
-  }
-  await recompute()
-})
-
-/* ------------------------------------------------------------------ *
  * 防抖
  * ------------------------------------------------------------------ */
 
@@ -598,80 +495,79 @@ watch(
       {{ ui['tool.epsg-convert.axisNoteXY'] }}
     </p>
 
-    <div class="row">
-      <div class="field">
-        <label for="t03-x">{{ sourceLabels[0] }}</label>
-        <input
-          id="t03-x"
-          v-model="xInput"
-          type="text"
-          inputmode="decimal"
-          autocomplete="off"
-          spellcheck="false"
-          :placeholder="example.x"
-          :aria-invalid="invalid.x ? 'true' : undefined"
-        />
-        <span v-if="invalid.x" class="field__error" role="alert">
-          {{ ui['tool.epsg-convert.errNumber'] }}
-        </span>
-      </div>
+    <div class="t03__io">
+      <div class="t03__inputs">
+        <div class="row">
+          <div class="field">
+            <label for="t03-x">{{ sourceLabels[0] }}</label>
+            <input
+              id="t03-x"
+              v-model="xInput"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              spellcheck="false"
+              :placeholder="example.x"
+              :aria-invalid="invalid.x ? 'true' : undefined"
+            />
+            <span v-if="invalid.x" class="field__error" role="alert">
+              {{ ui['tool.epsg-convert.errNumber'] }}
+            </span>
+          </div>
 
-      <div class="field">
-        <label for="t03-y">{{ sourceLabels[1] }}</label>
-        <input
-          id="t03-y"
-          v-model="yInput"
-          type="text"
-          inputmode="decimal"
-          autocomplete="off"
-          spellcheck="false"
-          :placeholder="example.y"
-          :aria-invalid="invalid.y ? 'true' : undefined"
-        />
-        <span v-if="invalid.y" class="field__error" role="alert">
-          {{ ui['tool.epsg-convert.errNumber'] }}
-        </span>
-      </div>
-    </div>
-
-    <p class="hint">{{ ui['tool.epsg-convert.coordHint'] }}</p>
-
-    <div class="btn-row">
-      <button type="button" class="btn btn--ghost" @click="swapXY">
-        {{ ui['tool.epsg-convert.swapXY'] }}
-      </button>
-    </div>
-
-    <!-- 高级选项：原生 <details>，爬虫可读、不依赖 JS -->
-    <details class="advanced">
-      <summary>{{ ui['common.advanced'] }}</summary>
-
-      <div class="field">
-        <label class="check">
-          <input v-model="custom7Enabled" type="checkbox" />
-          <span>{{ ui['tool.epsg-convert.custom7'] }}</span>
-        </label>
-        <span class="field__hint">{{ ui['tool.epsg-convert.custom7Hint'] }}</span>
-      </div>
-
-      <div v-if="custom7Enabled" class="custom7">
-        <div v-for="[key, labelKey] in CUSTOM7_FIELDS" :key="key" class="field field--small">
-          <label :for="`t03-${key}`">{{ ui[labelKey] }}</label>
-          <input
-            :id="`t03-${key}`"
-            v-model="custom7[key]"
-            type="text"
-            inputmode="decimal"
-            autocomplete="off"
-          />
+          <div class="field">
+            <label for="t03-y">{{ sourceLabels[1] }}</label>
+            <input
+              id="t03-y"
+              v-model="yInput"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              spellcheck="false"
+              :placeholder="example.y"
+              :aria-invalid="invalid.y ? 'true' : undefined"
+            />
+            <span v-if="invalid.y" class="field__error" role="alert">
+              {{ ui['tool.epsg-convert.errNumber'] }}
+            </span>
+          </div>
         </div>
-        <p v-if="custom7Incomplete" class="note note--warn">
-          {{ ui['tool.epsg-convert.custom7Incomplete'] }}
-        </p>
-      </div>
-    </details>
 
-    <output class="result-stack" aria-live="polite">
+        <p class="hint">{{ ui['tool.epsg-convert.coordHint'] }}</p>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn--ghost" @click="swapXY">
+            {{ ui['tool.epsg-convert.swapXY'] }}
+          </button>
+        </div>
+
+        <!-- 自定义 7 参数：内联展开，不再藏进「高级选项」 -->
+        <div class="custom7-block">
+          <label class="check">
+            <input v-model="custom7Enabled" type="checkbox" />
+            <span>{{ ui['tool.epsg-convert.custom7'] }}</span>
+          </label>
+          <span class="field__hint">{{ ui['tool.epsg-convert.custom7Hint'] }}</span>
+
+          <div v-if="custom7Enabled" class="custom7">
+            <div v-for="[key, labelKey] in CUSTOM7_FIELDS" :key="key" class="field field--small">
+              <label :for="`t03-${key}`">{{ ui[labelKey] }}</label>
+              <input
+                :id="`t03-${key}`"
+                v-model="custom7[key]"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+              />
+            </div>
+            <p v-if="custom7Incomplete" class="note note--warn">
+              {{ ui['tool.epsg-convert.custom7Incomplete'] }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    <output class="t03__result" aria-live="polite">
       <div v-if="bothEmpty" class="empty-state">
         <p>{{ ui['tool.epsg-convert.emptyTitle'] }}</p>
         <p>{{ ui['tool.epsg-convert.emptyBody'] }}</p>
@@ -772,18 +668,13 @@ watch(
             :fail-label="ui['common.copyFailed']"
             variant="secondary"
           />
-          <button type="button" class="btn btn--primary" @click="onShare">
-            {{ ui['common.share'] }}
-          </button>
           <button type="button" class="btn btn--ghost" @click="clearAll">
             {{ ui['common.clear'] }}
           </button>
         </div>
-        <p class="hint">{{ ui['common.shareWarning'] }}</p>
       </template>
-
-      <p v-if="shareNote" class="note note--dim share-note">{{ shareNote }}</p>
     </output>
+    </div>
 
     <!-- PRD 6.4：三条精度声明必须常驻、不可折叠 -->
     <div class="disclaimer">
@@ -798,13 +689,42 @@ watch(
 .t03 {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
 }
 
-.result-stack {
+/* 输入在左、结果在右，两栏等高 */
+.t03__io {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: stretch;
+}
+
+/* 输入与结果共用同一套面板样式，左右两栏外观一致 */
+.t03__inputs,
+.t03__result {
+  background: var(--bg-sub);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: var(--sp-3);
+}
+
+.t03__inputs {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+}
+
+.t03__result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+@media (max-width: 720px) {
+  .t03__io {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .result-title {
@@ -843,17 +763,6 @@ watch(
   margin: 0;
 }
 
-.share-note {
-  overflow-wrap: anywhere;
-  font-family: var(--mono);
-}
-
-.advanced {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-}
-
 .custom-code {
   display: flex;
   flex-direction: column;
@@ -861,10 +770,17 @@ watch(
   margin-block-start: var(--sp-2);
 }
 
+.custom7-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
 .custom7 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--sp-3);
+  margin-block-start: var(--sp-2);
 }
 
 .field--small label {

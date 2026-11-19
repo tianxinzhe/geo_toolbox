@@ -18,9 +18,9 @@ export const site = {
 
   /** 一句话定位，用于首页与 og:description */
   tagline: {
-    zh: '11 个地理信息小工具，全部在浏览器本地计算，数据不上传',
-    en: '11 geospatial utilities. Everything runs locally in your browser.',
-    ja: '11 の地理情報ツール。すべてブラウザ内で計算、データは送信されません'
+    zh: '15 个地理信息小工具，全部在浏览器本地计算，数据不上传',
+    en: '15 geospatial utilities. Everything runs locally in your browser.',
+    ja: '15 の地理情報ツール。すべてブラウザ内で計算、データは送信されません'
   },
 
   /**

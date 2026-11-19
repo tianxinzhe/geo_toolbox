@@ -45,7 +45,9 @@ function typeLabel(t: string): string {
 }
 
 function featureLabel(f: DrawFeature): string {
-  const name = typeof f.properties.name === 'string' ? f.properties.name.trim() : ''
+  // 导入数据常用 Name（大写）表示名称，展示时按 name → Name 回退
+  const raw = f.properties.name ?? f.properties.Name
+  const name = typeof raw === 'string' ? raw.trim() : ''
   return name !== ''
     ? name
     : props.ui['tool.map-draw.unnamed'].replace('{type}', typeLabel(f.geometry?.type ?? ''))

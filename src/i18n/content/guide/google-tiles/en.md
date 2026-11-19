@@ -5,7 +5,7 @@ heading: "How Google map tiles work: XYZ, zoom and coordinates"
 group: tile
 order: 18
 readingMinutes: 8
-updated: 2026-11-09
+updated: 2026-11-19
 ---
 
 When you open a web map, the browser does not download one complete world map. It assembles dozens of small images for the current view. These images are **tiles**, and each has an identifier made of `z`, `x` and `y`. Once you understand that identifier, you can produce your own tile list for offline caching, cache warming or data partitioning.
@@ -101,7 +101,7 @@ Bulk tile fetching must respect the provider's terms of service. Google map tile
 
 ## Generating your own XYZ list
 
-Doing the formulas by hand is error-prone, especially across levels and the antimeridian. Use [Google tile coordinates](/en/tools/tile-coords/) to draw an area on the map, or import GeoJSON / CSV data, choose the zoom levels, and export an Excel sheet of `x, y, z`.
+Doing the formulas by hand is error-prone, especially across levels and the antimeridian. Use [Google tile coordinates](/en/tools/tile-coords/) to draw an area on the map or import GeoJSON, choose the zoom levels, and export a CSV of `x, y, z` that opens directly in Excel — or export the same tiles as GeoJSON polygons to check in QGIS or the map preview.
 
 ## Frequently asked
 

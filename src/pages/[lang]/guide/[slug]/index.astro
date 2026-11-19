@@ -8,14 +8,44 @@
 import { getCollection } from 'astro:content'
 import { LAUNCHED, type Lang } from '../../../../config/i18n'
 import { GUIDE_GROUPS } from '../../../../i18n/guideGroups'
+import { TOOLS, type ToolMeta } from '../../../../i18n/tools'
 import { t } from '../../../../i18n/ui'
 import ContentPage from '../../../../layouts/ContentPage.astro'
 import GuideCard from '../../../../components/GuideCard.astro'
 import { getDoc } from '../../../../lib/docs'
-import { guideIndexPath, guidePath, homePath } from '../../../../lib/paths'
+import { guideIndexPath, guidePath, homePath, toolPath } from '../../../../lib/paths'
 import { articleJsonLd } from '../../../../lib/seo'
 
 const LOCALE: Record<Lang, string> = { zh: 'zh-CN', en: 'en-GB', ja: 'ja-JP' }
+
+/**
+ * 每篇科普对应的在线工具。
+ *
+ * 文章解释「为什么」，工具负责「怎么做」：正文末尾统一给出入口，
+ * 避免读者读完还要回首页自己找。多篇格式文章都指向同一个转换器，
+ * 因为本站的转换器就是这些格式的统一入口。
+ */
+const GUIDE_TOOLS: Record<string, string[]> = {
+  'csv-tsv': ['format-convert'],
+  dxf: ['format-convert', 'epsg-convert'],
+  excel: ['format-convert'],
+  flatgeobuf: ['format-convert'],
+  'format-parsing': ['format-convert', 'mvt'],
+  geojson: ['format-convert', 'map-preview'],
+  geopackage: ['format-convert'],
+  gml: ['format-convert'],
+  gmt: ['format-convert'],
+  'google-tiles': ['tile-coords'],
+  gpx: ['format-convert', 'map-preview'],
+  kml: ['format-convert', 'map-preview'],
+  'mif-mid': ['format-convert'],
+  'projection-types': ['epsg-convert'],
+  'projections-epsg': ['epsg-convert'],
+  shapefile: ['format-convert', 'map-preview'],
+  topojson: ['format-convert'],
+  'vector-formats': ['format-convert'],
+  wkt: ['format-convert']
+}
 
 export async function getStaticPaths() {
   const entries = await getCollection('guide')
@@ -55,6 +85,11 @@ const related = (await getCollection('guide'))
   )
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3)
+
+// 正文末尾的工具入口：按 slug 查表，未登记的指南不渲染该区块
+const tools: ToolMeta[] = (GUIDE_TOOLS[slug] ?? [])
+  .map((toolSlug) => TOOLS.find((tool) => tool.slug === toolSlug))
+  .filter((tool): tool is ToolMeta => Boolean(tool))
 ---
 
 <ContentPage
@@ -64,6 +99,9 @@ const related = (await getCollection('guide'))
   description={data.description}
   h1={heading}
   headVariant="article"
+  ogType="article"
+  publishedTime={data.updated?.toISOString()}
+  modifiedTime={data.updated?.toISOString()}
   doc={{ collection: 'guide', slug }}
   crumbs={[
     { label: t(lang, 'nav.home'), href: homePath(lang) },
@@ -105,37 +143,97 @@ const related = (await getCollection('guide'))
     {updated && <span>{updated}</span>}
   </p>
 
-  {/* 正文之后的同类文章：放在 doc 之后，保持正文优先 */}
-  {
-    related.length > 0 && (
-      <Fragment slot="after">
-        <section class="guide-related" aria-labelledby="guide-related-title">
-          <div class="section-head">
-            <h2 id="guide-related-title">{t(lang, 'doc.moreInGroup')}</h2>
-            <a class="section-head__link" href={guideIndexPath(lang)}>
-              {t(lang, 'home.guides.all')} →
+  {/* 正文之后：先给工具入口，再列同类文章 */}
+  <Fragment slot="after">
+    {tools.length > 0 && (
+      <aside class="guide-cta" aria-labelledby="guide-cta-title">
+        <div class="guide-cta__text">
+          <h2 id="guide-cta-title">{t(lang, 'guide.cta.title')}</h2>
+          <p>{t(lang, 'guide.cta.body')}</p>
+        </div>
+        <div class="guide-cta__actions">
+          {tools.map((tool, index) => (
+            <a
+              class:list={['btn', index === 0 ? 'btn--primary' : 'btn--ghost']}
+              href={toolPath(lang, tool.slug)}
+            >
+              {tool.names[lang]}
             </a>
-          </div>
-          <ul class="guide-grid">
-            {related.map((entry) => (
-              <li>
-                <GuideCard
-                  lang={lang}
-                  slug={entry.id.slice(0, -3)}
-                  heading={entry.data.heading}
-                  description={entry.data.description}
-                  readingMinutes={entry.data.readingMinutes}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      </Fragment>
-    )
-  }
+          ))}
+          <a class="guide-cta__all" href={homePath(lang)}>
+            {t(lang, 'guide.cta.all')} →
+          </a>
+        </div>
+      </aside>
+    )}
+
+    {related.length > 0 && (
+      <section class="guide-related" aria-labelledby="guide-related-title">
+        <div class="section-head">
+          <h2 id="guide-related-title">{t(lang, 'doc.moreInGroup')}</h2>
+          <a class="section-head__link" href={guideIndexPath(lang)}>
+            {t(lang, 'home.guides.all')} →
+          </a>
+        </div>
+        <ul class="guide-grid">
+          {related.map((entry) => (
+            <li>
+              <GuideCard
+                lang={lang}
+                slug={entry.id.slice(0, -3)}
+                heading={entry.data.heading}
+                description={entry.data.description}
+                readingMinutes={entry.data.readingMinutes}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </Fragment>
 </ContentPage>
 
 <style>
+  .guide-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    background: var(--bg-sub);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+
+  .guide-cta__text {
+    min-inline-size: min(100%, 22rem);
+  }
+
+  .guide-cta h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+
+  .guide-cta__text p {
+    margin: var(--sp-1) 0 0;
+    color: var(--ink-2);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+  }
+
+  .guide-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .guide-cta__all {
+    font-size: var(--fs-label);
+  }
+
   .guide-related {
     padding-block-start: var(--sp-2);
   }

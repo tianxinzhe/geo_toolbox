@@ -34,6 +34,8 @@ interface Props {
   ui: Record<string, string>
   slug: string
   toolId: string
+  /** 是否提供粘贴 CSV/TSV 的入口；个别工具只允许上传文件 */
+  allowPaste?: boolean
 }
 
 const props = defineProps<Props>()
@@ -381,7 +383,7 @@ onMounted(() => {
       </span>
     </p>
 
-    <div class="field">
+    <div v-if="allowPaste !== false" class="field">
       <label for="batch-paste">{{ ui['batch.pasteLabel'] }}</label>
       <textarea
         id="batch-paste"
@@ -599,7 +601,9 @@ onMounted(() => {
       </template>
     </template>
 
-    <p v-else-if="!errorCode" class="empty-state">{{ ui['batch.emptyBody'] }}</p>
+    <p v-else-if="!errorCode && allowPaste !== false" class="empty-state">
+      {{ ui['batch.emptyBody'] }}
+    </p>
   </section>
 </template>
 

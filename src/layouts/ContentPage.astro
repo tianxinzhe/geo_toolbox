@@ -55,6 +55,12 @@ interface Props {
    * article = 长文阅读页，字号介于两者之间。
    */
   headVariant?: 'default' | 'display' | 'article'
+  /** Open Graph 类型；科普文章页传 article，其余默认 website */
+  ogType?: 'website' | 'article'
+  /** 发布时间（ISO 8601），交给 Base 输出 article:published_time */
+  publishedTime?: string
+  /** 更新时间（ISO 8601），交给 Base 输出 article:modified_time */
+  modifiedTime?: string
 }
 
 const {
@@ -71,7 +77,10 @@ const {
   jsonLd = [],
   noindex = false,
   width = 'doc',
-  headVariant = 'default'
+  headVariant = 'default',
+  ogType = 'website',
+  publishedTime,
+  modifiedTime
 } = Astro.props
 
 const crumbs: Crumb[] = Astro.props.crumbs ?? [
@@ -100,6 +109,9 @@ const Doc = rendered?.Content
   jsonLd={allJsonLd}
   noindex={noindex}
   anchor={anchor}
+  ogType={ogType}
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
 >
   <div class:list={['container', 'shell', 'content-page', width === 'tool' ? 'content-page--wide' : '']}>
     <Breadcrumb crumbs={crumbs} label={t(lang, 'a11y.breadcrumb')} />

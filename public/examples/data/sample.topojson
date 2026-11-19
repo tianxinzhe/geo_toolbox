@@ -1,0 +1,82 @@
+{
+  "type": "Topology",
+  "transform": {
+    "scale": [
+      0.0001,
+      0.0001
+    ],
+    "translate": [
+      -180.0,
+      -90.0
+    ]
+  },
+  "objects": {
+    "poi": {
+      "type": "Point",
+      "coordinates": [
+        1060145,
+        1307580
+      ],
+      "properties": {
+        "name": "Times Square",
+        "kind": "poi"
+      }
+    },
+    "walk": {
+      "type": "LineString",
+      "arcs": [
+        0
+      ],
+      "properties": {
+        "name": "Walk",
+        "kind": "line"
+      }
+    },
+    "square": {
+      "type": "Polygon",
+      "arcs": [
+        [
+          1
+        ]
+      ],
+      "properties": {
+        "name": "Square",
+        "kind": "area"
+      }
+    }
+  },
+  "arcs": [
+    [
+      [
+        1060145,
+        1307580
+      ],
+      [
+        83,
+        -53
+      ]
+    ],
+    [
+      [
+        1060136,
+        1307572
+      ],
+      [
+        18,
+        0
+      ],
+      [
+        0,
+        14
+      ],
+      [
+        -18,
+        0
+      ],
+      [
+        0,
+        -14
+      ]
+    ]
+  ]
+}

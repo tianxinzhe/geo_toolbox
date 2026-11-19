@@ -89,37 +89,6 @@ export interface ToolMeta {
 
 export const TOOLS: ToolMeta[] = [
   {
-    id: 'T01',
-    slug: 'coord-convert',
-    category: 'coordinate',
-    map: 'optional',
-    fileIO: false,
-    batch: true,
-    mobileTier: 'B',
-    gps: false,
-    names: { zh: 'WGS84 / CGCS2000 转换', en: 'WGS84 / CGCS2000 Converter', ja: 'WGS84 / CGCS2000 変換' },
-    desc: {
-      zh: 'WGS84 与 CGCS2000 互转，实用精度内等值',
-      en: 'WGS84 and CGCS2000 — equivalent datums',
-      ja: 'WGS84 と CGCS2000 の相互変換（実用上等価）'
-    },
-    keywords: {
-      all: ['wgs84', 'cgcs2000', 'cgcs-2000', 'coord', 'coordinate'],
-      zh: ['坐标系转换', '大地基准', '经纬度转换', '测绘', '国家坐标系'],
-      ja: ['座標変換', '測地系', '経緯度', '座標系']
-    },
-    related: [
-      'dms-decimal',
-      'epsg-convert',
-      'geohash',
-      'map-preview',
-      'map-draw',
-      'tile-coords',
-      'format-convert',
-      'buffer-circle'
-    ]
-  },
-  {
     id: 'T02',
     slug: 'dms-decimal',
     category: 'coordinate',
@@ -140,14 +109,14 @@ export const TOOLS: ToolMeta[] = [
       ja: ['度分秒', '10進法', '経度', '緯度', '分', '秒']
     },
     related: [
-      'coord-convert',
       'epsg-convert',
       'geohash',
       'map-preview',
       'tile-coords',
       'map-draw',
       'format-convert',
-      'buffer-circle'
+      'buffer-circle',
+      'clip-overlay'
     ]
   },
   {
@@ -171,14 +140,14 @@ export const TOOLS: ToolMeta[] = [
       ja: ['平面直角座標系', '日本測地系2011', 'JGD2011', 'JGD2000', '東京測地系', '系番号', '投影']
     },
     related: [
-      'coord-convert',
       'dms-decimal',
       'map-preview',
       'geohash',
       'format-convert',
       'map-draw',
       'tile-coords',
-      'buffer-circle'
+      'buffer-circle',
+      'clip-overlay'
     ]
   },
   {
@@ -207,7 +176,7 @@ export const TOOLS: ToolMeta[] = [
       'buffer-circle',
       'epsg-convert',
       'geohash',
-      'coord-convert',
+      'merge-layers',
       'dms-decimal',
       'tile-coords'
     ]
@@ -233,7 +202,7 @@ export const TOOLS: ToolMeta[] = [
       ja: ['エンコード', 'デコード', '空間索引', '精度', 'メッシュ']
     },
     related: [
-      'coord-convert',
+      'clip-overlay',
       'dms-decimal',
       'map-draw',
       'map-preview',
@@ -267,7 +236,7 @@ export const TOOLS: ToolMeta[] = [
       'buffer-circle',
       'format-convert',
       'map-preview',
-      'coord-convert',
+      'attribute-extract',
       'geohash',
       'tile-coords',
       'dms-decimal',
@@ -298,7 +267,7 @@ export const TOOLS: ToolMeta[] = [
       'map-draw',
       'map-preview',
       'format-convert',
-      'coord-convert',
+      'clip-overlay',
       'tile-coords',
       'geohash',
       'dms-decimal',
@@ -332,7 +301,7 @@ export const TOOLS: ToolMeta[] = [
     related: [
       'map-draw',
       'buffer-circle',
-      'coord-convert',
+      'clip-overlay',
       'epsg-convert',
       'map-preview',
       'format-convert',
@@ -379,7 +348,7 @@ export const TOOLS: ToolMeta[] = [
       'map-draw',
       'format-convert',
       'tile-coords',
-      'coord-convert',
+      'merge-layers',
       'epsg-convert',
       'dms-decimal',
       'buffer-circle',
@@ -424,7 +393,7 @@ export const TOOLS: ToolMeta[] = [
       'map-preview',
       'format-convert',
       'buffer-circle',
-      'coord-convert',
+      'attribute-extract',
       'tile-coords',
       'epsg-convert',
       'geohash'
@@ -459,7 +428,7 @@ export const TOOLS: ToolMeta[] = [
       'map-preview',
       'format-convert',
       'map-draw',
-      'coord-convert',
+      'dissolve',
       'geohash',
       'buffer-circle',
       'tile-coords'
@@ -492,8 +461,8 @@ export const TOOLS: ToolMeta[] = [
       'map-preview',
       'format-convert',
       'clip-overlay',
-      'buffer-circle',
-      'coord-convert'
+      'epsg-convert',
+      'map-draw'
     ]
   },
   {
@@ -524,7 +493,7 @@ export const TOOLS: ToolMeta[] = [
       'clip-overlay',
       'buffer-circle',
       'geohash',
-      'coord-convert'
+      'map-draw'
     ]
   },
   {
@@ -551,11 +520,81 @@ export const TOOLS: ToolMeta[] = [
       'attribute-join',
       'merge-layers',
       'clip-overlay',
-      'buffer-circle',
+      'epsg-convert',
       'attribute-extract',
       'map-preview',
       'format-convert',
-      'coord-convert'
+      'map-draw'
+    ]
+  },
+  {
+    id: 'T21',
+    slug: 'plus-codes',
+    category: 'encoding',
+    map: 'none',
+    fileIO: false,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: {
+      zh: 'Plus Codes 位置编码',
+      en: 'Plus Codes (Open Location Code)',
+      ja: 'Plus Codes（Open Location Code）'
+    },
+    desc: {
+      zh: '经纬度与 Plus Code 双向转换，离线可算',
+      en: 'Coordinates ↔ Plus Code, offline',
+      ja: '座標と Plus Code の相互変換'
+    },
+    keywords: {
+      all: ['plus code', 'plus codes', 'open location code', 'olc', 'location code'],
+      zh: ['加号编码', '位置编码', '地点编码', '开放位置编码', '短地址'],
+      ja: ['プラスコード', '位置コード', '地点コード', '住所コード']
+    },
+    related: [
+      'geohash',
+      'dms-decimal',
+      'epsg-convert',
+      'map-preview',
+      'map-draw',
+      'tile-coords',
+      'format-convert',
+      'buffer-circle'
+    ]
+  },
+  {
+    id: 'T22',
+    slug: 'mvt',
+    category: 'format',
+    map: 'none',
+    fileIO: true,
+    batch: false,
+    mobileTier: 'B',
+    gps: false,
+    names: {
+      zh: 'MVT 矢量瓦片解析',
+      en: 'MVT Vector Tile Decoder',
+      ja: 'MVT ベクタタイル解析'
+    },
+    desc: {
+      zh: '上传 PBF 或粘贴 Base64，解出图层与 GeoJSON',
+      en: 'Decode PBF or Base64 tiles into GeoJSON',
+      ja: 'PBF / Base64 タイルを GeoJSON に変換'
+    },
+    keywords: {
+      all: ['mvt', 'mapbox vector tile', 'vector tile', 'pbf', 'protobuf', 'tile'],
+      zh: ['矢量瓦片', '瓦片解析', '矢量切片', '二进制瓦片', '瓦片解码'],
+      ja: ['ベクタタイル', 'タイル解析', 'プロトコルバッファ', 'タイルデコード']
+    },
+    related: [
+      'tile-coords',
+      'format-convert',
+      'geohash',
+      'plus-codes',
+      'map-preview',
+      'map-draw',
+      'buffer-circle',
+      'attribute-extract'
     ]
   }
 ]

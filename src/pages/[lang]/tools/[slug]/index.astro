@@ -63,6 +63,7 @@ const batchUi = BATCH_SLUGS.has(tool.slug) ? pick(lang, BATCH_UI_KEYS) : null
         ui={batchUi}
         slug={tool.slug}
         toolId={tool.id}
+        allowPaste={tool.slug !== 'dms-decimal'}
       />
     )
   }

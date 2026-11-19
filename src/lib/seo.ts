@@ -97,6 +97,7 @@ export function articleJsonLd(opts: {
     description: opts.description,
     url,
     mainEntityOfPage: url,
+    image: [absolute(site.url, '/og-default.png')],
     inLanguage: LOCALE[opts.lang],
     datePublished: date,
     dateModified: date,
