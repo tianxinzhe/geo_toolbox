@@ -1,12 +1,14 @@
 ---
 title: 'Contact | GeoToolbox'
-description: 'How to contact GeoToolbox by email: report a wrong calculation, suggest a tool, ask about the privacy policy or point out an error in the documentation. Includes what to put in a bug report.'
-updated: 2026-11-10
+description: 'How to contact GeoToolbox by email or GitHub Issues: report a wrong calculation, suggest a tool, ask about the privacy policy or point out an error in the documentation. Includes bug report guidance.'
+updated: 2026-11-23
 ---
 
 ## When it is worth contacting us
 
-This site has no comment section and no user accounts, so the email address at the top of this page is the only direct channel. Please put the feedback type in the subject line (for example "Wrong result · Coordinate conversion"). The categories below are the most useful, ordered by how quickly they get handled:
+This site has no comment section and no user accounts. The email address at the top of this page and [GitHub Issues](https://github.com/tianxinzhe/geo_toolbox/issues) are the two direct channels. Please put the feedback type in the subject line (for example "Wrong result · Coordinate conversion"); reproducible calculation errors and feature requests can also be filed as an issue so they can be tracked. Anything involving personal data, sensitive coordinates or material you would rather not publish should go by email only — do not paste it into an issue.
+
+The categories below are the most useful, ordered by how quickly they get handled:
 
 | Priority | Type | Detail |
 |---|---|---|

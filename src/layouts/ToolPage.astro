@@ -23,7 +23,6 @@ import AdSlot from '../components/AdSlot.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 import RelatedTools from '../components/RelatedTools.astro'
 import ToolResources from '../components/ToolResources.astro'
-import ToolShot from '../components/ToolShot.astro'
 import PrivacyNotice from '../components/ui/PrivacyNotice.astro'
 import Base from './Base.astro'
 
@@ -98,9 +97,6 @@ const needsDesktopHint = tool.mobileTier === 'C'
         <!-- SR-07：常驻在输入区附近，不是藏在隐私政策页里 -->
         <PrivacyNotice lang={lang} />
       </section>
-
-      {/* 界面截图：与工具区同一视觉层级，帮助读者确认「这就是我要的工具」 */}
-      <ToolShot lang={lang} slug={tool.slug} name={tool.names[lang]} />
 
       {/* 广告位 A：工具区与文档区之间 */}
       <AdSlot lang={lang} slot="A" />

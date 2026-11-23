@@ -49,14 +49,14 @@ If a tool produces a result that disagrees with a value you know to be correct, 
 
 <a id="author"></a>
 
-## Who maintains this site
+## About the author
 
-This site is maintained independently by **alex.yuan** — no team, no investors, no outsourced content:
+This site is built and maintained independently by **alex.yuan** — no team, no investors, no outsourced content.
 
-- **Maintainer**: alex.yuan, a programmer with a background in geoinformatics
-- **Background**: 10 years of GIS work and 20 years of software development
-- **Why this site exists**: coordinate conversions, format changes and map checks kept coming up in daily work, and the online tools available either demanded registration and uploads or were awkward to use — so these workflows were rebuilt as a browser-only version
+alex.yuan is a programmer who studied geoinformatics, with 10 years of professional GIS work and 20 years of software development. Coordinate conversions, format changes and map checks came up constantly in daily work, so this browser-based set of geospatial tools was built for convenience.
+
 - GitHub: [@tianxinzhe](https://github.com/tianxinzhe)
+- Issue tracker: [GitHub Issues](https://github.com/tianxinzhe/geo_toolbox/issues)
 - Email: [tianxinzhe032@gmail.com](mailto:tianxinzhe032@gmail.com)
 - Hosting: Cloudflare Pages (static, no backend)
 

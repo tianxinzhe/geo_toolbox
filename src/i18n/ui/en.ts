@@ -146,7 +146,6 @@ const en = {
   'doc.resources': 'Further reading and samples',
   'doc.guides': 'Related guides',
   'doc.samples': 'Sample data and parsing code',
-  'doc.screenshot': 'Interface preview',
   'doc.faq': 'Frequently asked questions',
   'doc.howItWorks': 'How it works',
   'doc.moreInGroup': 'More in this group',

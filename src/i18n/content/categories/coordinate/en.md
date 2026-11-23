@@ -1,12 +1,12 @@
 ---
 title: 'Coordinate Conversion Tools — datums and projections | GeoToolbox'
 description: 'Two coordinate tools: DMS to decimal degrees, and projected CRS conversion by EPSG code. How to choose between them.'
-updated: 2026-11-16
+updated: 2026-11-23
 ---
 
 ## What this category covers
 
-The word "coordinate" covers at least four genuinely different things in practice, and confusing them is the single most common source of error:
+The word "coordinate" covers at least three genuinely different things in practice, and confusing them is the single most common source of error:
 
 | Type | Example | Character |
 |---|---|---|

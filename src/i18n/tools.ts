@@ -25,9 +25,9 @@ export const CATEGORY_META: Record<CategoryKey, { names: Record<Lang, string>; d
   coordinate: {
     names: { zh: '坐标与转换', en: 'Coordinates & Conversion', ja: '座標と変換' },
     desc: {
-      zh: '经纬度写法、大地基准、投影带之间的互转',
-      en: 'Convert between coordinate notations, datums and projected systems',
-      ja: '経緯度の表記・測地系・投影法の相互変換'
+      zh: '经纬度写法转换，以及基准面与投影坐标的换算',
+      en: 'Coordinate notation, datum and projection conversions',
+      ja: '経緯度表記・測地系・投影座標の変換'
     }
   },
   format: {

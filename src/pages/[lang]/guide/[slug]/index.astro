@@ -144,7 +144,7 @@ const tools: ToolMeta[] = (GUIDE_TOOLS[slug] ?? [])
     {updated && <span class="page-meta__sep" aria-hidden="true">·</span>}
     {updated && <span>{updated}</span>}
     <span class="page-meta__sep" aria-hidden="true">·</span>
-    <a class="page-meta__link" href={legalPath(lang, 'about')}>
+    <a class="page-meta__link" href={`${legalPath(lang, 'about')}#author`}>
       {t(lang, 'guide.byline', { name: site.author.name })}
     </a>
   </p>

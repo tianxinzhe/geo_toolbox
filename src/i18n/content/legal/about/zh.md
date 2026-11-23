@@ -49,14 +49,14 @@ updated: 2026-11-23
 
 <a id="author"></a>
 
-## 谁在维护
+## 关于作者
 
-本站由个人开发者 **alex.yuan** 独立维护，没有团队、投资方或内容外包：
+本站由 **alex.yuan** 独立开发与维护，没有团队、投资方或内容外包。
 
-- **维护者**：alex.yuan，程序员，地理信息专业出身
-- **背景**：从事地理信息相关工作 10 年，代码开发 20 年
-- **为什么做这个站**：日常工作中经常要做坐标转换、格式转换和地图核对，能找到的在线工具要么需要注册与上传，要么不好用，于是把这套流程做成了浏览器版本
+alex.yuan 是一名程序员，学习地理信息专业，从事地理信息专业工作 10 年，代码开发 20 年。日常工作中经常需要做坐标转换、格式转换和地图核对，为了方便，开发了这款网页版本的地理信息工具。
+
 - GitHub：[@tianxinzhe](https://github.com/tianxinzhe)
+- 问题反馈：[GitHub Issues](https://github.com/tianxinzhe/geo_toolbox/issues)
 - 邮箱：[tianxinzhe032@gmail.com](mailto:tianxinzhe032@gmail.com)
 - 部署：Cloudflare Pages（纯静态，无后台）
 
