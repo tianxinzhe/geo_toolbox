@@ -57,3 +57,8 @@ On the map, green features are the dissolved result and blue features are the so
 **What is the empty group?** A missing field, null and an empty string are grouped together and shown as “(empty)”. This is intentional, so blanks do not scatter into many single-feature groups.
 
 **Can I dissolve by two fields at once?** One field per run. Build a combined helper field first, such as class plus level, and dissolve on that field.
+
+## References
+
+- [OGC Simple Features: union and validity rules](https://www.ogc.org/standards/sfa/)
+- [Turf.js: reference implementation of geometry union](https://turfjs.org/)

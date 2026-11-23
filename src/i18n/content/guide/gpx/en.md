@@ -4,7 +4,7 @@ description: GPX's wpt, trk and rte elements, the lat/lon attribute convention, 
 heading: "GPX explained: waypoints, tracks and routes"
 group: vector
 order: 7
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

@@ -71,3 +71,8 @@ If the data crosses the 180° meridian, the tool picks the shorter side and says
 **Can I export a single level?** Set the minimum and maximum Z to the same value. Multiple levels are enumerated separately and then merged into the sorted list.
 
 **Can I use the list with a TMS template?** Not directly. For TMS, convert y to `2^z − 1 − y`; this tool exports the Google / XYZ scheme.
+
+## References
+
+- [Google Maps: tile coordinates](https://developers.google.com/maps/documentation/javascript/coordinates)
+- [OpenStreetMap: Slippy map tile names](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)

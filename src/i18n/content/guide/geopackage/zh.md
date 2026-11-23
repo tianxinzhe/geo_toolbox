@@ -4,7 +4,7 @@ description: GeoPackage 的系统表 gpkg_contents、gpkg_geometry_columns、gpk
 heading: GeoPackage 格式详解：SQLite 容器与几何 blob
 group: vector
 order: 13
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

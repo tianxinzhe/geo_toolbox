@@ -59,3 +59,8 @@ If the goal is machine indexing and bulk queries, GeoHash is usually more conven
 ## Using this tool
 
 Enter longitude first, then latitude, for example `116.3974, 39.9088`. Degrees-minutes-seconds notation is also accepted and detected automatically. Copy the resulting code directly. When decoding, paste the full code including the `+` and the two or three characters after it. If a result looks unexpected, check whether you entered a 10-digit or 11-digit code and whether the coordinate sits close to a cell boundary.
+
+## References
+
+- [Google Open Location Code reference implementation](https://github.com/google/open-location-code)
+- [Official Plus Codes site and encoding rules](https://plus.codes/)

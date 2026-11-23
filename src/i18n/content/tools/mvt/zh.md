@@ -98,3 +98,8 @@ MVT 用屏幕坐标系（y 向下）的绕向来区分外环和洞，GeoJSON 的
 ### 解析会在服务器上留记录吗？
 
 不会。文件只通过浏览器的 File API 读进内存，Base64 也只在本页解码，没有任何网络请求，刷新页面即清空。
+
+## 参考与依据
+
+- [Mapbox Vector Tile 规范](https://github.com/mapbox/vector-tile-spec)
+- [Protocol Buffers：编码格式文档](https://protobuf.dev/)

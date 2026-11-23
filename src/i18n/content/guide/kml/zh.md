@@ -4,7 +4,7 @@ description: KML 的 Document、Placemark、coordinates 与样式结构，KMZ �
 heading: KML 与 KMZ 格式详解：结构、样式与打包
 group: vector
 order: 6
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

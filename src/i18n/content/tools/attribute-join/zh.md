@@ -56,3 +56,8 @@ faq:
 **能连接 Excel 的多个工作表吗？** 目前只读第一个工作表。请把需要连接的那张表放在最前面，或另存为单独的 CSV。
 
 **连接后能继续做空间分析吗？** 可以。导出的 GeoJSON 可以直接作为裁切、缓冲区、按属性提取与按字段融合的输入。
+
+## 参考与依据
+
+- [RFC 4180：CSV 格式规范](https://datatracker.ietf.org/doc/html/rfc4180)
+- [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)

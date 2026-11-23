@@ -4,7 +4,7 @@ description: How TopoJSON shares boundaries through arcs, quantises coordinates 
 heading: "TopoJSON explained: arcs and quantisation"
 group: vector
 order: 5
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

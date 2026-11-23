@@ -71,3 +71,8 @@ y = floor((1 − ln(tan(lat) + 1 / cos(lat)) / π) / 2 × n)
 **可以只导出某一级吗？** 把最小 Z 与最大 Z 设为同一个值即可。两级之间会分别枚举并合并排序。
 
 **TMS 模板能用吗？** 不能直接套用。若服务使用 TMS，需要把 y 改为 `2^z − 1 − y`；本工具输出的是 Google / XYZ 方案。
+
+## 参考与依据
+
+- [Google Maps：瓦片坐标说明](https://developers.google.com/maps/documentation/javascript/coordinates)
+- [OpenStreetMap：Slippy map 瓦片编号](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)

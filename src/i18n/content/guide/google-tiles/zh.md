@@ -4,7 +4,7 @@ description: 从 Web 墨卡托到 XYZ 瓦片编号，说明缩放层级如何让
 heading: Google 地图瓦片原理：XYZ 编号与坐标计算
 group: tile
 order: 18
-readingMinutes: 8
+readingMinutes: 3
 updated: 2026-11-19
 ---
 

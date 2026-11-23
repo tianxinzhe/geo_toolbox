@@ -4,7 +4,7 @@ description: 从经纬度到平面坐标要经过什么，UTM 与高斯克吕格
 heading: 地图投影与 EPSG：UTM、高斯克吕格怎么选
 group: projection
 order: 2
-readingMinutes: 9
+readingMinutes: 2
 updated: 2026-11-09
 ---
 

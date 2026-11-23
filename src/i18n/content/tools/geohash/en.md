@@ -111,3 +111,8 @@ Pick the character length that matches your radius, fetch the centre cell and it
 ### What are GeoHashes good for in a database?
 
 Points sharing a prefix sit in the same rectangle, so an ordinary B-tree index can use a LIKE prefix query to narrow the candidates without a spatial extension. GeoHashes also work well as shard keys, cache keys and coarse location labels in logs. They are a first-pass filter, not a replacement for exact coordinates, geodesic distance calculations or a true spatial index.
+
+## References
+
+- [Elasticsearch: geohash grid aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html)
+- [Geohash: algorithm background and alphabet](https://en.wikipedia.org/wiki/Geohash)

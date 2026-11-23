@@ -4,7 +4,7 @@ description: TopoJSON 如何用 arcs 共享边界、transform 量化坐标、obj
 heading: TopoJSON 格式详解：拓扑、arcs 与量化
 group: vector
 order: 5
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

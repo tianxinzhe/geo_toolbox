@@ -4,7 +4,7 @@ description: How GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, DXF and n
 heading: A field guide to 15 vector data formats
 group: vector
 order: 3
-readingMinutes: 9
+readingMinutes: 3
 updated: 2026-11-09
 ---
 

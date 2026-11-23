@@ -47,6 +47,18 @@ updated: 2026-11-16
 
 如果你发现某个工具的结果与你已知的正确值不符，或者文档里有事实性错误，请通过[联系方式页面](/zh/contact/)告诉我们。**计算错误是本站最严重的问题类型**，会优先处理。
 
+## 谁在维护
+
+本站由个人开发者独立维护，没有团队、投资方或内容外包：
+
+- GitHub：[@tianxinzhe](https://github.com/tianxinzhe)
+- 邮箱：[tianxinzhe032@gmail.com](mailto:tianxinzhe032@gmail.com)
+- 部署：Cloudflare Pages（纯静态，无后台）
+
+内容依据公开规范（OGC、EPSG、IETF RFC、Google 与 OpenStreetMap 文档）编写，算法与精度说明在实现变更时同步核对；每篇文档的更新时间写在页面底部。发现错误请通过[联系方式](/zh/contact/)反馈，计算类问题优先处理。
+
+本站不接收付费收录、付费排名或软文；相关工具与延伸阅读只按主题相关性推荐。
+
 ## 这个站不适合做什么
 
 说清楚边界同样重要：

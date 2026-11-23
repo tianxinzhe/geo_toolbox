@@ -1,0 +1,154 @@
+---
+/**
+ * 工具页的「延伸阅读与示例」区块。
+ *
+ * 目的：把 15 个工具页与 19 篇科普指南、17 份样例数据、16 个 Python 解析脚本
+ * 连成主题簇 —— 工具解释「怎么做」，指南解释「为什么」，样例让结果可复现。
+ * 映射集中在本文件，新增工具或指南时只改一处。
+ */
+import { getCollection } from 'astro:content'
+import type { Lang } from '../config/i18n'
+import { t } from '../i18n/ui'
+import { guidePath } from '../lib/paths'
+
+interface Props {
+  lang: Lang
+  slug: string
+}
+
+const { lang, slug } = Astro.props
+
+/** 工具 → 相关指南（slug 见 src/i18n/content/guide） */
+const GUIDE_LINKS: Record<string, string[]> = {
+  'attribute-extract': ['csv-tsv', 'vector-formats'],
+  'attribute-join': ['csv-tsv', 'vector-formats'],
+  'buffer-circle': ['projection-types'],
+  'clip-overlay': ['vector-formats', 'geojson'],
+  dissolve: ['vector-formats', 'shapefile'],
+  'dms-decimal': ['projections-epsg', 'projection-types'],
+  'epsg-convert': ['projections-epsg', 'projection-types'],
+  'format-convert': ['geojson', 'kml', 'shapefile', 'vector-formats'],
+  'map-draw': ['geojson', 'google-tiles'],
+  'map-preview': ['geojson', 'kml', 'gpx'],
+  'merge-layers': ['vector-formats', 'shapefile'],
+  mvt: ['format-parsing'],
+  'tile-coords': ['google-tiles']
+}
+
+/** 工具 → 可直接下载的样例数据与解析脚本（public/examples 下） */
+const SAMPLE_LINKS: Record<string, { data?: string[]; code?: string[] }> = {
+  'attribute-extract': { data: ['sample.csv'], code: ['csv_parser.py'] },
+  'attribute-join': { data: ['sample.csv'] },
+  'clip-overlay': { data: ['sample.geojson'] },
+  dissolve: { data: ['sample.geojson'] },
+  'format-convert': {
+    data: ['sample.geojson', 'sample.kml', 'sample-shapefile.zip'],
+    code: ['geojson_parser.py', 'kml_parser.py']
+  },
+  'map-draw': { data: ['sample.geojson'], code: ['geojson_parser.py'] },
+  'map-preview': { data: ['sample.geojson', 'sample.kml', 'sample.gpx'] },
+  'merge-layers': { data: ['sample.geojson'] }
+}
+
+const entries = await getCollection('guide')
+const headings = new Map(
+  entries
+    .filter((entry) => entry.id.endsWith(`/${lang}`))
+    .map((entry) => [entry.id.slice(0, -3), entry.data.heading ?? entry.data.title])
+)
+
+const guideItems = (GUIDE_LINKS[slug] ?? [])
+  .map((guideSlug) => ({ slug: guideSlug, label: headings.get(guideSlug) }))
+  .filter((item): item is { slug: string; label: string } => Boolean(item.label))
+
+const samples = SAMPLE_LINKS[slug] ?? {}
+const dataItems = samples.data ?? []
+const codeItems = samples.code ?? []
+const hasSamples = dataItems.length > 0 || codeItems.length > 0
+const visible = guideItems.length > 0 || hasSamples
+---
+
+{
+  visible && (
+    <section class="tool-resources" aria-labelledby="tool-resources-title">
+      <div class="section-head">
+        <h2 id="tool-resources-title">{t(lang, 'doc.resources')}</h2>
+      </div>
+      <div class="tool-resources__grid">
+        {guideItems.length > 0 && (
+          <div class="tool-resources__group">
+            <h3>{t(lang, 'doc.guides')}</h3>
+            <ul>
+              {guideItems.map((item) => (
+                <li>
+                  <a href={guidePath(lang, item.slug)}>{item.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {hasSamples && (
+          <div class="tool-resources__group">
+            <h3>{t(lang, 'doc.samples')}</h3>
+            <ul>
+              {dataItems.map((file) => (
+                <li>
+                  <a href={`/examples/data/${file}`} download>
+                    {file}
+                  </a>
+                </li>
+              ))}
+              {codeItems.map((file) => (
+                <li>
+                  <a href={`/examples/python/${file}`}>{file}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .tool-resources {
+    max-inline-size: var(--w-doc);
+  }
+
+  .tool-resources__grid {
+    display: grid;
+    gap: var(--sp-4);
+    margin-block-start: var(--sp-3);
+  }
+
+  .tool-resources__group h3 {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  .tool-resources__group ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tool-resources__group a {
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+  }
+
+  @media (min-width: 768px) {
+    .tool-resources__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-6);
+    }
+  }
+</style>

@@ -4,7 +4,7 @@ description: How GMT multi-segment ASCII marks segments with >, writes longitude
 heading: "GMT explained: multi-segment ASCII and plotting conventions"
 group: vector
 order: 16
-readingMinutes: 5
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

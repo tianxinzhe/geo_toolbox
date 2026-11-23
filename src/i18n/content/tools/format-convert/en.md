@@ -52,3 +52,9 @@ Advanced options provide three switches: pretty-print versus compact output, coo
 ## Limits and privacy
 
 A single file is limited to 20 MB and 50,000 features; pasted text is limited to 200,000 characters. When a limit is exceeded, the tool reports the actual value and the limit and does not attempt the conversion. File content exists only in the current tab’s memory: it is not uploaded, not written to local storage, and is destroyed when the page closes.
+
+## References
+
+- [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)
+- [OGC KML standard](https://www.ogc.org/standards/kml/)
+- [GeoPackage specification](https://www.geopackage.org/spec/)

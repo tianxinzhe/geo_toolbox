@@ -52,3 +52,8 @@ faq:
 **能按多个字段筛选吗？** 当前一次一个条件。可以先用一个条件提取，导出 GeoJSON 后再作为输入做第二次提取。
 
 **和裁切工具有什么区别？** 裁切按空间范围筛选，本工具按属性值筛选；两者可以串联，例如先取出某类用地，再用行政区边界裁切。
+
+## 参考与依据
+
+- [RFC 4180：CSV 格式规范](https://datatracker.ietf.org/doc/html/rfc4180)
+- [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)

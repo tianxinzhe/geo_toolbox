@@ -4,7 +4,7 @@ description: MIF 的 Version、Charset、Columns、Data 结构，Point、Line、
 heading: MIF/MID 格式详解：几何与属性双文件
 group: vector
 order: 17
-readingMinutes: 5
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

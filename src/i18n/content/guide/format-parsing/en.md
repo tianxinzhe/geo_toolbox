@@ -4,7 +4,7 @@ description: How GeoJSON, TopoJSON, KML, KMZ, GPX, GML, CSV, XLSX, WKT, GMT, DXF
 heading: 'How vector formats are parsed: 16 inputs with minimal examples'
 group: vector
 order: 19
-readingMinutes: 11
+readingMinutes: 12
 updated: 2026-11-18
 faq:
   - q: 'Why does the coordinate system stay the same after conversion?'

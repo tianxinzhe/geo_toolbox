@@ -4,7 +4,7 @@ description: WKT 的 POINT、LINESTRING、POLYGON、MULTIPOLYGON 写法，Z/M �
 heading: WKT 格式详解：几何文本、SRID 与 EWKT
 group: vector
 order: 10
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

@@ -52,3 +52,8 @@ The field picker shows up to three sample values to confirm the right column. Ch
 **Can I filter on several fields?** One condition runs at a time. Extract once, export the GeoJSON, then feed it back as the input for a second pass.
 
 **How is this different from the clip tool?** Clip filters by spatial extent; this tool filters by attribute value. They chain well: extract a land-use category first, then clip it with a district boundary.
+
+## References
+
+- [RFC 4180: CSV format specification](https://datatracker.ietf.org/doc/html/rfc4180)
+- [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)

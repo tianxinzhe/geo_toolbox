@@ -54,3 +54,8 @@ faq:
 **能合并不同几何类型的文件吗？** 可以。点、线、面会同时存在于结果中，统计卡片会分别计数。若下游工具只接受某一种几何，可以先用按属性提取或按几何类型拆分。
 
 **为什么地图上位置偏了？** 本工具不转换坐标系。若某个文件是投影坐标（例如 UTM 米制坐标），会被当成经纬度显示。请先用 EPSG 转换工具把它转成 WGS84 经纬度再合并。
+
+## 参考与依据
+
+- [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)
+- [OGC Simple Features：几何类型定义](https://www.ogc.org/standards/sfa/)

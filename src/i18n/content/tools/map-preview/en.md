@@ -73,3 +73,8 @@ You can switch between street, satellite and terrain basemaps. Tile failures onl
 **Which formats work?** The 14 families in the table above. Everything except GeoJSON is converted locally before drawing.
 
 **Why is my data in the wrong place?** Most often the file stores projected coordinates in metres while the tool expects WGS84 degrees. Convert it with the EPSG converter first.
+
+## References
+
+- [Leaflet: map rendering library documentation](https://leafletjs.com/)
+- [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)

@@ -4,7 +4,7 @@ description: What happens between longitude/latitude and planar coordinates, how
 heading: Map projections and EPSG codes
 group: projection
 order: 2
-readingMinutes: 8
+readingMinutes: 2
 updated: 2026-11-09
 ---
 

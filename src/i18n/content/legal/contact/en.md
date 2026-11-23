@@ -21,7 +21,7 @@ This site has no comment section and no user accounts, so the email address at t
 
 Calculation bugs are easy to report in a way that cannot be reproduced. Please put as much of the following into the email body as you can:
 
-1. **The tool name or page URL** — the ten tools behave differently, and a URL pinpoints it exactly
+1. **The tool name or page URL** — the fifteen tools behave differently, and a URL pinpoints it exactly
 2. **The complete input values** — paste them verbatim, do not round. Precision problems often live in the last digit
 3. **The value you expected, and where it came from** — another tool, a field measurement, a published dataset? The source changes how we evaluate the discrepancy
 4. **The language version and browser you used** — a small number of issues relate to locale-specific formatting or to one browser's implementation

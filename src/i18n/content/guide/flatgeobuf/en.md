@@ -4,7 +4,7 @@ description: The FlatGeobuf file header, layer schema, packed R-tree spatial ind
 heading: "FlatGeobuf explained: FlatBuffers and spatial indexing"
 group: vector
 order: 14
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

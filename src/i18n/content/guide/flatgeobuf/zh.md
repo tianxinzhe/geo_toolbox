@@ -4,7 +4,7 @@ description: FlatGeobuf 的文件头、图层 schema、打包 R-tree 空间索�
 heading: FlatGeobuf 格式详解：FlatBuffers 与空间索引
 group: vector
 order: 14
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

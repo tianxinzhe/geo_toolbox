@@ -4,7 +4,7 @@ description: GeoJSON、KML、GPX、Shapefile、GeoPackage、FlatGeobuf、DXF 等
 heading: 15 种矢量数据格式总览与选型
 group: vector
 order: 3
-readingMinutes: 9
+readingMinutes: 2
 updated: 2026-11-09
 ---
 

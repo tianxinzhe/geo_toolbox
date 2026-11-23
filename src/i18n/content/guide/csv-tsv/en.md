@@ -4,7 +4,7 @@ description: Two ways to arrange longitude and latitude in CSV / TSV, when to us
 heading: CSV and TSV for coordinates
 group: vector
 order: 8
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

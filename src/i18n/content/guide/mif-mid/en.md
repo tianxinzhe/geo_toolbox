@@ -4,7 +4,7 @@ description: The Version, Charset, Columns and Data structure of MIF, the Point,
 heading: "MIF/MID explained: geometry and attribute in two files"
 group: vector
 order: 17
-readingMinutes: 5
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

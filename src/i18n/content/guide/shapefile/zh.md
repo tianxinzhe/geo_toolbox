@@ -4,7 +4,7 @@ description: Shapefile 的 .shp、.shx、.dbf、.prj、.cpg 各文件作用，2G
 heading: Shapefile 格式详解：多文件结构与限制
 group: vector
 order: 12
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

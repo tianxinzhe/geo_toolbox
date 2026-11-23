@@ -132,3 +132,8 @@ Take the Royal Observatory at Greenwich: `0°7'39.36"W`. The degrees part is zer
 ### Which format should I store in my database?
 
 Decimal degrees. It is a single number, so it can be compared, sorted, indexed and used in calculations without splitting into three columns, and it has no carry-over edge cases at 60. Degrees-minutes and degrees-minutes-seconds are presentation formats for people, paper maps and report tables; use the copy buttons in the result area whenever you need one.
+
+## References
+
+- [ISO 6709: standard representation of latitude and longitude](https://www.iso.org/standard/75147.html)
+- [EPSG Registry: coordinate systems and datums](https://epsg.org/)

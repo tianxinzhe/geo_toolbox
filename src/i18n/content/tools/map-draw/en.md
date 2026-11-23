@@ -44,3 +44,9 @@ The coordinate system is fixed to WGS 84. Every export format writes the origina
 One second after each change, the features are written to browser local storage. Reopening the page restores them and reports how many were recovered. If storage is full, autosave stops and the tool asks you to export promptly rather than overwriting existing data.
 
 The basemap defaults to keyless OpenStreetMap streets, with a top-right switch to Esri satellite imagery or the Esri topographic map. If tiles fail, drawing, measurement and export remain fully usable, only without a visual reference. Above 2,000 features the tool warns about performance but does not block further work.
+
+## References
+
+- [Leaflet: map rendering library documentation](https://leafletjs.com/)
+- [Leaflet-Geoman: drawing and editing plugin](https://github.com/geoman-io/leaflet-geoman)
+- [RFC 7946: GeoJSON export format](https://datatracker.ietf.org/doc/html/rfc7946)

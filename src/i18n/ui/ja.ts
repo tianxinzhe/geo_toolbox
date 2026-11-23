@@ -134,6 +134,9 @@ const ja: Record<UiKey, string> = {
   /* ---------- ドキュメント領域 ---------- */
   'doc.onThisPage': 'このページの内容',
   'doc.related': '関連ツール',
+  'doc.resources': '関連ガイドとサンプル',
+  'doc.guides': '関連ガイド',
+  'doc.samples': 'サンプルデータと解析コード',
   'doc.faq': 'よくある質問',
   'doc.howItWorks': '使い方',
   'doc.moreInGroup': '同じ分類の記事',

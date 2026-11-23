@@ -4,7 +4,7 @@ description: GeoJSON 的 FeatureCollection、Feature 与 Geometry 结构，经�
 heading: GeoJSON 格式详解：结构、坐标顺序与限制
 group: vector
 order: 4
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

@@ -51,3 +51,8 @@ In every case the tool applies no epoch correction and loads no grid files such 
 ## A practical check
 
 Validate with a known point first. For example, Tokyo Station’s longitude and latitude converted to JGD2011 zone IX should give roughly −35,000 m northing and −6,000 m easting. Then paste your own data. If the result is off by a whole zone, check the central meridian first; if it is off by a fixed few hundred metres, check the datum; if the X and Y magnitudes are exchanged, check the axis order.
+
+## References
+
+- [EPSG Registry: authoritative coordinate system codes](https://epsg.org/)
+- [PROJ: projection and datum transformation documentation](https://proj.org/)

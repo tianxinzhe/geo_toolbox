@@ -73,3 +73,8 @@ Leaflet 本身只支持 GeoJSON，上表里除 GeoJSON 以外的格式，都会�
 **支持哪些格式？** 上表列出的 14 类格式都可以；除 GeoJSON 外都会先在本地转成 GeoJSON 再显示。
 
 **为什么数据位置偏了？** 多半是文件里存的是投影坐标（米），而工具按 WGS84 经纬度解释。请先用 EPSG 坐标转换工具转成经纬度再查看。
+
+## 参考与依据
+
+- [Leaflet：地图渲染库文档](https://leafletjs.com/)
+- [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)

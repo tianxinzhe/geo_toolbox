@@ -4,7 +4,7 @@ description: WGS84、Web 墨卡托、UTM、高斯克吕格、日本平面直角�
 heading: 地图投影类型一览：覆盖范围与使用场景
 group: projection
 order: 1
-readingMinutes: 9
+readingMinutes: 5
 updated: 2026-11-09
 ---
 

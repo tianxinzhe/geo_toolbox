@@ -45,3 +45,9 @@ faq:
 地图默认使用免密钥的 OpenStreetMap 街道底图，可在右上角切换为 Esri 卫星影像或 Esri 地形图；底图由 IntersectionObserver 懒初始化，不在视口时不请求瓦片，不影响页面加载。底图加载失败时，圆形计算、指标与导出仍然完全可用，页面会明确提示「底图加载失败，计算与导出仍可正常使用」。
 
 移动端默认不接管单指拖动，避免地图抢走页面滚动；点一下「点击启用地图拖动」后才接管，双指缩放始终可用。
+
+## 参考与依据
+
+- [OGC Simple Features：几何类型与缓冲语义](https://www.ogc.org/standards/sfa/)
+- [GeographicLib：大地测量算法与精度说明](https://geographiclib.sourceforge.io/)
+- [Movable Type：球面距离与方位角公式](https://www.movable-type.co.uk/scripts/latlong.html)

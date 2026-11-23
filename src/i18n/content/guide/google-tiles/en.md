@@ -4,7 +4,7 @@ description: "From Web Mercator to XYZ numbering: how each zoom level multiplies
 heading: "How Google map tiles work: XYZ, zoom and coordinates"
 group: tile
 order: 18
-readingMinutes: 8
+readingMinutes: 4
 updated: 2026-11-19
 ---
 

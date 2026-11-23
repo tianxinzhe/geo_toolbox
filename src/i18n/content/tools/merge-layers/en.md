@@ -54,3 +54,8 @@ Files do not need to share a format: GeoJSON, KML, GPX, Shapefile, GeoPackage an
 **Can files with different geometry types be merged?** Yes. Points, lines and polygons can coexist in the result and are counted separately. If a downstream tool accepts only one geometry type, split the result with extract-by-attribute or by geometry type first.
 
 **Why are some features in the wrong place on the map?** This tool does not reproject. A file in projected coordinates, such as UTM metres, is shown as if it were longitude/latitude. Convert it to WGS84 with the EPSG tool before merging.
+
+## References
+
+- [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)
+- [OGC Simple Features: geometry type definitions](https://www.ogc.org/standards/sfa/)

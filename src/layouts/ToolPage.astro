@@ -22,6 +22,7 @@ import { breadcrumbJsonLd, faqJsonLd, softwareApplicationJsonLd, type Crumb } fr
 import AdSlot from '../components/AdSlot.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 import RelatedTools from '../components/RelatedTools.astro'
+import ToolResources from '../components/ToolResources.astro'
 import PrivacyNotice from '../components/ui/PrivacyNotice.astro'
 import Base from './Base.astro'
 
@@ -108,6 +109,8 @@ const needsDesktopHint = tool.mobileTier === 'C'
         {/* 广告位 B：文中插入，正文 ≥800 字时（由内容作者决定是否写入本节） */}
         <AdSlot lang={lang} slot="B" />
       </section>
+
+      <ToolResources lang={lang} slug={tool.slug} />
 
       <RelatedTools
         lang={lang}

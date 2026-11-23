@@ -111,3 +111,8 @@ GeoHash 需要 32 个字符来对应 5 个二进制位，标准选用数字 0-9 
 ### 把 GeoHash 存进数据库有什么好处？
 
 同前缀的点在同一个矩形区域里，因此可以用普通的 B-Tree 索引配合 LIKE 前缀查询快速缩小范围，不需要额外的空间扩展。它也很适合做分片键、缓存键和日志里的粗略位置标签。但它不能替代精确坐标、球面距离计算或真正的空间索引，适合做第一层过滤而不是最终判定。
+
+## 参考与依据
+
+- [Elasticsearch：GeoHash 网格聚合说明](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html)
+- [GeoHash 算法背景与字符表](https://en.wikipedia.org/wiki/Geohash)

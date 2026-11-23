@@ -44,3 +44,9 @@ faq:
 每次要素变更后 1 秒写入浏览器本地存储，重新打开页面会自动恢复并提示恢复数量。存储空间不足时停止自动保存并提示及时导出，不会覆盖已有保存。
 
 底图默认使用免密钥的 OpenStreetMap 街道图，可在右上角切换为 Esri 卫星影像或 Esri 地形图。底图加载失败时绘制、量测与导出仍然可用，只是无法参照地物。要素超过 2,000 个时提示可能影响流畅度，但不阻止继续操作。
+
+## 参考与依据
+
+- [Leaflet：地图渲染库文档](https://leafletjs.com/)
+- [Leaflet-Geoman：绘制与编辑插件](https://github.com/geoman-io/leaflet-geoman)
+- [RFC 7946：GeoJSON 导出格式](https://datatracker.ietf.org/doc/html/rfc7946)

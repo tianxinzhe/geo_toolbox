@@ -4,7 +4,7 @@ description: KML's Document, Placemark, coordinates and styling, what a KMZ arch
 heading: KML and KMZ explained
 group: vector
 order: 6
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

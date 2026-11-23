@@ -4,7 +4,7 @@ description: WGS84, Web Mercator, UTM, Gauss-Krüger, Japan Plane Rectangular an
 heading: "Map projections at a glance: coverage and use cases"
 group: projection
 order: 1
-readingMinutes: 9
+readingMinutes: 7
 updated: 2026-11-09
 ---
 

@@ -49,3 +49,8 @@ Clip, Intersect and Difference need both layers; Simplify only needs A, and the 
 **Can I process more than two layers?** Each run takes two layers. Export the result and feed it back as A or B to continue stacking operations.
 
 **How does this work with the buffer tool?** Generate a buffer polygon, export it, then use it as layer B for Clip or Difference.
+
+## References
+
+- [OGC Simple Features: overlay and set operations](https://www.ogc.org/standards/sfa/)
+- [Turf.js: reference implementations of browser-side geometry operations](https://turfjs.org/)

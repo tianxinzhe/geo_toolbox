@@ -4,7 +4,7 @@ description: How DXF pairs group codes with values, the SECTION/ENTITIES structu
 heading: "DXF explained: group codes, entities and coordinate limits"
 group: vector
 order: 15
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

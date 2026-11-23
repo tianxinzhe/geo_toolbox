@@ -47,6 +47,18 @@ The calculation logic is covered by unit tests. The coordinate conversion tests 
 
 If a tool produces a result that disagrees with a value you know to be correct, or if the documentation contains a factual error, please tell us via the [contact page](/en/contact/). **A wrong number is the most serious class of bug on this site** and is handled first.
 
+## Who maintains this site
+
+This site is maintained by an independent developer — no team, no investors, no outsourced content:
+
+- GitHub: [@tianxinzhe](https://github.com/tianxinzhe)
+- Email: [tianxinzhe032@gmail.com](mailto:tianxinzhe032@gmail.com)
+- Hosting: Cloudflare Pages (static, no backend)
+
+Content is written against public specifications (OGC, EPSG, IETF RFCs, Google and OpenStreetMap documentation). Algorithm and precision notes are checked whenever the implementation changes, and every document shows its update date at the bottom. Report mistakes through the [contact page](/en/contact/); calculation issues are handled first.
+
+The site does not accept paid listings, paid rankings or sponsored posts. Related tools and further reading are chosen for topical relevance only.
+
 ## What this site is not for
 
 Stating the boundaries matters as much as stating the capabilities:

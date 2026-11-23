@@ -4,7 +4,7 @@ description: How WKT writes POINT, LINESTRING, POLYGON and MULTIPOLYGON, the Z a
 heading: "WKT explained: geometry text, dimensions and SRID"
 group: vector
 order: 10
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

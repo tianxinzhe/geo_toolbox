@@ -96,3 +96,8 @@ MVT uses screen-space winding (y down) to separate exterior rings from holes, wh
 ### Is anything stored on a server?
 
 No. Files are read into memory through the browser File API and base64 is decoded in the page. There are no network requests, and a refresh clears everything.
+
+## References
+
+- [Mapbox Vector Tile specification](https://github.com/mapbox/vector-tile-spec)
+- [Protocol Buffers: encoding documentation](https://protobuf.dev/)

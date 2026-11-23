@@ -4,7 +4,7 @@ description: 从识别、解析到写出，逐种拆解 GeoJSON、TopoJSON、KML
 heading: 格式转换如何解析：16 种矢量格式的读入方式与最小示例
 group: vector
 order: 19
-readingMinutes: 11
+readingMinutes: 7
 updated: 2026-11-18
 faq:
   - q: '为什么转换后坐标系没有跟着变？'

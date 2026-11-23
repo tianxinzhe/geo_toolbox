@@ -4,7 +4,7 @@ description: GPX 的 wpt、trk、rte 三类核心元素，lat/lon 属性写法�
 heading: GPX 格式详解：航点、轨迹与路线
 group: vector
 order: 7
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

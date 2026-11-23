@@ -4,7 +4,7 @@ description: GML 的 FeatureCollection、featureMember、gml:pos 与 srsName 结
 heading: GML 格式详解：OGC XML 要素与轴序
 group: vector
 order: 11
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

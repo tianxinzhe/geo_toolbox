@@ -4,7 +4,7 @@ description: 经纬度在 CSV / TSV 中的两种组织方式、WKT 列的使用�
 heading: CSV 与 TSV 坐标格式详解：列组织与陷阱
 group: vector
 order: 8
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

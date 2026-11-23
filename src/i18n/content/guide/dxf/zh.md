@@ -4,7 +4,7 @@ description: DXF 的组码与值成对结构、SECTION/ENTITIES、POINT、LINE�
 heading: DXF 格式详解：组码、实体与坐标限制
 group: vector
 order: 15
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

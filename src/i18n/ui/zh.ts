@@ -132,6 +132,9 @@ const zh: Record<UiKey, string> = {
   /* ---------- 文档区 ---------- */
   'doc.onThisPage': '本页目录',
   'doc.related': '相关工具',
+  'doc.resources': '延伸阅读与示例',
+  'doc.guides': '相关指南',
+  'doc.samples': '示例数据与解析代码',
   'doc.faq': '常见问题',
   'doc.howItWorks': '使用说明',
   'doc.moreInGroup': '同类文章',

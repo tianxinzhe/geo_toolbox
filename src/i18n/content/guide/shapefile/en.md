@@ -4,7 +4,7 @@ description: What .shp, .shx, .dbf, .prj and .cpg each do, the 2 GB ceiling, 10-
 heading: "Shapefile explained: the multi-file format and its limits"
 group: vector
 order: 12
-readingMinutes: 6
+readingMinutes: 2
 updated: 2026-11-09
 ---
 

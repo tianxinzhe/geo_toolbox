@@ -4,7 +4,7 @@ description: The ZIP + XML structure of XLSX, how legacy XLS differs, and why da
 heading: Excel (XLSX / XLS) coordinate data
 group: vector
 order: 9
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

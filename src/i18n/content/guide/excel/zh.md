@@ -4,7 +4,7 @@ description: XLSX 的 ZIP + XML 结构、旧版 XLS 的 BIFF 差异，以及日�
 heading: Excel（XLSX / XLS）坐标数据详解
 group: vector
 order: 9
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

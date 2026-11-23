@@ -52,3 +52,9 @@ CSV/TSV 会自动识别常见的经纬度列名，例如 `lat/lng`、`latitude/l
 ## 限额与隐私
 
 单个文件上限 20 MB，最多 50,000 个要素；粘贴文本上限 200,000 字符。超限时会明确告知实际数值与限额，不会尝试处理。文件仅在当前标签页内存中存在，不上传、不写入本地存储，关闭页面即销毁。
+
+## 参考与依据
+
+- [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)
+- [OGC KML 标准](https://www.ogc.org/standards/kml/)
+- [GeoPackage 规范](https://www.geopackage.org/spec/)

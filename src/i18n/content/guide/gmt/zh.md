@@ -4,7 +4,7 @@ description: GMT 多段 ASCII 的段头、经纬度行与 z 值写法，-R / -J 
 heading: GMT 格式详解：多段 ASCII 与绘图约定
 group: vector
 order: 16
-readingMinutes: 5
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

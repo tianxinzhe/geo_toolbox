@@ -56,3 +56,8 @@ On the map, green features are the joined result and blue features are the origi
 **Can I join several Excel worksheets?** Only the first worksheet is read. Move the sheet you need to the front, or save it as a separate CSV.
 
 **Can I continue with spatial analysis afterwards?** Yes. The exported GeoJSON can be used directly as input to clip, buffer, extract-by-attribute and dissolve tools.
+
+## References
+
+- [RFC 4180: CSV format specification](https://datatracker.ietf.org/doc/html/rfc4180)
+- [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)

@@ -4,7 +4,7 @@ description: The gpkg_contents, gpkg_geometry_columns and gpkg_spatial_ref_sys t
 heading: "GeoPackage explained: SQLite container and geometry blobs"
 group: vector
 order: 13
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 

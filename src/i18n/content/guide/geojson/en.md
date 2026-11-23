@@ -4,7 +4,7 @@ description: The FeatureCollection, Feature and Geometry structure of GeoJSON, i
 heading: "GeoJSON explained: structure and limits"
 group: vector
 order: 4
-readingMinutes: 6
+readingMinutes: 2
 updated: 2026-11-09
 ---
 

@@ -4,7 +4,7 @@ description: How GML structures FeatureCollection, featureMember, gml:pos and sr
 heading: "GML explained: OGC XML features and axis order"
 group: vector
 order: 11
-readingMinutes: 6
+readingMinutes: 1
 updated: 2026-11-09
 ---
 
