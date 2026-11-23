@@ -63,33 +63,62 @@ const loading = ref(true)
 type LeafletModule = typeof import('leaflet')
 type BasemapKey = 'street' | 'satellite' | 'terrain'
 
+interface TileSource {
+  url: string
+  attribution: string
+  maxZoom: number
+  /** 源本身的最大可用层级；超过后由 Leaflet 放大上一级瓦片，避免出现「无数据」灰块 */
+  maxNativeZoom?: number
+  subdomains?: string
+}
+
+const OSM_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
 /**
- * 三个免密钥底图源（SR-09）。
- * 均有请求量限制，因此切换只换图层、不预加载，失败统一走 FR-06 降级提示。
+ * 免密钥底图源（SR-09），按可用性排序：首个源失败时自动尝试下一个。
+ *
+ * 全部使用 Web Mercator 坐标、不做 GCJ-02 加偏——国内商业底图（高德/腾讯/GeoQ）
+ * 虽然访问快，但会让 WGS84 点位整体偏移数百米，与本站坐标工具的口径冲突。
+ *
+ * 街道图默认走 Esri：tile.openstreetmap.org 在中国大陆不可达。Esri 的中国街道数据
+ * 只到 13 级，因此标注 maxNativeZoom——放大时由 Leaflet 拉伸 13 级瓦片，而不是显示
+ * 「Map data not yet available」灰块；需要细节时可切到卫星影像。
  */
-const BASEMAPS: Record<
-  BasemapKey,
-  { url: string; attribution: string; maxZoom: number; subdomains?: string }
-> = {
-  street: {
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
-  },
-  satellite: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution:
-      'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-    maxZoom: 19
-  },
-  terrain: {
-    // OpenTopoMap 在部分网络环境不可达，地形图改用同为免密钥的 Esri World Topographic Map
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    attribution:
-      'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS User Community',
-    maxZoom: 19
-  }
+const BASEMAPS: Record<BasemapKey, TileSource[]> = {
+  street: [
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      attribution:
+        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS User Community',
+      maxZoom: 19,
+      maxNativeZoom: 13
+    },
+    {
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: OSM_ATTRIBUTION,
+      maxZoom: 19
+    }
+  ],
+  satellite: [
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      attribution:
+        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+      maxZoom: 19
+    }
+  ],
+  terrain: [
+    // OpenTopoMap 在部分网络环境不可达，地形图改用同为免密钥的 Esri World Topographic Map；
+    // 中国区数据同样只到 13 级
+    {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      attribution:
+        'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS User Community',
+      maxZoom: 19,
+      maxNativeZoom: 13
+    }
+  ]
 }
 
 const basemap = ref<BasemapKey>('street')
@@ -107,6 +136,15 @@ let observer: IntersectionObserver | null = null
 let resizeObserver: ResizeObserver | null = null
 let observerDone = false
 let tileErrorEmitted = false
+let sourceIndex = 0
+let tileErrorCount = 0
+let tileLoaded = false
+let fallbackTimer: ReturnType<typeof setTimeout> | null = null
+
+/** 单源失败阈值：连续的 tileerror 达到该数量才切换备用源，避免个别瓦片重试造成误判 */
+const TILE_ERROR_THRESHOLD = 3
+/** 连接被静默丢弃时既不成功也不报错，超过此时长仍无瓦片加载即切换备用源 */
+const TILE_TIMEOUT_MS = 8000
 
 function colorOf(properties: Record<string, unknown> | null | undefined, fallback: string): string {
   const c = properties?.color
@@ -153,34 +191,87 @@ function onMapClick(e: import('leaflet').LeafletMouseEvent): void {
   emit('pick', e.latlng.lat, e.latlng.lng)
 }
 
-/** 切换底图：只替换瓦片图层，保留中心、缩放与叠加要素 */
-function setBasemap(key: BasemapKey): void {
-  basemap.value = key
-  if (!map || !L) return
-
-  if (tiles) {
-    map.removeLayer(tiles)
-    tiles = null
+function clearFallbackTimer(): void {
+  if (fallbackTimer !== null) {
+    clearTimeout(fallbackTimer)
+    fallbackTimer = null
   }
-  failed.value = false
-  tileErrorEmitted = false
+}
 
-  const source = BASEMAPS[key]
-  tiles = L.tileLayer(source.url, {
+function removeTiles(): void {
+  clearFallbackTimer()
+  if (tiles && map) map.removeLayer(tiles)
+  tiles = null
+}
+
+/** 全部源均失败：移除图层，保留灰底与提示，工具的计算与导出不受影响（FR-06） */
+function reportTileFailure(): void {
+  removeTiles()
+  failed.value = true
+  if (!tileErrorEmitted) {
+    tileErrorEmitted = true
+    emit('tile-error')
+  }
+}
+
+function tryNextSource(): void {
+  if (!map || !L) return
+  if (sourceIndex + 1 < BASEMAPS[basemap.value].length) {
+    loadSource(sourceIndex + 1)
+  } else {
+    reportTileFailure()
+  }
+}
+
+/** 加载指定序号的底图源；切换只替换瓦片图层，保留中心、缩放与叠加要素 */
+function loadSource(index: number): void {
+  if (!map || !L) return
+  const source = BASEMAPS[basemap.value][index]
+  if (!source) {
+    reportTileFailure()
+    return
+  }
+
+  removeTiles()
+  sourceIndex = index
+  tileErrorCount = 0
+  tileLoaded = false
+  failed.value = false
+
+  const layer = L.tileLayer(source.url, {
     maxZoom: source.maxZoom,
+    ...(source.maxNativeZoom !== undefined ? { maxNativeZoom: source.maxNativeZoom } : {}),
     attribution: source.attribution,
     ...(source.subdomains ? { subdomains: source.subdomains } : {})
   })
-  tiles.on('tileerror', () => {
-    failed.value = true
-    if (!tileErrorEmitted) {
-      tileErrorEmitted = true
-      emit('tile-error')
-    }
+  tiles = layer
+  // 已被替换的旧图层仍可能抛出在途错误，用实例比对忽略它们
+  layer.on('tileload', () => {
+    if (tiles !== layer) return
+    tileLoaded = true
+    clearFallbackTimer()
   })
-  tiles.addTo(map)
+  layer.on('tileerror', () => {
+    if (tiles !== layer) return
+    tileErrorCount += 1
+    if (tileErrorCount >= TILE_ERROR_THRESHOLD) tryNextSource()
+  })
+  layer.addTo(map)
   // 地形图最高 17 级；切换时避免停在不存在的层级
   if (map.getZoom() > source.maxZoom) map.setZoom(source.maxZoom)
+
+  fallbackTimer = setTimeout(() => {
+    if (!tileLoaded) tryNextSource()
+  }, TILE_TIMEOUT_MS)
+}
+
+/** 用户切换底图类型：从该类型的首选源重新开始 */
+function setBasemap(key: BasemapKey): void {
+  basemap.value = key
+  if (!map || !L) return
+  tileErrorEmitted = false
+  failed.value = false
+  loadSource(0)
 }
 
 async function init(): Promise<void> {
@@ -263,6 +354,7 @@ watch(() => props.geojson, renderOverlay, { deep: false })
 onBeforeUnmount(() => {
   observer?.disconnect()
   resizeObserver?.disconnect()
+  clearFallbackTimer()
   map?.remove()
   map = null
   overlay = null

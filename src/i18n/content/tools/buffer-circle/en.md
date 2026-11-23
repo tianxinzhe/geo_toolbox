@@ -43,7 +43,7 @@ Buffer mode uses a planar approximation through turf, which is different from th
 
 ## Map behaviour and fallback
 
-The map uses keyless OpenStreetMap street tiles by default, with a top-right switch to Esri satellite imagery or the Esri topographic map. It is lazily initialised by an IntersectionObserver, so no tiles are requested while it is outside the viewport. If tiles fail to load, circle calculations, metrics and export remain fully available, and the page states that clearly.
+The map uses keyless Esri street tiles by default (falling back to OpenStreetMap if Esri is unreachable), with a top-right switch to Esri satellite imagery or the Esri topographic map. It is lazily initialised by an IntersectionObserver, so no tiles are requested while it is outside the viewport. If tiles fail to load, circle calculations, metrics and export remain fully available, and the page states that clearly.
 
 On touch devices the map does not capture one-finger dragging by default, so vertical page scrolling is not hijacked. A visible “tap to enable map dragging” button switches the behaviour; pinch zoom always works.
 
