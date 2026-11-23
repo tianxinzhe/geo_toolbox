@@ -4,13 +4,15 @@ description: How GMT multi-segment ASCII marks segments with >, writes longitude
 heading: "GMT explained: multi-segment ASCII and plotting conventions"
 group: vector
 order: 16
-readingMinutes: 1
-updated: 2026-11-09
+readingMinutes: 6
+updated: 2026-11-23
 ---
 
 The GMT (Generic Mapping Tools) format is a simple ASCII structure widely used for scientific plotting. It has no official standard; the rules come from GMT conventions: a `>` starts a segment, followed by coordinate lines.
 
-## Basic form
+Strictly speaking it is not a separate data format at all, but the text layout that GMT's table reader accepts. The same file means different things to different modules: `gmt plot` treats the first two columns as coordinates and, with `-C`, may read the third as a colour value; `gmt surface` treats three columns as scattered data to interpolate. Nothing in the file declares a type, so the command decides.
+
+## Minimal example: the basic form
 
 ```text
 > first point
@@ -31,6 +33,8 @@ The GMT (Generic Mapping Tools) format is a simple ASCII structure widely used f
 - **Coordinates with no segment header** are treated as one continuous record.
 - **Polygons are expressed by closing the first and last point**; there is no polygon keyword.
 
+The header line is the only structural marker. It cuts the file into segments, each a run of consecutive coordinates, and the text after `>` usually becomes the feature name. Blank lines do not open a new segment and are normally skipped, so omitting one `>` silently joins two segments into one line. Comment lines start with `#`; they are safe at the top of a file or segment, while a comment in the middle of coordinates is handled inconsistently between modules.
+
 ## Coordinate system and plotting parameters
 
 A GMT file **declares no coordinate system**. It is set on the command line at plot time:
@@ -41,12 +45,77 @@ A GMT file **declares no coordinate system**. It is set on the command line at p
 
 The same file drawn with a different `-J` produces a different shape, so exchanging a GMT file means passing the region and projection along with it.
 
-## Limits
+`-R` is ordered west, east, south, north, with western longitudes negative, so a region crossing 180° has to be split or handled with the 0–360 convention. `-J` decides how the sphere is flattened: geographic projections such as `-JM` and `-JN` assume longitude and latitude, while a linear projection such as `-JX` treats the numbers as plain planar coordinates. Feed projected metres to a geographic projection and every point falls outside the region, leaving a blank plot.
 
-- **No attribute table**: everything must go into segment header text.
-- **No geometry type declaration**: a point is one line, a line is consecutive lines, a polygon is closed by matching endpoints.
-- **No coordinate system**: it cannot be interpreted without the plotting parameters.
-- **No styling**: colours and symbols come from the plotting command, not the file.
+Column selection can override the default order. `-i` chooses which columns to use, for example taking the third as x and the second as y; it affects reading only, never the file, so one dataset can be interpreted differently by two commands. Use `-h` when the file has a header record. Gridded data such as netCDF is a separate model and cannot be read as a table.
+
+## Structure and fields
+
+| Line or field | Rule | Required | Common values |
+|---|---|---|---|
+| segment header `>` | starts a segment, free text follows | may be omitted in a single-segment file | `> Times Square` |
+| coordinate line | several whitespace-separated numbers | yes | `-73.9855 40.758` |
+| third column `z` | elevation, intensity or colour value | optional | height, temperature, weight |
+| comment `#` | line is ignored | optional | `# lon lat` |
+| blank line | skipped, does not split segments | optional | empty |
+| column separator | spaces or tabs, may be mixed | yes | one or more spaces |
+| geometry type | inferred from point count and closure | never declared | point, line, closed ring |
+| attributes | no attribute table, only header text | cannot be expressed | none |
+| CRS | does not exist in the file | cannot be expressed | set by `-R` and `-J` |
+
+A coordinate line needs at least two columns. Extra columns are not an error; the module decides what to do with them and ignores the rest if it expects two. There is no marker for point, line or polygon: one line is a point, consecutive lines are a line, and only a ring whose first and last coordinate match, with at least four points, resembles a closed polygon. Plotting also needs `-L` before the polyline is closed and filled, because the file never tells the software "this is a polygon".
+
+Styling is absent too. Colour, symbol and line width come from options such as `-W`, `-G` and `-C` on the plotting command, so the appearance changes with the command rather than with the data.
+
+## Common mistakes
+
+### Missing segment headers
+
+**Symptom**: two separate lines are joined by a long stroke, or several polygons merge into one.
+
+**Cause**: the `>` line between segments is absent. A blank line is not a separator, so the reader keeps appending coordinates to the same segment.
+
+**Consequence**: geometry is connected wrongly. The plot shows an obvious crossing, but the data itself raises no error and spot checks rarely catch it.
+
+### Swapped axes or wrong units
+
+**Symptom**: a blank map, every point outside the region, or all points stacked in a corner.
+
+**Cause**: the columns are latitude then longitude, or the file holds projected metres while `-J` applies a geographic projection.
+
+**Consequence**: the region and the data do not intersect; the command succeeds but draws nothing. Confirm the column order and units, then fix them with `-i` or the right projection.
+
+### Longitudes written as 0–360
+
+**Symptom**: western-hemisphere points appear at the far side of the map, or a line crossing 180° circles the globe.
+
+**Cause**: some sources write longitudes from 0 to 360, while geographic projections assume −180 to 180.
+
+**Consequence**: points shift and long lines sweep across the figure. Subtract 360 from values above 180, or settle on one convention for the whole dataset.
+
+### Comma-separated values
+
+**Symptom**: the read fails, or the whole line is treated as one invalid record.
+
+**Cause**: GMT splits on whitespace; a comma is not a delimiter. Copying from CSV or a document often brings commas along.
+
+**Consequence**: the module errors or skips the row, and data quietly goes missing. Replace commas with spaces or tabs before publishing.
+
+### Writing attributes into the segment header
+
+**Symptom**: after conversion only the name survives; categories and numeric fields are gone.
+
+**Cause**: a GMT table has no attribute table. The header is a free-text label, not a key-value structure.
+
+**Consequence**: you cannot colour or filter by attribute. Use GeoJSON or GeoPackage when attributes matter, or keep a separate table and rely on row order.
+
+### Unclosed polygons
+
+**Symptom**: a filled area appears as an outline, or the fill is malformed.
+
+**Cause**: the first and last points differ, or the last point is wrong. Closure can only be judged from coordinates, since the file has no polygon type.
+
+**Consequence**: `-L` closes the ring forcibly and may add an edge across the shape; without it the ring is treated as a line. Neither case reports an error.
 
 ## Where it fits
 
@@ -57,4 +126,34 @@ The same file drawn with a different `-J` produces a different shape, so exchang
 | Need attributes or layers | Use GeoJSON or GeoPackage |
 | Need an exact coordinate system | Record the EPSG code separately |
 
-Use the [vector format converter](/en/tools/format-convert/) for conversion; for projected plotting, first unify the coordinate system with the [projection converter](/en/tools/epsg-convert/).
+## Compared with neighbours
+
+| Format | Attributes | Geometry type | CRS | Ecosystem |
+|---|---|---|---|---|
+| GMT table | none, only header text | inferred | no declaration | GMT and a few scientific tools |
+| CSV / TSV | any columns | points, or a WKT column | no declaration | universal |
+| GeoJSON | yes | explicit points, lines, polygons | WGS84 by default | web maps and GIS |
+| WKT | none | explicit, one per line | optional SRID | GIS and databases |
+
+GMT's niche is narrow: preparing data for GMT plots, or reading coordinates back out of them. It is simple enough to write by hand, and therefore has no self-description at all. When data must be exchanged, carry attributes or be understood by someone else, CSV or GeoJSON fits better.
+
+## Converting and tools
+
+Use the [vector format converter](/en/tools/format-convert/) for conversion; for projected plotting, first unify the coordinate system with the [projection converter](/en/tools/epsg-convert/). General table rules are in [CSV and TSV](/en/guide/csv-tsv/); the wider choice is in the [15-format overview](/en/guide/vector-formats/).
+
+## Sample data and parser
+
+- [sample.gmt](/examples/data/sample.gmt), [gmt_parser.py](/examples/python/gmt_parser.py)
+
+The sample has three segments: a point at Times Square, a short walking line and a closed rectangle. The standard-library script splits on segments, writes a single point as a point, a closed ring of at least four points as a polygon and anything else as a line:
+
+```bash
+python gmt_parser.py sample.gmt -o out.geojson
+```
+
+Header text becomes a `name` property. A file with no `>` is treated as one segment. Holes cannot be expressed, coordinates are read as stored, and no reprojection is performed.
+
+## References
+
+- [GMT documentation](https://docs.generic-mapping-tools.org/latest/)
+- [GMT: gmt command reference](https://docs.generic-mapping-tools.org/latest/gmt.html)

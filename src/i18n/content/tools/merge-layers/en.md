@@ -58,4 +58,4 @@ Files do not need to share a format: GeoJSON, KML, GPX, Shapefile, GeoPackage an
 ## References
 
 - [RFC 7946: GeoJSON format specification](https://datatracker.ietf.org/doc/html/rfc7946)
-- [OGC Simple Features: geometry type definitions](https://www.ogc.org/standards/sfa/)
+- [OGC Simple Features: geometry type definitions](https://www.ogc.org/publications/standard/sfa/)

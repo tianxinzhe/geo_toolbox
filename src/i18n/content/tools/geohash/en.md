@@ -19,7 +19,7 @@ faq:
 
 A GeoHash is a short string that encodes a latitude and longitude using a public, deterministic algorithm. It does not project the coordinates or change what they mean. Instead it repeatedly bisects the surface along longitude and latitude: each bisection records which half the point falls into, and every five bits are mapped to one character from a 32-symbol alphabet. The longitude and latitude bits are interleaved, so each character carries information about both axes.
 
-The useful property is that **a shared prefix means a shared rectangular cell**. A longer string is a smaller cell, and it always extends the shorter string. The point `116.3974, 39.9088` near Tiananmen Square, Beijing, encodes to `wx4g0bk` at seven characters; its first five characters `wx4g0` cover a much larger area around the city. Encoding and decoding are deterministic: the same coordinate at the same length always produces the same string.
+The useful property is that **a shared prefix means a shared rectangular cell**. A longer string is a smaller cell, and it always extends the shorter string. The point `116.3974, 39.9088` near Tiananmen Square, Beijing, encodes to `wx4g09n` at seven characters; its first five characters `wx4g0` cover a much larger area around the city. Encoding and decoding are deterministic: the same coordinate at the same length always produces the same string.
 
 GeoHash is not the only spatial encoding. Google's S2 and Uber's H3 solve a similar problem with different cell shapes: S2 uses spherical cells, H3 uses hexagons, and GeoHash uses latitude-longitude rectangles. GeoHash remains popular because it is easy to implement, short enough for a URL and directly storable in an ordinary text column.
 
@@ -29,7 +29,7 @@ Because a prefix maps to a fixed rectangle, a GeoHash column can serve as the fi
 
 There are two important limits. First, the result is a rectangle, not a circle: points in the same cell may still lie outside the requested radius, so a geodesic distance filter is still required. Second, the centre cell alone misses points just across a boundary. In practice you fetch the centre and its eight neighbours, or split a larger query area into several prefix ranges.
 
-Another easy mistake is **comparing prefixes of different lengths**. `wx4g` and `wx4g0bk` both refer to Beijing, but the first is a cell roughly 20 kilometres wide and the second is roughly 150 metres wide. Mixing lengths makes the meaning of "nearby" change silently in different parts of the code. Fix the length in the schema, or state explicitly what area the current length represents.
+Another easy mistake is **comparing prefixes of different lengths**. `wx4g` and `wx4g09n` both refer to Beijing, but the first is a cell roughly 20 kilometres wide and the second is roughly 150 metres wide. Mixing lengths makes the meaning of "nearby" change silently in different parts of the code. Fix the length in the schema, or state explicitly what area the current length represents.
 
 ## Length and precision
 

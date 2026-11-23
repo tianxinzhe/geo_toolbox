@@ -135,6 +135,7 @@ const zh: Record<UiKey, string> = {
   'doc.resources': '延伸阅读与示例',
   'doc.guides': '相关指南',
   'doc.samples': '示例数据与解析代码',
+  'doc.screenshot': '界面预览',
   'doc.faq': '常见问题',
   'doc.howItWorks': '使用说明',
   'doc.moreInGroup': '同类文章',

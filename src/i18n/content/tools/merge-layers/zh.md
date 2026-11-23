@@ -58,4 +58,4 @@ faq:
 ## 参考与依据
 
 - [RFC 7946：GeoJSON 格式规范](https://datatracker.ietf.org/doc/html/rfc7946)
-- [OGC Simple Features：几何类型定义](https://www.ogc.org/standards/sfa/)
+- [OGC Simple Features：几何类型定义](https://www.ogc.org/publications/standard/sfa/)

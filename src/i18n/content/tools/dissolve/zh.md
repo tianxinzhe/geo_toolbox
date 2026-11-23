@@ -60,5 +60,5 @@ faq:
 
 ## 参考与依据
 
-- [OGC Simple Features：几何并集与有效性规则](https://www.ogc.org/standards/sfa/)
+- [OGC Simple Features：几何并集与有效性规则](https://www.ogc.org/publications/standard/sfa/)
 - [Turf.js：几何合并的参考实现](https://turfjs.org/)

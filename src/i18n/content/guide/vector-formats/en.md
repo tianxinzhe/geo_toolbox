@@ -4,8 +4,8 @@ description: How GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, DXF and n
 heading: A field guide to 15 vector data formats
 group: vector
 order: 3
-readingMinutes: 3
-updated: 2026-11-09
+readingMinutes: 5
+updated: 2026-11-23
 ---
 
 The same points, lines and polygons can be stored in GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf and a dozen other formats. Picking the wrong one rarely fails immediately; the problem appears at delivery, on import, or when someone opens the file in another program.
@@ -65,5 +65,48 @@ A common mistake: KMZ and XLSX look like single formats, but both are ZIP contai
 2. **Attribute fields**: Shapefile field names max out at 10 characters and one layer holds one geometry type; Excel turns long numerics into scientific notation; CSV without an encoding declaration mangles non-ASCII text.
 3. **Geometric detail**: GPX cannot hold polygons; some multi-part polygons do not survive KML; DXF arcs and block references may become polylines.
 4. **Styles and attachments**: KML icons, colours and description images disappear when converted to GeoJSON; KMZ attachments need separate handling after extraction.
+
+## Common mistakes and traps
+
+The format itself rarely errors. The problems come from assumptions about coordinate systems, field capacity and file size.
+
+1. **Swapping longitude and latitude**
+   - Symptom: the whole layer is mirrored, or longitudes appear where latitudes belong.
+   - Cause: GeoJSON and most APIs order coordinates longitude first, but the CSV header says lat,lng and the data was assembled to match the header.
+   - Effect: every feature is misplaced, yet the map still draws a plausible shape, so the error is easy to miss.
+   - Fix: check ranges. Longitude stays within ±180 and latitude within ±90. Verify column names and order together, not the header alone.
+
+2. **Editing coordinate columns in Excel**
+   - Symptom: the last digits of coordinates become zero, or administrative codes turn into scientific notation.
+   - Cause: Excel infers numeric types. Integers longer than 15 digits lose precision, and leading zeros disappear.
+   - Effect: the precision is gone for good after the next export, and positions shift by centimetres to kilometres.
+   - Fix: import the coordinate columns as text, or let a converter read the original file instead of retyping values in a spreadsheet.
+
+3. **Treating format conversion as CRS conversion**
+   - Symptom: the file opens with attributes intact, but everything sits thousands of kilometres away.
+   - Cause: GeoJSON, KML and GPX are read as WGS84 longitude/latitude, while the source is CGCS2000 projected coordinates.
+   - Effect: positions are wrong, and every distance, area or spatial query built on top of them fails.
+   - Fix: identify the source CRS, convert to longitude/latitude first, then change the format.
+
+4. **Ignoring field names and single-geometry layers**
+   - Symptom: Shapefile field names are truncated or collide, and points inside a polygon layer disappear.
+   - Cause: Shapefile field names stop at 10 characters, and one layer holds one geometry type.
+   - Effect: attributes no longer match and features are dropped silently, usually noticed only during reporting.
+   - Fix: rename and split layers before export, and use GeoPackage when the format is a free choice.
+
+Formats make different assumptions about coordinate systems, attributes and size. GeoJSON is fixed to WGS84 by specification and orders coordinates longitude first; KML and GPX also use longitude/latitude. Shapefile depends on `.prj`, GeoPackage stores the EPSG code in its database, and FlatGeobuf records the CRS in its header, so a missing declaration leaves you guessing. Attribute capacity differs as well: Shapefile names are limited, GeoJSON properties are free key/value pairs, GeoPackage behaves like a database table, and CSV has a single header row. Size and access speed trade off against each other; text formats are easy to read and diff, while binary formats suit millions of features and mobile reads. The underlying specifications are [OGC Simple Feature Access](https://www.ogc.org/publications/standard/sfa/), [RFC 7946](https://www.rfc-editor.org/rfc/rfc7946) and [geopackage.org](https://www.geopackage.org/).
+
+## Choosing a format
+
+| Goal | First choice | Alternative | Watch out for |
+|---|---|---|---|
+| Web APIs and programmatic use | GeoJSON | TopoJSON | Longitude-first order, larger files |
+| Delivery to non-GIS users | KML / KMZ | GeoJSON | Styles and icons survive in-format |
+| Archiving and large reads | GeoPackage | FlatGeobuf | Records EPSG, attributes and a spatial index |
+| Spreadsheet work and batch calculation | CSV / TSV | Excel | State the CRS and encoding |
+
+## Tools and examples on this site
+
+The [vector format converter](/en/tools/format-convert/) handles the main formats above and warns about features that a restricted target such as GPX or CSV would drop. To check that converted data lands in the right place, overlay it in [map preview](/en/tools/map-preview/). If the whole layer is offset, convert the CRS to WGS84 with the [projected CRS converter](/en/tools/epsg-convert/) before retrying the format change. For the syntax of a single geometry and ring closure, see [WKT](/en/guide/wkt/); for tiles that are already cut, use the [MVT parser](/en/tools/mvt/) to inspect layers and attributes.
 
 Conversion itself is not hard. Knowing in advance what will disappear is. To convert files, use the [vector format converter](/en/tools/format-convert/).

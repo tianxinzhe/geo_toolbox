@@ -137,6 +137,7 @@ const ja: Record<UiKey, string> = {
   'doc.resources': '関連ガイドとサンプル',
   'doc.guides': '関連ガイド',
   'doc.samples': 'サンプルデータと解析コード',
+  'doc.screenshot': '画面プレビュー',
   'doc.faq': 'よくある質問',
   'doc.howItWorks': '使い方',
   'doc.moreInGroup': '同じ分類の記事',

@@ -60,5 +60,5 @@ On the map, green features are the dissolved result and blue features are the so
 
 ## References
 
-- [OGC Simple Features: union and validity rules](https://www.ogc.org/standards/sfa/)
+- [OGC Simple Features: union and validity rules](https://www.ogc.org/publications/standard/sfa/)
 - [Turf.js: reference implementation of geometry union](https://turfjs.org/)

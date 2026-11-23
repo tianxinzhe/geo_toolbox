@@ -1,0 +1,80 @@
+---
+/**
+ * 工具页的操作界面截图。
+ *
+ * 图片在 `public/screenshots/{slug}-{lang}.png`，由无头浏览器对构建产物
+ * 逐页截取，中英文各一张，保证截图与线上界面一致。
+ *
+ * 只对已截图且已上线的工具渲染；新增工具时补图并在此登记即可。
+ */
+import type { Lang } from '../config/i18n'
+import { t } from '../i18n/ui'
+
+interface Props {
+  lang: Lang
+  slug: string
+  name: string
+}
+
+const { lang, slug, name } = Astro.props
+
+/** 已生成截图的工具（与 public/screenshots 保持一致） */
+const SHOT_SLUGS = new Set([
+  'dms-decimal',
+  'epsg-convert',
+  'format-convert',
+  'geohash',
+  'map-draw',
+  'buffer-circle',
+  'tile-coords',
+  'map-preview',
+  'clip-overlay',
+  'attribute-extract',
+  'attribute-join',
+  'merge-layers',
+  'dissolve',
+  'plus-codes',
+  'mvt'
+])
+
+const visible = SHOT_SLUGS.has(slug)
+const src = `/screenshots/${slug}-${lang}.png`
+const alt =
+  lang === 'zh'
+    ? `${name}的操作界面截图`
+    : lang === 'ja'
+      ? `${name}の操作画面`
+      : `${name} interface screenshot`
+---
+
+{
+  visible && (
+    <figure class="tool-shot">
+      <img src={src} width="1280" height="1080" loading="lazy" decoding="async" alt={alt} />
+      <figcaption>{t(lang, 'doc.screenshot')}</figcaption>
+    </figure>
+  )
+}
+
+<style>
+  .tool-shot {
+    max-inline-size: var(--w-tool);
+    margin: 0;
+  }
+
+  .tool-shot img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--bg-sub);
+  }
+
+  .tool-shot figcaption {
+    margin-block-start: var(--sp-1);
+    color: var(--ink-3);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+  }
+</style>

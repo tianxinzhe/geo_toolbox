@@ -1,7 +1,8 @@
 ---
 title: 'Online Map Drawing Tool: Points, Lines, Polygons | GeoToolbox'
 description: 'Draw points, lines, polygons, rectangles and circles on a map, measure length and area, edit attributes, and export GeoJSON, KML, GPX, WKT or CSV.'
-updated: 2026-11-16
+updated: 2026-11-23
+readingMinutes: 6
 faq:
   - q: 'Is my drawing uploaded to a server?'
     a: 'No. Drawing, measuring, attribute editing and export all run in the browser, with no upload request. To recover your work after an accidental page close, this tool writes features to the browser’s localStorage. It is the only tool on this site that persists user content, and the privacy policy says so explicitly. You can clear it at any time with “Clear local save”.'
@@ -44,6 +45,53 @@ The coordinate system is fixed to WGS 84. Every export format writes the origina
 One second after each change, the features are written to browser local storage. Reopening the page restores them and reports how many were recovered. If storage is full, autosave stops and the tool asks you to export promptly rather than overwriting existing data.
 
 The basemap defaults to keyless OpenStreetMap streets, with a top-right switch to Esri satellite imagery or the Esri topographic map. If tiles fail, drawing, measurement and export remain fully usable, only without a visual reference. Above 2,000 features the tool warns about performance but does not block further work.
+
+## Inputs and outputs
+
+Imports arrive by paste or file in GeoJSON, KML, GPX, CSV, TopoJSON or WKT. New features are appended; the current canvas is never cleared. A GeoJSON FeatureCollection is expanded as-is, CSV produces points from its coordinate columns with the other columns as properties, KML geometry becomes points, lines and polygons, and GPX waypoints, routes and tracks become points and lines. Property names and values keep their original spelling and case. Nested objects and arrays appear in the property panel as JSON text; editing that text turns the value into a string, so restructure nested data before import if the structure matters.
+
+Export covers GeoJSON, KML, GPX, WKT, CSV and a zipped Shapefile. GeoJSON is written as a FeatureCollection with eight decimal places and empty properties removed. CSV writes `lng`, `lat` and the property columns when every feature is a point; as soon as a line or polygon is present it switches to a `wkt` column plus properties, because one table cannot hold both shapes. GPX cannot carry polygons, so those features are skipped and counted in a warning. The Shapefile archive contains `.shp`, `.shx`, `.dbf`, `.prj` and `.cpg`, with the projection declared as WGS 84. Circles and rectangles are stored as polygons; a circle is a 64-segment approximation, and its radius is not added to the properties automatically, so add a field if the radius must survive.
+
+## Boundaries and limits
+
+Coordinates are treated as WGS 84 longitude and latitude, with no reprojection. Projected coordinates in metres therefore land in the wrong place and need conversion first.
+
+Drawing does not validate geometry. A self-intersecting polygon can be drawn and exported, and its area is still computed on the sphere, but downstream overlay, buffer or database tools may reject the ring or return something hard to explain. Ring winding is not normalised either: GeoJSON specifies counterclockwise exterior rings, while this tool writes points in the order they were clicked. Most readers tolerate either direction, but a strict checker may ask for repair. See [GeoJSON explained](/en/guide/geojson/) for coordinate order and ring structure.
+
+Repeated points are not merged. Clicking the same spot twice creates a zero-length edge; length totals ignore it, yet the exported file carries a duplicate coordinate. Removing duplicates is data repair, so it is not done silently while drawing.
+
+Undo covers deletes, clears and property changes, but the history holds 50 steps. Autosave depends on the browser quota; when storage is full, saving pauses and the page asks for an export. A missing basemap does not affect the data.
+
+## Precision and performance
+
+Drawing accuracy is bounded by screen pixels. At low zoom a pixel can represent hundreds of metres, and that error goes straight into the coordinate; zoom to street level before clicking, or import known coordinates instead. Circle radius comes from the geodesic distance between the centre and the pressed point, not from a pixel radius, so changing zoom does not alter a finished circle.
+
+Length is summed edge by edge along geodesics and area uses spherical excess on the authalic sphere, so neither depends on a projected plane and high latitudes do not stretch the area. The cost is per-edge geodesic work: a single polygon with tens of thousands of vertices makes selection and statistics noticeably slower. Above 2,000 features the page already warns about smoothness, and at that size editing, redrawing and export previews all feel sluggish.
+
+Local browser computation suits manual drawing and light cleanup from a handful to a few hundred features. Batch editing, topology checks and layer overlays at thousands of features belong in a desktop GIS or a command-line tool; bring the result back here for inspection.
+
+## Compared with alternatives
+
+| Aspect | This tool | Desktop GIS | Command line |
+| --- | --- | --- | --- |
+| Setup | Open a page and draw | Install and learn | Write commands |
+| Typical size | Tens to hundreds of features | Tens of thousands, complex topology | Large batches and repeatable runs |
+| Editing | Drag vertices, edit properties live | Full editing and snapping | None |
+| Where data lives | In the browser | Local project files | Local scripts and files |
+| Automation | None | Models and scripts, partly | Best suited |
+
+For a quick extent or a few pins this tool is fastest. Precise snapping, topology rules and attribute joins fit a desktop GIS. A fixed daily pipeline is better served by a command-line script.
+
+## A worked example
+
+Suppose three sampling points must be marked in a campus and a 500-metre reference area drawn around its centre.
+
+1. Zoom until campus roads are legible, pick point mode and click the three sampling locations. Each click adds a row with its longitude and latitude.
+2. Switch to circle mode, press at the campus centre and drag outward to roughly 500 metres. On release the canvas shows a 64-segment polygon, and the list reports an area close to the spherical area for that radius.
+3. Select the circle, add a `purpose` key with the value `survey-area`, and give each point a `sample_id`.
+4. Export GeoJSON: the result is a FeatureCollection with three Point features and one Polygon, carrying the properties just entered. Exporting CSV instead produces a `wkt` column, not `lng` and `lat`, because the collection mixes points and a polygon.
+
+If only the points are needed downstream, delete the circle before export. If the exact radius matters, store it as a property, since the polygon no longer carries the centre-and-radius meaning.
 
 ## References
 
