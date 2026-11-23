@@ -1,7 +1,7 @@
 ---
 title: '矢量格式转换 — GeoJSON / KML / GPX / Shapefile / GeoPackage | 地理工具箱'
 description: '在 GeoJSON、KML/KMZ、GPX、Shapefile、GeoPackage、FlatGeobuf、CSV/Excel、WKT、TopoJSON 等十余种矢量格式之间互转，保留属性，文件不上传、全部本地处理。'
-updated: 2026-11-10
+updated: 2026-11-23
 faq:
   - q: '文件会被上传到服务器吗？'
     a: '不会。文件通过浏览器的 File API 读入当前标签页内存，转换也在本地完成，不存在上传请求。关闭页面或刷新后数据即销毁，本站也不会把内容写入浏览器本地存储。这是本工具与多数在线转换器最根本的区别。'
@@ -52,6 +52,14 @@ CSV/TSV 会自动识别常见的经纬度列名，例如 `lat/lng`、`latitude/l
 ## 限额与隐私
 
 单个文件上限 20 MB，最多 50,000 个要素；粘贴文本上限 200,000 字符。超限时会明确告知实际数值与限额，不会尝试处理。文件仅在当前标签页内存中存在，不上传、不写入本地存储，关闭页面即销毁。
+
+## 国内数据源与中文编码
+
+国内公开数据多以 Shapefile（CGCS2000）或 GDB 分发，GeoJSON 相对少见。GDB 不是本工具的输入格式，需要先在 QGIS 或 ArcGIS 里导出为 Shapefile 或 GeoPackage。Shapefile 若带有 `.prj`，导入时会按其声明转换到 WGS84；CGCS2000 与 WGS84 的差异在厘米级，坐标数值几乎不变。
+
+高德、腾讯开放平台返回 GCJ-02 坐标，百度返回 BD-09。把接口结果存成 CSV 再转成 GeoJSON，只是换了容器，偏移仍然存在：这些坐标与 WGS84 相差 50~500 米，放到 OSM 或天地图底图上会整体错位。需要与卫星影像对齐时，先做纠偏，再进入本工具。
+
+编码是另一个常见问题。Excel 另存为 CSV 时默认使用本地编码，中文 Windows 下通常是 GB18030；工具在 CSV/TSV 的导入选项里提供 UTF-8 与 GBK/GB18030 两种选择，选错时属性里的中文会变成乱码，坐标列不受影响。Shapefile 的属性由 DBF 承载，带 `.cpg` 且声明 UTF-8 时中文正常，缺少 `.cpg` 的旧数据按 GBK 读取。DBF 字段名上限为 10 个字符，较长的中文名会在导出时被重命名并提示。
 
 ## 参考与依据
 

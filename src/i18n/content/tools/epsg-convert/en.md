@@ -1,7 +1,7 @@
 ---
 title: 'Projected CRS Converter (EPSG) | GeoToolbox'
 description: 'Convert coordinates between WGS 84, UTM, Web Mercator, China’s Gauss-Krüger bands and Japan’s 19 plane rectangular zones. Enter any EPSG code, all in your browser.'
-updated: 2026-11-09
+updated: 2026-11-23
 faq:
   - q: 'Why is X northing and Y easting in Japan’s plane rectangular system?'
     a: 'Japanese survey regulations define X as northing and Y as easting, the opposite of the GIS convention used by most software. If you enter easting in the first field, nothing errors — the point simply lands hundreds of kilometres away. This tool changes the field labels with the selected CRS: a geographic CRS shows “X (longitude)” and “Y (latitude)”, Japan’s plane rectangular system shows “X (northing)” and “Y (easting)”, and UTM or Gauss-Krüger shows “X (easting)” and “Y (northing)”.'
@@ -51,6 +51,12 @@ In every case the tool applies no epoch correction and loads no grid files such 
 ## A practical check
 
 Validate with a known point first. For example, Tokyo Station’s longitude and latitude converted to JGD2011 zone IX should give roughly −35,000 m northing and −6,000 m easting. Then paste your own data. If the result is off by a whole zone, check the central meridian first; if it is off by a fixed few hundred metres, check the datum; if the X and Y magnitudes are exchanged, check the axis order.
+
+## US State Plane and the British National Grid
+
+State Plane codes are not in the shortlist, so picking one triggers the full EPSG table (about seven thousand definitions, loaded on demand). Many zones are defined in US survey feet: EPSG:2225 is California zone 1 in feet, and a northing of 2,000,000 there is roughly 609,600 m. The tool keeps the unit declared by the EPSG definition and shows it with the result, so read the unit before pasting values from a plat or a surveyor’s report. NAD83 State Plane is tied to NAD83, and NAD83 differs from WGS 84 by a metre or two; the tool treats them as aligned and applies no transformation — fine for display, not for a boundary survey. Metric State Plane entries exist as well, so the same place may have several plausible codes; use the code printed on the source data rather than the first search result that looks local.
+
+For Great Britain, EPSG:27700 is the British National Grid, in metres, on OSGB36. The 7-parameter shift used here brings it to WGS 84 within a few metres, while the OSGB36 offset itself is around 100 m, so a file mistaken for WGS 84 is visibly displaced. Northern Ireland is not covered by EPSG:27700; it uses the Irish Grid (EPSG:29903) on the TM75 datum.
 
 ## References
 

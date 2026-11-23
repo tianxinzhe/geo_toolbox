@@ -1,7 +1,7 @@
 ---
 title: 'Vector Format Converter: GeoJSON, KML, GPX, Shapefile, GeoPackage | GeoToolbox'
 description: 'Convert between GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV/Excel, WKT, TopoJSON and more in your browser, with properties preserved.'
-updated: 2026-11-10
+updated: 2026-11-23
 faq:
   - q: 'Are my files uploaded to a server?'
     a: 'No. The browser File API reads the file into the current tab, and the conversion runs locally. There is no upload request. Closing or refreshing the page discards the data, and the file is not written to local storage. That is the fundamental difference between this tool and most online converters.'
@@ -52,6 +52,14 @@ Advanced options provide three switches: pretty-print versus compact output, coo
 ## Limits and privacy
 
 A single file is limited to 20 MB and 50,000 features; pasted text is limited to 200,000 characters. When a limit is exceeded, the tool reports the actual value and the limit and does not attempt the conversion. File content exists only in the current tab’s memory: it is not uploaded, not written to local storage, and is destroyed when the page closes.
+
+## Where US and UK datasets come from
+
+US Census TIGER/Line files are Shapefiles in NAD83 longitude and latitude and include a `.prj`. Importing the zipped Shapefile reprojects them to WGS 84 through that `.prj`, which moves the last digits by about a metre while keeping the data in the right place. The National Map and USGS 3DEP publish both GeoPackage and Shapefile; some layers are NAD83 geographic and others are State Plane in feet, so check the CRS before combining them. A State Plane layer that has lost its `.prj` is assumed to be WGS 84 and will land far from the intended area.
+
+Ordnance Survey Open Data (Boundary-Line, Open Roads, Open Names) is published in British National Grid, EPSG:27700, in metres. With the `.prj` present, import reprojects it to WGS 84 and replaces eastings and northings with longitude and latitude, which is expected. A Shapefile without its `.prj` is read as WGS 84 and will be misplaced by roughly 100 m in Great Britain, so keep the sidecar files together.
+
+GPX from Garmin devices, Strava and most cycling computers is WGS 84 and needs no conversion. CSV from US agencies may label columns `LAT`/`LON`, `LATITUDE`/`LONGITUDE` or `Y`/`X`. The first two are recognised as geographic coordinates; `X`/`Y` are read as longitude and latitude as well, so State Plane values in feet fail the range check instead of being silently misplaced.
 
 ## References
 

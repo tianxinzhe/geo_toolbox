@@ -1,7 +1,7 @@
 ---
 title: 'Google Tile Coordinates — Export an XYZ tile list | GeoToolbox'
 description: 'Draw a rectangle on the map or import GeoJSON, compute Google / XYZ tile numbers for the zoom levels you choose, and export x/y/z CSV files or tile polygons as GeoJSON.'
-updated: 2026-11-19
+updated: 2026-11-23
 faq:
   - q: 'What is the difference between XYZ and TMS tiles?'
     a: 'The x index is the same, but y is flipped. XYZ (used by Google Maps and OpenStreetMap) has its origin at the top-left and y increases southwards; TMS has its origin at the bottom-left and y increases northwards. For the same location and zoom, TMS y equals 2^z − 1 − XYZ y. This tool exports the XYZ scheme.'
@@ -71,6 +71,16 @@ If the data crosses the 180° meridian, the tool picks the shorter side and says
 **Can I export a single level?** Set the minimum and maximum Z to the same value. Multiple levels are enumerated separately and then merged into the sorted list.
 
 **Can I use the list with a TMS template?** Not directly. For TMS, convert y to `2^z − 1 − y`; this tool exports the Google / XYZ scheme.
+
+## Tile services in the US and UK
+
+Standard XYZ is what OpenStreetMap, Mapbox and MapLibre, Esri basemaps and most self-hosted tile servers expect, so a list generated here drops into those templates unchanged. Two local conventions are worth knowing.
+
+USGS topographic maps are published as 7.5-minute quadrangles: 7.5 minutes of latitude is about 8.6 miles, and at 40°N the same span of longitude is about 6.6 miles. At z=14 a tile is roughly 1.2 miles wide at that latitude, so one quad needs something like 40–50 tiles, and z=13 halves the count per side. The National Map also offers WMTS endpoints whose tile matrix identifiers are not the same as XYZ z/x/y, so read the service metadata instead of assuming the numbers line up.
+
+In Great Britain, web maps from Ordnance Survey and OSM use XYZ in Web Mercator, but printed OS maps are indexed by National Grid squares such as `TQ 30 80`, which are not tile numbers. The two systems answer different questions: a grid reference locates a point on paper, an XYZ triplet locates a rendered image.
+
+Finally, bulk downloading from public tile servers is usually restricted. Generate the list here, but fetch tiles from a service whose terms allow it — your own server, or a provider with an offline-use licence.
 
 ## References
 

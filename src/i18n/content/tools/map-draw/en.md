@@ -93,6 +93,18 @@ Suppose three sampling points must be marked in a campus and a 500-metre referen
 
 If only the points are needed downstream, delete the circle before export. If the exact radius matters, store it as a property, since the polygon no longer carries the centre-and-radius meaning.
 
+## Working in feet, miles and acres
+
+The map reports length in metres and area in square metres, which is what GeoJSON and Shapefile expect. When the brief or the deed is written in imperial units, convert before comparing numbers: one foot is 0.3048 m, one mile is 1609.344 m, one acre is 4046.86 m², and one hectare is 10,000 m² (2.471 acres). A 100 ft × 200 ft lot is 20,000 sq ft, or 1,858 m² — about 0.46 acre. A quarter-section in the Public Land Survey System is 160 acres, roughly 0.65 km²; that is large for hand drawing but still workable, since the statistics bar recomputes area after every vertex edit.
+
+Circle radius comes from the drag, not from a typed number, so the honest way to record an exact radius is a property. Draw the circle, add a `radius_ft` or `radius_m` field, and let downstream users convert it; do not round-trip it through the polygon.
+
+## Checking a drawing against US and UK reference data
+
+NAD83, the datum behind US Census TIGER/Line and most state and county data, sits within a metre or two of WGS 84. Drawing against Esri imagery or an OSM basemap in the United States is therefore safe at street scale — a metre is well below the precision of a hand-placed vertex. State Plane coordinates are a different matter: they are on a local grid in feet or metres and must be converted with the [projected CRS converter](/en/tools/epsg-convert/) before they can be compared with anything drawn here.
+
+In Great Britain, Ordnance Survey data is published on the British National Grid (EPSG:27700), whose OSGB36 datum is about 100 m from WGS 84. That offset is visible on a map: if a boundary from a planning portal lands beside the building instead of on it, suspect the datum rather than the drawing. Northern Ireland uses the Irish Grid, a separate system again.
+
 ## References
 
 - [Leaflet: map rendering library documentation](https://leafletjs.com/)
