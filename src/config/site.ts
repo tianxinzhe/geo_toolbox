@@ -33,6 +33,11 @@ export const site = {
   /** 联系邮箱（FR-10 联系方式页要求至少一个可直达渠道） */
   contactEmail: 'tianxinzhe032@gmail.com',
 
+  /** 内容维护者署名，用于指南页署名与 Article JSON-LD 的 author */
+  author: {
+    name: 'alex.yuan'
+  },
+
   /** 版权起始年 */
   since: 2026
 } as const

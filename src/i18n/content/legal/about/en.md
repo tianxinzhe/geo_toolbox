@@ -1,7 +1,7 @@
 ---
 title: 'About | GeoToolbox'
 description: 'What GeoToolbox is, who it is for and how it is maintained. Fifteen geospatial utilities, all computed locally in your browser, no sign-up, no upload, deployed on Cloudflare Pages.'
-updated: 2026-11-16
+updated: 2026-11-23
 ---
 
 ## What this site is
@@ -47,10 +47,15 @@ The calculation logic is covered by unit tests. The coordinate conversion tests 
 
 If a tool produces a result that disagrees with a value you know to be correct, or if the documentation contains a factual error, please tell us via the [contact page](/en/contact/). **A wrong number is the most serious class of bug on this site** and is handled first.
 
+<a id="author"></a>
+
 ## Who maintains this site
 
-This site is maintained by an independent developer — no team, no investors, no outsourced content:
+This site is maintained independently by **alex.yuan** — no team, no investors, no outsourced content:
 
+- **Maintainer**: alex.yuan, a programmer with a background in geoinformatics
+- **Background**: 10 years of GIS work and 20 years of software development
+- **Why this site exists**: coordinate conversions, format changes and map checks kept coming up in daily work, and the online tools available either demanded registration and uploads or were awkward to use — so these workflows were rebuilt as a browser-only version
 - GitHub: [@tianxinzhe](https://github.com/tianxinzhe)
 - Email: [tianxinzhe032@gmail.com](mailto:tianxinzhe032@gmail.com)
 - Hosting: Cloudflare Pages (static, no backend)

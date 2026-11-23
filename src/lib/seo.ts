@@ -101,7 +101,11 @@ export function articleJsonLd(opts: {
     inLanguage: LOCALE[opts.lang],
     datePublished: date,
     dateModified: date,
-    author: { '@type': 'Organization', name: site.name[opts.lang], url: absolute(site.url, '/') },
+    author: {
+      '@type': 'Person',
+      name: site.author.name,
+      url: absolute(site.url, `/${opts.lang}/about/`)
+    },
     publisher: {
       '@type': 'Organization',
       name: site.name[opts.lang],

@@ -898,6 +898,7 @@ const en = {
   'guide.readMore': 'Read the guide',
   'guide.minutes': '{count} min read',
   'guide.updated': 'Updated {date}',
+  'guide.byline': 'By {name}',
   'guide.cta.title': 'Try it in the browser',
   'guide.cta.body':
     'No upload, no install: open the tool and files are parsed locally in your browser.',

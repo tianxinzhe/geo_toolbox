@@ -890,6 +890,7 @@ const ja: Record<UiKey, string> = {
   'guide.readMore': '記事を読む',
   'guide.minutes': '約 {count} 分',
   'guide.updated': '{date} 更新',
+  'guide.byline': '執筆・保守：{name}',
   'guide.cta.title': 'ブラウザで試す',
   'guide.cta.body': 'ツールを開けば解析・変換できます。ファイルはアップロードされず、端末内で処理されます。',
   'guide.cta.all': 'すべてのツール',

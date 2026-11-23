@@ -13,8 +13,9 @@ import { t } from '../../../../i18n/ui'
 import ContentPage from '../../../../layouts/ContentPage.astro'
 import GuideCard from '../../../../components/GuideCard.astro'
 import { getDoc } from '../../../../lib/docs'
-import { guideIndexPath, guidePath, homePath, toolPath } from '../../../../lib/paths'
+import { guideIndexPath, guidePath, homePath, legalPath, toolPath } from '../../../../lib/paths'
 import { articleJsonLd } from '../../../../lib/seo'
+import { site } from '../../../../config/site'
 
 const LOCALE: Record<Lang, string> = { zh: 'zh-CN', en: 'en-GB', ja: 'ja-JP' }
 
@@ -142,6 +143,10 @@ const tools: ToolMeta[] = (GUIDE_TOOLS[slug] ?? [])
     <span>{minutes}</span>
     {updated && <span class="page-meta__sep" aria-hidden="true">·</span>}
     {updated && <span>{updated}</span>}
+    <span class="page-meta__sep" aria-hidden="true">·</span>
+    <a class="page-meta__link" href={legalPath(lang, 'about')}>
+      {t(lang, 'guide.byline', { name: site.author.name })}
+    </a>
   </p>
 
   {/* 正文之后：先给工具入口，再列同类文章 */}

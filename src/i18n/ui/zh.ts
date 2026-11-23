@@ -827,6 +827,7 @@ const zh: Record<UiKey, string> = {
   'guide.readMore': '阅读全文',
   'guide.minutes': '约 {count} 分钟',
   'guide.updated': '更新于 {date}',
+  'guide.byline': '由 {name} 撰写与维护',
   'guide.cta.title': '在线试一试',
   'guide.cta.body': '打开工具即可解析与转换，文件只在浏览器本地处理，不上传。',
   'guide.cta.all': '全部工具',
