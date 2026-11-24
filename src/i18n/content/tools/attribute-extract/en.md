@@ -1,6 +1,6 @@
 ---
-title: 'Extract by Attribute — Filter vector features online | GeoToolbox'
-description: 'Load a GeoJSON, KML, Shapefile or Excel file, choose a field and condition (equals, contains, greater than, is empty and more), then export matching features as GeoJSON.'
+title: 'Extract by Attribute — Filter vector features | GeoToolbox'
+description: 'Load GeoJSON, KML, Shapefile or Excel, choose a field and condition, then export the matching features as GeoJSON. Runs locally in your browser.'
 updated: 2026-11-23
 readingMinutes: 8
 faq:
@@ -16,7 +16,7 @@ faq:
 
 ## What this tool solves
 
-Parcels, POIs and road networks carry an attribute table: land use, district name, population, area, status. To look at one category you would normally reach for “Extract by Attribute” in a desktop GIS, or write a WHERE clause in a database. This tool turns it into three choices — field, condition, value — highlights the matching features on the map and lets you export them as a new GeoJSON.
+Parcels, POIs and road networks carry an attribute table: land use, district name, population, area, status. To look at one category you would normally reach for “Extract by Attribute” in a desktop GIS, or write a WHERE clause in a database. Here it takes three choices: field, condition, value. Matching features are highlighted on the map and export as a new GeoJSON.
 
 Typical uses: pull one POI category out of a city-wide dataset, keep parcels above an area threshold, retain a single district or status, or inspect records where a field is empty.
 
@@ -44,7 +44,7 @@ The field picker shows up to three sample values to confirm the right column. Ch
 - Up to 20 MB and 50,000 features per file. Crop larger datasets first.
 - One condition per run. For AND / OR logic, export the result and extract again.
 - Coordinates are read as WGS84 longitude/latitude. Projected coordinates land in the wrong place; convert them with the EPSG tool first.
-- Everything runs locally in the browser. Files are never uploaded and nothing is written to server logs.
+- Nothing leaves the browser: files are never uploaded, and nothing reaches server logs.
 
 ## Common questions
 
@@ -60,7 +60,7 @@ Input is one vector file or a coordinate table: GeoJSON, TopoJSON, KML, GPX, CSV
 
 Output is a GeoJSON FeatureCollection containing the matching features only. Geometry is unchanged, every attribute is copied, and source order is preserved. Filtering never changes types: a CSV value of `"9"` compared as a number is still written as the string `"9"` on export. Use the format converter afterwards if a field must change type.
 
-The field picker lists every property name and attaches up to three non-empty sample values. "Choose an existing value" reads up to 200 distinct values, sorts them and offers them for selection; a value outside the list can still be typed. These aids never change the comparison rules.
+The field picker lists every property name with up to three non-empty sample values, and "Choose an existing value" reads up to 200 distinct values, sorts them and offers them for selection. A value outside the list can still be typed. Neither aid changes the comparison rules.
 
 ## Empty values, case and numbers
 
@@ -82,11 +82,11 @@ The tool does not repair geometry, deduplicate or clean attributes. Overlapping 
 
 ## Performance and data volume
 
-Loading scans the attribute table once to collect fields, sample values and the numeric flag, and "choose an existing value" scans the chosen field again. Cost grows with features multiplied by fields; tens of thousands of rows with a few dozen columns are usually fine, while hundreds of wide columns become noticeably slower.
+Loading scans the attribute table once to collect fields, sample values and the numeric flag, and "choose an existing value" scans the chosen field again. Cost grows with features multiplied by fields. Tens of thousands of rows with a few dozen columns are usually fine; hundreds of wide columns get noticeably slower.
 
 Filtering itself is one linear pass and lighter than loading. Parsing is often the real bottleneck: large GeoJSON or Excel files use more memory, and approaching 50,000 features the page can stall. Very long property values or many nested objects also slow display and serialisation.
 
-This tool suits one-off filtering, data-quality checks and handing a result to the next step. Multi-condition logic, regular expressions, spatial predicates, grouped statistics or repeated queries belong in QGIS, a spatial database or a script.
+One-off filtering and data-quality checks are the natural fit. Multi-condition logic, regular expressions, spatial predicates, grouped statistics and repeated queries belong in QGIS, a spatial database or a script.
 
 ## Compared with alternatives
 
@@ -99,7 +99,7 @@ This tool suits one-off filtering, data-quality checks and handing a result to t
 | Repetition | Manual | Models and batch runs | Best for automation |
 | Typical size | Small to medium files | Large data, complex rules | Big data and fixed pipelines |
 
-Checking one category or confirming that a column is empty is fastest here. Multiple conditions, regular expressions or joins are better served by QGIS expressions. Repeating the same filter into a database every day is more reliable as SQL or a script.
+Checking one category, or confirming that a column is empty, is quickest here. Multiple conditions and regular expressions are better served by QGIS expressions. A filter that runs against a database every day belongs in SQL or a script.
 
 ## A worked example
 

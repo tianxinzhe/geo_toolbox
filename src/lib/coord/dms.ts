@@ -281,9 +281,8 @@ export function formatDmsSymbolic(dms: Dms, secDigits = 3): string {
 /**
  * 文本式度分秒，按语言本地化（PRD T02：`39度54分31.7秒`）。
  *
- * 三种语言的写法：
+ * 两种语言的写法：
  *   zh → `39度54分31.68秒`（西经/南纬前缀「西经」「南纬」）
- *   ja → `39度54分31.68秒`（同 zh，但方向词用「西経」「南緯」）
  *   en → `39° 54' 31.68" W`（英文习惯仍用符号，但加空格与方向词）
  */
 export function formatDmsTextual(dms: Dms, lang: Lang, secDigits = 2): string {
@@ -296,26 +295,19 @@ export function formatDmsTextual(dms: Dms, lang: Lang, secDigits = 2): string {
     return `${deg}° ${dms.minutes}' ${sec}" ${dms.hemisphere ?? ''}`.trim()
   }
 
-  const dirWord = directionWord(dms.hemisphere, negative, isLat, lang)
+  const dirWord = directionWord(dms.hemisphere, negative, isLat)
   return `${dirWord}${deg}度${dms.minutes}分${sec}秒`
 }
 
-/** 方向词。zh / ja 用文字，且必须用对应语言的字形（SR-11：日文汉字字形不同） */
+/** 方向词。zh 用文字，en 在 formatDmsTextual 里直接拼符号 */
 function directionWord(
   hemisphere: Dms['hemisphere'],
   negative: boolean,
-  isLat: boolean,
-  lang: Lang
+  isLat: boolean
 ): string {
   const south = hemisphere === 'S' || (hemisphere === undefined && negative && isLat)
   const west = hemisphere === 'W' || (hemisphere === undefined && negative && !isLat)
 
-  if (lang === 'ja') {
-    // ⚠️ 日文用「経」「緯」的日文字形，不能用中文的「经」「纬」
-    if (south) return '南緯'
-    if (west) return '西経'
-    return isLat ? '北緯' : '東経'
-  }
   if (south) return '南纬'
   if (west) return '西经'
   return isLat ? '北纬' : '东经'
@@ -333,7 +325,7 @@ export function formatDmSymbolic(dm: Dm, minDigits = 4): string {
 
 /**
  * 可接受的度分秒分隔符（SR-01 表）：
- *   `° ' "`、`d m s`、中文「度分秒」、日文「度分秒」（字形相同）
+ *   `° ' "`、`d m s`、中文「度分秒」
  * 以及冒号式 `116:23:50.6`（常见于 GPS 设备导出）
  */
 const DMS_SEPARATORS = /[°º^'"’‘″′:：dmsDMS度分秒]/
@@ -452,7 +444,7 @@ export function parseDmsInput(
 /**
  * 抽出半球符号。
  *
- * 接受前置（`N39.9088`）、后置（`39.9088N`）与中日文方向词（`北纬39.9088`）。
+ * 接受前置（`N39.9088`）、后置（`39.9088N`）与中文方向词（`北纬39.9088`）。
  * SR-01：「带明确半球符号时按符号确定，忽略书写顺序」。
  *
  * @param strictAxis true（默认）时，与 axis 不匹配的符号（如纬度位置上写了 `E`）
@@ -467,10 +459,9 @@ function extractHemisphere(
 ): { body: string; hemisphere?: 'N' | 'S' | 'E' | 'W'; signFromSymbol: 1 | -1 } {
   const expected = axis === 'lat' ? ['N', 'S'] : ['E', 'W']
 
-  // 中文 / 日文方向词
+  // 中文方向词
   const words: Record<string, 'N' | 'S' | 'E' | 'W'> = {
-    北纬: 'N', 南纬: 'S', 东经: 'E', 西经: 'W',
-    北緯: 'N', 南緯: 'S', 東経: 'E', 西経: 'W'
+    北纬: 'N', 南纬: 'S', 东经: 'E', 西经: 'W'
   }
   for (const [word, h] of Object.entries(words)) {
     if (value.includes(word)) {

@@ -109,18 +109,6 @@ async function checkUiDicts(): Promise<void> {
       console.log(`  ✓ ${lang}（${LABEL[lang]}）键完整`)
     }
   }
-
-  // 未上线语言只警告不失败：M15 之前允许暂时落后
-  for (const lang of ['ja'] as Lang[]) {
-    if (LAUNCHED.includes(lang)) continue
-    try {
-      const dict = (await import(`../src/i18n/ui/${lang}.ts`)).default as Record<string, string>
-      const missing = (Object.keys(en) as UiKey[]).filter((k) => !dict[k])
-      if (missing.length) warn(lang, `未上线语言，缺 ${missing.length} 个键（M15 前可接受）`)
-    } catch {
-      warn(lang, '未上线语言，字典文件缺失（M15 前可接受）')
-    }
-  }
 }
 
 /* ------------------------------------------------------------------ *
@@ -283,7 +271,7 @@ function checkFrontmatter(): void {
     if (f.kind !== 'tool') continue
 
     // 去掉 Markdown 语法后统计有效字符：
-    //   zh / ja 按字符数 ≥500；en 按词数 ≥350
+    //   zh 按字符数 ≥500；en 按词数 ≥350
     const text = body
       .replace(/```[\s\S]*?```/g, ' ') // 代码块不计入正文量
       .replace(/^\s*\|.*\|\s*$/gm, ' ') // 表格行不计入

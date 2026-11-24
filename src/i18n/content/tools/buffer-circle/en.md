@@ -16,7 +16,7 @@ faq:
 
 ## What question this tool answers
 
-“What falls within three kilometres of this point?” It is one of the most common questions in site selection, delivery coverage, emergency planning, radio coverage and retail catchment analysis. The answer has to be visible on a map, and it has to export to a standard format before it can enter the next step of the workflow.
+“What falls within three kilometres of this point?” Site selection, delivery coverage, emergency planning, radio coverage and retail catchment analysis all ask it. The answer has to be visible on a map, and it has to export in a standard format before it can move to the next step.
 
 There are two modes:
 
@@ -39,7 +39,7 @@ Circle area uses an authalic sphere and perimeter uses geodesic distances on the
 
 A single radius cannot exceed 20,000 km: beyond that the circle approaches a hemisphere and the concept stops being meaningful. The tool rejects such values and explains why. Radii less than or equal to zero are also rejected.
 
-Buffer mode uses a planar approximation through turf, which is different from the geodesic semantics of circle mode. The former is good for quick illustration, the latter for coverage analysis where real distance matters. For strict accuracy, prefer circle mode or treat the buffer as a first-pass extent for a professional GIS.
+Buffer mode uses a planar approximation through turf, which is different from the geodesic semantics of circle mode. That suits quick illustration and is weak for coverage analysis where real distance matters. For strict accuracy, prefer circle mode, or treat the buffer as a first-pass extent for a professional GIS.
 
 ## Map behaviour and fallback
 
@@ -81,7 +81,7 @@ Browser-side work suits quick extent checks, illustration and first-pass coverag
 | Result | One Polygon per radius | One feature per feature and radius | Dissolve and topology editing available |
 | Best for | Coverage and catchment radii | Roadside or parcel setbacks | Production analysis and loading |
 
-Prefer circle mode when equal real-world distance matters, buffer mode when expanding along roads or parcels, and a desktop GIS or spatial database when dissolve, projected buffers or strict accuracy are required.
+Use circle mode when equal real-world distance matters, and buffer mode for setbacks along roads or parcels. When you need dissolve, projected buffers or strict accuracy, a desktop GIS or spatial database is the right tool.
 
 ## A worked example
 

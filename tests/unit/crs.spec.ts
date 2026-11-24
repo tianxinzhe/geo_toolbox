@@ -1,11 +1,9 @@
 /**
- * CRS 层单测：日本 19 区带、中国高斯带、基准变换与轴序。
+ * CRS 层单测：中国高斯带、UTM、基准变换与坐标量级检查。
  *
  * 黄金值来源：
- *   - 区带参数来自 EPSG 注册表（scripts/verify-epsg.ts 逐条核验）
+ *   - 带号参数来自 EPSG 注册表（scripts/verify-epsg.ts 逐条核验）
  *   - Web Mercator 用公式可手算的已知值
- *   - 日本平面直角的期望值只断言「量级 + 往返残差」，避免把 proj4 的
- *     实现细节当成测量基准
  */
 
 import { describe, expect, it } from 'vitest'
@@ -29,110 +27,6 @@ import {
   resolveCrsId,
   normalizeTowgs84
 } from '../../src/lib/crs/engine'
-import {
-  fromRoman,
-  japanPlaneEpsg,
-  japanPlaneProj4,
-  japanZoneOfCode,
-  parseZoneInput,
-  toRoman
-} from '../../src/lib/crs/japan'
-
-describe('日本平面直角坐标系', () => {
-  it('19 区带的 EPSG 代码与 PRD/注册表一致', () => {
-    expect(japanPlaneEpsg('jgd2011', 1)).toBe(6669)
-    expect(japanPlaneEpsg('jgd2011', 19)).toBe(6687)
-    // PRD 的 2451~2469 是笔误，第 I 系实际是 2443
-    expect(japanPlaneEpsg('jgd2000', 1)).toBe(2443)
-    expect(japanPlaneEpsg('jgd2000', 19)).toBe(2461)
-    expect(japanPlaneEpsg('tokyo', 1)).toBe(30161)
-    expect(japanPlaneEpsg('tokyo', 19)).toBe(30179)
-  })
-
-  it('区带越界直接拒绝', () => {
-    expect(() => japanPlaneEpsg('jgd2011', 0)).toThrow(RangeError)
-    expect(() => japanPlaneEpsg('jgd2011', 20)).toThrow(RangeError)
-  })
-
-  it('代码能反查区带号', () => {
-    expect(japanZoneOfCode(6669)).toBe(1)
-    expect(japanZoneOfCode(6677)).toBe(9)
-    expect(japanZoneOfCode(2461)).toBe(19)
-    expect(japanZoneOfCode(4326)).toBeUndefined()
-  })
-
-  it('第 IX 系的投影参数与 EPSG 一致', () => {
-    const p = japanPlaneProj4('jgd2011', 9)
-    expect(p).toContain('+proj=tmerc')
-    expect(p).toContain('+lat_0=36')
-    expect(p).toContain('+lon_0=139.8333333333333')
-    expect(p).toContain('+k=0.9999')
-    expect(p).toContain('+x_0=0 +y_0=0')
-  })
-
-  it('罗马数字与多种区带写法', () => {
-    expect(toRoman(9)).toBe('IX')
-    expect(toRoman(19)).toBe('XIX')
-    expect(fromRoman('IX')).toBe(9)
-    expect(fromRoman('XIX')).toBe(19)
-    expect(fromRoman('IIII')).toBeUndefined()
-
-    expect(parseZoneInput('9')).toBe(9)
-    expect(parseZoneInput('09')).toBe(9)
-    expect(parseZoneInput('9系')).toBe(9)
-    expect(parseZoneInput('第9系')).toBe(9)
-    expect(parseZoneInput('IX')).toBe(9)
-    expect(parseZoneInput('Ⅸ')).toBe(9)
-    expect(parseZoneInput('１１')).toBe(11) // 全角
-    expect(parseZoneInput('第ⅩⅠ系')).toBe(11)
-    expect(parseZoneInput('20')).toBeUndefined()
-  })
-
-  it('轴序为 yx：X=北方向、Y=東方向', async () => {
-    const info = await resolveCrs(6677)
-    expect(info.axisOrder).toBe('yx')
-    expect(checkCoord(info, 0, 0)).toEqual([])
-  })
-
-  it('往复转换残差在毫米级', async () => {
-    const t = await createTransform('epsg:6668', 'epsg:6677')
-    const [north, east] = t.forward(139.7671, 35.6812)
-    // 东京站在第 IX 系原点的西南方：北向与东向都应为负值
-    expect(north).toBeLessThan(0)
-    expect(east).toBeLessThan(0)
-    expect(Math.abs(north)).toBeGreaterThan(30_000)
-    expect(Math.abs(east)).toBeLessThan(10_000)
-
-    const [lng, lat] = t.inverse(north, east)
-    expect(lng).toBeCloseTo(139.7671, 8)
-    expect(lat).toBeCloseTo(35.6812, 8)
-  })
-
-  it('负值坐标是合法的（PRD 6.4 第 2 条）', async () => {
-    const t = await createTransform('epsg:6668', 'epsg:6677')
-    const [north, east] = t.forward(139.5, 35.5)
-    expect(Number.isFinite(north)).toBe(true)
-    expect(Number.isFinite(east)).toBe(true)
-    expect(north).toBeLessThan(0)
-    expect(east).toBeLessThan(0)
-  })
-
-  it('日本平面直角作为源时按 X=北、Y=東 读取（而非 X=东、Y=北）', async () => {
-    const toPlane = await createTransform('epsg:6668', 'epsg:6677')
-    const [north, east] = toPlane.forward(139.7671, 35.6812)
-
-    const fromPlane = await createTransform('epsg:6677', 'epsg:6668')
-    const [lng, lat] = fromPlane.forward(north, east)
-    expect(lng).toBeCloseTo(139.7671, 8)
-    expect(lat).toBeCloseTo(35.6812, 8)
-
-    // 把两个分量对调后，结果必须明显偏离原位置 —— 这是轴序错误时的典型症状
-    const [lngSwapped, latSwapped] = fromPlane.forward(east, north)
-    expect(Math.abs(lngSwapped - 139.7671) > 0.01 || Math.abs(latSwapped - 35.6812) > 0.01).toBe(
-      true
-    )
-  })
-})
 
 describe('中国高斯-克吕格与 UTM', () => {
   it('3° / 6° 带的 CM 清单长度', () => {
@@ -170,10 +64,9 @@ describe('中国高斯-克吕格与 UTM', () => {
     expect(utmZoneForLongitude(116.3974)).toBe(50)
     expect(utmZoneForLongitude(-0.1276)).toBe(30)
     expect(utmZoneForLongitude(179.9)).toBe(60)
-    expect(utmEpsg('wgs84', 50, false)).toBe(32650)
-    expect(utmEpsg('wgs84', 50, true)).toBe(32750)
-    expect(utmEpsg('jgd2011', 54, false)).toBe(6691)
-    expect(utmEpsg('jgd2011', 40, false)).toBeUndefined()
+    expect(utmEpsg(50, false)).toBe(32650)
+    expect(utmEpsg(50, true)).toBe(32750)
+    expect(utmEpsg(54, false)).toBe(32654)
   })
 })
 
@@ -197,9 +90,9 @@ describe('投影引擎', () => {
 
   it('自动带号按锚点经度解析', async () => {
     const t = await createTransform('epsg:4326', 'auto:utm:WGS84', {
-      anchor: { lng: 139.7671, lat: 35.6812 }
+      anchor: { lng: 116.3974, lat: 39.9088 }
     })
-    expect(t.to.code).toBe(32654)
+    expect(t.to.code).toBe(32650)
   })
 
   it('自动带号作为源坐标系被拒绝', async () => {
@@ -219,9 +112,9 @@ describe('投影引擎', () => {
   })
 
   it('解析 EPSG id 的多种写法', () => {
-    expect(parseEpsgId('epsg:6669')).toBe(6669)
-    expect(parseEpsgId('EPSG:6669')).toBe(6669)
-    expect(parseEpsgId('6669')).toBe(6669)
+    expect(parseEpsgId('epsg:4548')).toBe(4548)
+    expect(parseEpsgId('EPSG:4548')).toBe(4548)
+    expect(parseEpsgId('4548')).toBe(4548)
     expect(() => parseEpsgId('abc')).toThrow()
   })
 
@@ -235,20 +128,14 @@ describe('投影引擎', () => {
 
 describe('基准变换判定', () => {
   it('同 datum → none', async () => {
-    const a = await resolveCrs(6668)
-    const b = await resolveCrs(6677)
+    const a = await resolveCrs(4326)
+    const b = await resolveCrs(3857)
     expect(datumShiftOf(a, b)).toBe('none')
   })
 
-  it('JGD2000 ↔ JGD2011 必须标记 missing（禁止等值处理）', async () => {
-    const a = await resolveCrs(4612)
-    const b = await resolveCrs(6668)
-    expect(datumShiftOf(a, b)).toBe('missing')
-  })
-
-  it('Tokyo 走七参数', async () => {
-    const a = await resolveCrs(4301)
-    const b = await resolveCrs(6668)
+  it('OSGB36 ↔ WGS84 走七参数', async () => {
+    const a = await resolveCrs(4277)
+    const b = await resolveCrs(4326)
     expect(datumShiftOf(a, b)).toBe('7param')
   })
 
@@ -292,10 +179,5 @@ describe('坐标量级检查', () => {
   it('X/Y 颠倒（X 百万级、Y 十万级）→ 警告', async () => {
     const info = await resolveCrs(4548)
     expect(checkCoord(info, 4_420_000, 442_000)).toContain('axis-swap')
-  })
-
-  it('日本平面直角的负值不触发量级警告', async () => {
-    const info = await resolveCrs(6677)
-    expect(checkCoord(info, -35_000, -6_000)).toEqual([])
   })
 })

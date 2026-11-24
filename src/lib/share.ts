@@ -137,12 +137,12 @@ export const T08_PARAMS: ParamTable = [
  *
  * 键名选型（SR-10：一经发布不再变更）：
  *
- *   `from` / `to`  坐标系 id，形如 `epsg:6669`、`auto:utm:WGS84`。
+ *   `from` / `to`  坐标系 id，形如 `epsg:4548`、`auto:utm:WGS84`。
  *                  用 string 而不是 int：自动带号类选项没有固定的 EPSG 代码，
  *                  要等接收方拿到经度后才能确定。组件解析失败时按默认值加载。
  *
- *   `x` / `y`      源坐标系下的坐标值，轴序与所选 CRS 一致（日本为
- *                  X=北、Y=東）。用 number 是为了让 std() 统一成句点小数点；
+ *   `x` / `y`      源坐标系下的坐标值，按所选 CRS 的轴序排列。
+ *                  用 number 是为了让 std() 统一成句点小数点；
  *                  投影坐标可达七位数，但 number 不做分组、不会出现千分位。
  *
  *   `rev`          「无可用基准变换时仍继续」的显式确认。bool 的 false

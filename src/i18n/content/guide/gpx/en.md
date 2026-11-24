@@ -8,7 +8,7 @@ readingMinutes: 5
 updated: 2026-11-23
 ---
 
-GPX is the de facto standard for GPS devices, sports watches and tracking apps. It records waypoints, tracks and routes in XML, and almost every outdoor application can import it.
+GPX is the de facto standard for GPS devices, sports watches and tracking apps. It stores waypoints, tracks and routes as XML, and almost every outdoor application can import it.
 
 ## Minimal working example
 
@@ -38,7 +38,7 @@ All three element types can share one file, and the safest order is `wpt`, then 
 
 ## Structure and fields
 
-The GPX vocabulary is fixed; extensions go through `extensions`. The table lists the parts that matter when reading or writing a file.
+The GPX vocabulary is fixed; extensions go through `extensions`. The table covers what matters when reading or writing a file.
 
 | Element or attribute | Required | Common values or units |
 | --- | --- | --- |
@@ -66,7 +66,7 @@ Elevation and time can appear on every point, which is what separates GPX from a
 
 ## Track simplification and timestamps
 
-Recorded tracks usually sample at a fixed interval, which gives many points and high detail but also a size cost in display and storage. A common response is simplification by distance or shape, for example a Douglas-Peucker pass that keeps turning points within a tolerance. Simplification changes the shape and drops the time and elevation of removed points, so decide the purpose first: navigation needs corner detail, while distance statistics care more about the overall shape.
+Recorded tracks usually sample at a fixed interval: many points, high detail, and a size cost in display and storage. Simplifying by distance or by shape is the usual fix, for example a Douglas-Peucker pass that keeps turning points within a tolerance. That changes the shape and drops the time and elevation of removed points, so decide the purpose first. Navigation needs corner detail; distance statistics care more about overall shape.
 
 Timestamps drive speed, stops and segmentation. When a device pauses, loses satellite lock or is split manually, start a new `<trkseg>` instead of connecting the gap; otherwise the output contains a straight line across the map and impossible speeds. If the original time series is kept after simplification, check that the point and time counts match and that time still increases monotonically.
 

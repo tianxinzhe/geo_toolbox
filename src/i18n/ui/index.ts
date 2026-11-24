@@ -14,14 +14,13 @@
 
 import { DEFAULT_LANG, type Lang } from '../../config/i18n'
 import en, { type UiKey } from './en'
-import ja from './ja'
 import zh from './zh'
 
 export type Key = UiKey
 export type { UiKey }
 
-/** 三语言字典。缺键即 TS 编译错误 */
-const DICT: Record<Lang, Record<UiKey, string>> = { en, zh, ja }
+/** 两语言字典。缺键即 TS 编译错误 */
+const DICT: Record<Lang, Record<UiKey, string>> = { en, zh }
 
 /** 插值参数：`{name}` 形式的字面替换 */
 export type Params = Record<string, string | number>

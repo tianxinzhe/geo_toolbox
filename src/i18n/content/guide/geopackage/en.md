@@ -1,6 +1,6 @@
 ---
-title: "GeoPackage explained: SQLite container and geometry blobs | GeoToolbox"
-description: The gpkg_contents, gpkg_geometry_columns and gpkg_spatial_ref_sys tables, the GP header and WKB inside geometry blobs, multi-layer support and spatial indexing.
+title: 'GeoPackage explained: SQLite and geometry | GeoToolbox'
+description: 'The gpkg_contents, gpkg_geometry_columns and gpkg_spatial_ref_sys tables, geometry blobs, multi-layer support and spatial indexing.'
 heading: "GeoPackage explained: SQLite container and geometry blobs"
 group: vector
 order: 13
@@ -8,9 +8,9 @@ readingMinutes: 5
 updated: 2026-11-23
 ---
 
-GeoPackage (`.gpkg`) is the OGC-standard modern vector container, and at heart a SQLite database. One file can hold multiple layers, several geometry types, styles and metadata, and it is steadily replacing Shapefile.
+GeoPackage (`.gpkg`) is the modern OGC vector container, and underneath it is a SQLite database. One file holds multiple layers, several geometry types, styles and metadata. It is steadily replacing Shapefile.
 
-The standard is maintained by OGC with a public specification, and revisions stay backward compatible. Its approach is the opposite of Shapefile: instead of a dedicated file type for each kind of data, it reuses general-purpose SQLite and adds a layer of convention on top. Transactions, indexes and views come for free, at the cost of readers having to understand the convention.
+OGC maintains the standard publicly, and revisions stay backward compatible. The approach is the opposite of Shapefile: rather than a dedicated file type for each kind of data, it reuses general-purpose SQLite and adds a layer of convention. Transactions, indexes and views come for free; readers just have to understand the convention.
 
 ## Minimum working example
 
@@ -30,7 +30,7 @@ FROM gpkg_contents;
 SELECT fid, geom FROM features LIMIT 5;
 ```
 
-A minimal vector GeoPackage has three metadata tables and at least one feature table. The metadata says which layers exist, what the geometry column is called and which coordinate system applies; the feature table holds the data. Remove any one of them and GIS software rejects the file, even though SQLite itself opens it fine.
+A minimal vector GeoPackage has three metadata tables and at least one feature table. The metadata records which layers exist, the geometry column name and the coordinate system; the feature table holds the data. Remove any one of them and GIS software rejects the file, though SQLite itself opens it fine.
 
 Besides feature tables, a GeoPackage may hold tile tables (`data_type` of `tiles`) and attribute-only tables (`attributes`). Vector data and a raster basemap can share one file, which Shapefile cannot do.
 
@@ -47,7 +47,7 @@ Besides feature tables, a GeoPackage may hold tile tables (`data_type` of `tiles
 
 Next to real coordinate systems, `gpkg_spatial_ref_sys` carries rows for an undefined geographic and an undefined planar system, used for drawings without a geographic meaning. If a layer points at one of those rows, do not treat its coordinates as longitude and latitude.
 
-The extent columns in `gpkg_contents` are the layer bounding box, and many tools use them for quick positioning. If they disagree with the data, zooming shows blank areas or jumps to the wrong place, so keep them updated after edits.
+The extent columns in `gpkg_contents` are the layer bounding box; many tools use them for quick positioning. When they disagree with the data, zooming shows blank areas or jumps to the wrong place. Update them after edits.
 
 `geometry_type_name` may be `GEOMETRY`, meaning points, lines and polygons can share one column. That is looser than Shapefile, but it also means a reader cannot assume a single type.
 
@@ -87,15 +87,15 @@ SQLite also allows only one writer at a time. Several people writing the same fi
 
 ## Common errors and traps
 
-**Renaming an ordinary SQLite file to `.gpkg`**: QGIS refuses it or says it is not a valid GeoPackage; the cause is missing metadata tables and no GeoPackage file identity; the result is a file no GIS will read, and the data must be exported again.
+**Renaming an ordinary SQLite file to `.gpkg`.** QGIS refuses it, or calls it an invalid GeoPackage, because the metadata tables and the GeoPackage file identity are missing. No GIS will read the result, so the data has to be exported again.
 
-**Copying only the `.gpkg` and leaving `-wal` and `-shm` behind**: recently written features are missing when the copy opens; the cause is WAL mode, where the latest commits still live in the sidecar files; the result is data loss, so close the database and copy the whole set.
+**Copying only the `.gpkg` and leaving `-wal` and `-shm` behind.** Recently written features go missing when the copy opens. In WAL mode the latest commits still sit in the sidecar files, so the copy is incomplete. Close the database and copy the whole set.
 
-**Editing geometry with SQL and getting no extent hits**: features exist but spatial filtering misses them; the cause is that the R-tree is maintained by triggers, and writes that bypass them leave the index stale; the result is incomplete query results and a need to rebuild the index.
+**Editing geometry with SQL and getting no extent hits.** Features exist but spatial filters miss them. The R-tree is maintained by triggers, so writes that bypass them leave the index stale. Query results come back incomplete until you rebuild it.
 
-**Exporting a multi-layer file to a single-layer format**: only one layer appears and the rest vanish silently; the cause is that Shapefile and FlatGeobuf hold a single layer; the result is incomplete data with no error message.
+**Exporting a multi-layer file to a single-layer format.** One layer appears and the rest disappear without a word. Shapefile and FlatGeobuf hold a single layer, so the output is incomplete and nothing reports an error.
 
-**A declared CRS that does not match the coordinates**: features shift or scale to the wrong place; the cause is projected coordinates written as `srs_id` 4326, or metadata copied from a template; the result is a layer that will not overlay, again without any warning.
+**A declared CRS that does not match the coordinates.** Features shift or scale to the wrong place. Either projected coordinates were written as `srs_id` 4326, or the metadata came from a template. The layer will not overlay, and again there is no warning.
 
 ## Comparison with nearby formats
 

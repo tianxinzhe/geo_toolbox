@@ -1,6 +1,6 @@
 ---
 title: 'Privacy Policy | GeoToolbox'
-description: 'GeoToolbox privacy policy: no accounts, no data collection, every calculation runs locally in your browser and file contents are never uploaded. Also covers advertising, map tiles and local storage.'
+description: 'GeoToolbox privacy policy: no accounts, no data collection, calculations run in your browser and files are never uploaded. Also covers ads and tiles.'
 updated: 2026-11-07
 ---
 
@@ -8,7 +8,7 @@ Effective date: 7 November 2026
 
 ## The short version
 
-**This site does not collect anything you type into it.** That is not a promise, it is a consequence of the architecture. GeoToolbox is a purely static site deployed on Cloudflare Pages. There is **no backend** — no server-side API, no database, no job queue. Coordinates you enter, text you paste and files you upload are all processed inside your own browser, and results are generated there too. The site has no technical means of receiving that data.
+**This site does not collect anything you type into it.** That is not a promise, it is a consequence of the architecture. GeoToolbox is a purely static site deployed on Cloudflare Pages. There is **no backend**: no server-side API, no database, no job queue. Coordinates you enter, text you paste and files you upload are processed inside your own browser, and the results are produced there too. The site has no technical means of receiving that data.
 
 ## What this site does not do
 
@@ -22,7 +22,7 @@ Effective date: 7 November 2026
 
 ## Browser local storage
 
-The site uses `localStorage` **in your own browser** to remember a few preferences, so you do not have to reconfigure them on your next visit. The only things stored are:
+The site uses `localStorage` **in your own browser** to remember a few preferences, so you do not have to set them again on your next visit. Only these are stored:
 
 - Interface language
 - Numeric precision setting
@@ -32,7 +32,7 @@ The site uses `localStorage` **in your own browser** to remember a few preferenc
 - The "comma meaning" toggle used by the coordinate parser
 - The current canvas contents of the map drawing tool, so a refresh does not lose your work
 
-None of this ever leaves your device and we cannot read it. You can clear it at any time from the "Cookie settings" link in the footer, or by clearing site data in your browser.
+None of it leaves your device, and we cannot read it. You can clear it at any time from the "Cookie settings" link in the footer, or by clearing site data in your browser.
 
 **GPS readings are never written to local storage.** Coordinates obtained through the "Use my location" button live only for the current page session and are destroyed when the page closes. They are not persisted in any form.
 
@@ -40,7 +40,7 @@ None of this ever leaves your device and we cannot read it. You can clear it at 
 
 ### Advertising (Google AdSense)
 
-On the **English and Japanese** versions of this site, advertising is served through Google AdSense. **The Simplified Chinese version loads no advertising script at all and reserves no ad space.**
+On the **English** version of this site, advertising is served through Google AdSense. **The Simplified Chinese version loads no advertising script at all and reserves no ad space.**
 
 Google, as a third-party vendor, uses cookies to serve ads, including personalised ads based on your prior visits to this site or other sites. Google's use of cookies is governed by its own privacy policy.
 
@@ -54,7 +54,7 @@ Before you make a choice, **no personalised advertising script is loaded at all*
 
 ### Map tiles
 
-Map features load imagery from public tile servers. When tiles load, your browser makes a request directly to that server, which may record standard access logs (IP address, user agent, request time, tile coordinates). We do not proxy, relay or record those requests.
+Map features load imagery from public tile servers. When tiles load, your browser requests them directly from that server, which may record standard access logs (IP address, user agent, request time, tile coordinates). We do not proxy, relay or record those requests.
 
 Mapping is **optional**: only tool pages that need a map load one, and they do so lazily. If you never expand the map area, no tile request is made. Purely numeric tools involve no map at all.
 
@@ -82,7 +82,7 @@ This site is not directed at children under 13 and does not knowingly collect pe
 
 ## Changes to this policy
 
-When this policy changes we will update the effective date at the top of the page and record the change below. Material changes — for example, adding analytics for the first time — will also be announced prominently on the site.
+When this policy changes we will update the effective date at the top of the page and record the change below. Material changes, for example adding analytics for the first time, will also be announced prominently on the site.
 
 | Date | Change |
 |---|---|

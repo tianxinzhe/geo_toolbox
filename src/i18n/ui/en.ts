@@ -68,7 +68,7 @@ const en = {
   'common.allTools': 'All tools',
   'common.batch': 'Batch mode',
   'common.batchHint': 'Upload a CSV/TSV file to process many rows at once.',
-  'common.desktopRecommended': 'This tool works best on a desktop, but everything is still usable here.',
+  'common.desktopRecommended': 'Best on a desktop, but everything still works here.',
   /* FR-05：分享按钮旁常驻提示 */
   'common.shareWarning': 'The link contains everything you typed. Do not share sensitive coordinates.',
   'common.shareTooLarge': 'Too large to share as a link. Download the file and send that instead.',
@@ -101,7 +101,7 @@ const en = {
   'coord.comma.hint': 'Only change this if your data uses a comma as the decimal separator.',
 
   /* ---------- 隐私声明（SR-07 常驻） ---------- */
-  'privacy.notice': 'All calculations run locally in your browser. Nothing is uploaded to any server.',
+  'privacy.notice': 'Every calculation runs locally in your browser; nothing is uploaded.',
 
   /* ---------- 错误提示（SR-06 三段式：原因 / 正确写法 / 示例） ---------- */
   'err.empty.title': 'Waiting for input',
@@ -118,9 +118,10 @@ const en = {
   'err.generic': 'Something went wrong. Your input has been kept.',
 
   /* ---------- 首页与索引 ---------- */
+  'home.seoTitle': 'GeoToolbox — 15 browser-based geospatial tools',
   'home.h1': 'Geospatial tools that never leave your browser',
   'home.intro':
-    'Fifteen focused utilities for coordinates, projections and vector formats. No sign-up, no upload — every calculation happens on your own device.',
+    'Fifteen tools for coordinates, projections and vector formats. No sign-up, no upload — every calculation runs on your device.',
   'home.section.tools': 'All tools',
   'home.section.why': 'Why this site',
   'home.why.local': 'Nothing is uploaded. Sensitive boundaries and tracks stay on your machine.',
@@ -160,7 +161,7 @@ const en = {
      带 {name} / {value} 的键由组件用字面替换插值，与 t() 的语法保持一致。 */
   'tool.dms-decimal.h1': 'DMS ↔ Decimal Degrees Converter',
   'tool.dms-decimal.lead':
-    'Paste a longitude/latitude pair, choose the source and target formats, and get the converted result.',
+    'Paste a longitude/latitude pair, pick the source and target formats, and read the result.',
   'tool.dms-decimal.sourceFormat': 'Source format',
   'tool.dms-decimal.targetFormat': 'Target format',
   'tool.dms-decimal.format.auto': 'Detect automatically',
@@ -193,16 +194,16 @@ const en = {
   'tool.dms-decimal.alternative':
     'This could also be read as {name}, which would give {value}. Check which meaning you intended.',
   'tool.dms-decimal.partialHint':
-    'Filling in a single field is fine — the other side is reported as not provided instead of raising an error.',
+    'Filling in one field is fine: the other side is reported as not provided, not as an error.',
   'tool.dms-decimal.precisionNote':
-    'Decimal degrees keep 8 decimal places (about 1 mm); degrees-and-minutes keep 4 decimals of a minute, and DMS keeps 2 decimals of a second (about 0.3 m).',
+    'Decimal degrees keep 8 decimal places (about 1 mm). Degrees and minutes keep 4 decimals of a minute; DMS keeps 2 decimals of a second (about 0.3 m).',
 
   /* ---------- T03 Projected CRS conversion (EPSG) ---------- */
   'tool.epsg-convert.h1': 'Projected CRS Converter (EPSG)',
-  'tool.epsg-convert.lead': 'Convert coordinates between any two EPSG coordinate systems — WGS 84, UTM, Web Mercator, China’s Gauss-Krüger bands and Japan’s 19 plane rectangular zones. Everything runs in your browser.',
+  'tool.epsg-convert.lead': 'Convert coordinates between any two EPSG systems: WGS 84, UTM, Web Mercator, and China’s Gauss-Krüger 3°/6° bands. Everything runs in your browser.',
   'tool.epsg-convert.coordHint': 'Enter the coordinate in the source system: decimal degrees for geographic CRS, metres for projected CRS. Grouping commas such as 4,420,000 are accepted.',
   'tool.epsg-convert.customCode': 'EPSG code',
-  'tool.epsg-convert.customCodeHint': 'Enter the numeric code, for example 6669 or 4548.',
+  'tool.epsg-convert.customCodeHint': 'Enter the numeric code, for example 3857 or 4548.',
   'tool.epsg-convert.invalidCode': 'Enter a valid positive EPSG code (numbers only).',
   'tool.epsg-convert.errNotFound': 'No projection definition was found for that EPSG code. Try another code or pick one from the common list.',
   'tool.epsg-convert.errNumber': 'Enter a number.',
@@ -210,15 +211,11 @@ const en = {
   'tool.epsg-convert.errNeedBoth': 'Fill in both coordinate values to see a result.',
   'tool.epsg-convert.errGeneric': 'The coordinate could not be converted. Check the source CRS and the values.',
   'tool.epsg-convert.autoNeedGeo': 'An automatic zone needs a longitude. Choose a geographic source CRS or enter a longitude first.',
-  'tool.epsg-convert.japanUtmRange': 'JGD2011 / UTM is defined for zones 51–55 only (Japan). Pick a WGS 84 UTM zone or a plane rectangular zone instead.',
   'tool.epsg-convert.loadingFull': 'Loading the full EPSG table…',
   'tool.epsg-convert.loadFailed': 'The full EPSG table could not be loaded. Check your connection and try again, or pick a CRS from the common list.',
-  'tool.epsg-convert.axisNoteJapan': 'Japan’s plane rectangular system uses X for northing and Y for easting — the opposite of the GIS convention. Enter northing (X) in the first field.',
-  'tool.epsg-convert.axisNoteXY': 'X is easting and Y is northing (GIS convention). Negative values are valid in some systems, including Japan’s plane rectangular zones west and south of the origin.',
+  'tool.epsg-convert.axisNoteXY': 'X is easting and Y is northing (GIS convention). Negative values are normal for areas west or south of a projection’s origin.',
   'tool.epsg-convert.eastX': 'X (easting)',
   'tool.epsg-convert.northY': 'Y (northing)',
-  'tool.epsg-convert.northX': 'X (northing)',
-  'tool.epsg-convert.eastY': 'Y (easting)',
   'tool.epsg-convert.xLongitude': 'X (longitude)',
   'tool.epsg-convert.yLatitude': 'Y (latitude)',
   'tool.epsg-convert.swapXY': 'Swap X and Y',
@@ -232,7 +229,7 @@ const en = {
   'tool.epsg-convert.shift.7param': 'Simplified 7-parameter (accuracy about 1–5 m)',
   'tool.epsg-convert.shift.missing': 'No parameters available',
   'tool.epsg-convert.shift.custom': 'Custom 7-parameter',
-  'tool.epsg-convert.missingWarning': 'No datum transformation parameters are available for this pair, so a null transformation would be wrong by metres or more. Results stay hidden until you explicitly continue. JGD2000 ↔ JGD2011 needs Japan’s semi-dynamic correction, and Xian 1980 needs official parameters; this site ships neither.',
+  'tool.epsg-convert.missingWarning': 'No datum transformation parameters are available for this pair, so a null transformation will be off by metres or more. Results stay hidden until you continue explicitly. Xian 1980 needs official parameters, which this site does not ship.',
   'tool.epsg-convert.allowMissing': 'Continue without a datum transformation (results may be off by metres)',
   'tool.epsg-convert.custom7': 'Use a custom 7-parameter transformation',
   'tool.epsg-convert.custom7Hint': 'Bursa-Wolf parameters: dx, dy, dz in metres; rx, ry, rz in arc-seconds; scale in ppm. Applied to the source CRS.',
@@ -247,11 +244,11 @@ const en = {
   'tool.epsg-convert.centralMeridian': 'Central meridian: {value}',
   'tool.epsg-convert.utmZone': 'UTM zone: {value}',
   'tool.epsg-convert.emptyTitle': 'Convert between EPSG coordinate systems',
-  'tool.epsg-convert.emptyBody': 'Pick a source and target CRS, then enter a coordinate. For example, convert WGS 84 longitude/latitude to a UTM or Gauss-Krüger grid.',
+  'tool.epsg-convert.emptyBody': 'Pick a source and target CRS, then enter a coordinate. A typical job is WGS 84 longitude/latitude to a UTM or Gauss-Krüger grid.',
   'tool.epsg-convert.copyPair': 'Copy X, Y',
   'tool.epsg-convert.identity': 'Source and target are the same CRS, so the values are returned unchanged.',
-  'tool.epsg-convert.precisionNote1': 'Datum transformations use simplified 7-parameter (Bursa-Wolf) models with an accuracy of about 1–5 m.',
-  'tool.epsg-convert.precisionNote2': 'No epoch correction is applied (Japan’s semi-dynamic correction or plate motion), so results are not suitable for high-precision surveying.',
+  'tool.epsg-convert.precisionNote1': 'Datum transformations use simplified 7-parameter (Bursa-Wolf) models, accurate to about 1–5 m.',
+  'tool.epsg-convert.precisionNote2': 'No epoch or plate-motion correction is applied, so results are not suitable for high-precision surveying.',
   'tool.epsg-convert.precisionNote3': 'Results are not a legal survey reference.',
 
   /* ---------- T08 GeoHash encode / decode ----------
@@ -260,7 +257,7 @@ const en = {
      component with literal replacement, matching t()'s syntax. */
   'tool.geohash.h1': 'GeoHash Encode and Decode',
   'tool.geohash.lead':
-    'Turn coordinates into a short GeoHash string and back. Decoding gives the cell centre, its bounding box, the ground size and the eight neighbouring cells.',
+    'Turn coordinates into a short GeoHash string, or decode a hash back. A decoded hash gives the cell centre, its bounding box, ground size and the eight neighbouring cells.',
   'tool.geohash.mode': 'Conversion direction',
   'tool.geohash.mode.encode': 'Coordinates → GeoHash',
   'tool.geohash.mode.decode': 'GeoHash → Coordinates',
@@ -270,7 +267,7 @@ const en = {
   'tool.geohash.precisionHint': '1 to 12 characters. Seven characters is roughly 150 m across.',
   'tool.geohash.hash': 'GeoHash string',
   'tool.geohash.hashHint':
-    'Only digits and the letters b c d e f g h j k m n p q r s t u v w x y z — a, i, l and o are excluded by the standard.',
+    'Only digits and the letters b c d e f g h j k m n p q r s t u v w x y z. The standard leaves out a, i, l and o.',
   /* SR-06 three-part error: what happened, why, what to do */
   'tool.geohash.errNumber': 'That is not a number I can read.',
   'tool.geohash.errNumberHint':
@@ -278,7 +275,7 @@ const en = {
   'tool.geohash.needBoth': 'Fill in both longitude and latitude to encode a GeoHash.',
   /* PRD T08 exception ②: over-long precision is clamped and reported */
   'tool.geohash.hashTooLong': 'The input is longer than 12 characters. Only the first 12 are used.',
-  'tool.geohash.precisionClamped': 'The length was clamped to {p} characters; GeoHash supports 1 to 12.',
+  'tool.geohash.precisionClamped': 'The length was cut to {p} characters; GeoHash supports 1 to 12.',
   /* PRD T08 exception ①: name the offending character and its position */
   'tool.geohash.errIllegal': 'Character {n} — “{char}” — is not a legal GeoHash character.',
   'tool.geohash.errIllegalHint':
@@ -304,7 +301,7 @@ const en = {
   'tool.geohash.current': 'Current',
   /* SR-03: the precision basis is stated in the tool, not buried in docs */
   'tool.geohash.precisionNote':
-    'A decoded coordinate is the centre of the cell. A GeoHash describes an area, not a precise point: the same string covers every location inside its bounding box.',
+    'Decoding returns the centre of the cell. A GeoHash describes an area, not a precise point: the same string covers every location inside its bounding box.',
   /* Eight direction names are looked up through the component's DIR_KEY table.
      ⚠️ All eight keys must exist — a missing one renders as undefined in the grid */
   'tool.geohash.dir.n': 'N',
@@ -319,7 +316,7 @@ const en = {
   /* ---------- T06 Vector format converter ---------- */
   'tool.format-convert.h1': 'Vector Format Converter',
   'tool.format-convert.lead':
-    'Convert GeoJSON, KML/KMZ, GPX, CSV/TSV, TopoJSON and WKT in your browser. Files never leave your device — no upload, no server.',
+    'Convert GeoJSON, KML/KMZ, GPX, CSV/TSV, TopoJSON or WKT in your browser. Nothing is uploaded; files stay on your device.',
   'tool.format-convert.modeFile': 'Upload a file',
   'tool.format-convert.modePaste': 'Paste text',
   'tool.format-convert.sourceLabel': 'Source format',
@@ -483,7 +480,7 @@ const en = {
   /* ---------- T10 Buffer & circle ---------- */
   'tool.buffer-circle.h1': 'Equidistant Circles & Buffers',
   'tool.buffer-circle.lead':
-    'Answer “what falls within N kilometres of this point?” Draw geodesic circles or buffer existing features, see them on the map and export GeoJSON, KML or WKT.',
+    'Find what falls within N kilometres of a point. Draw geodesic circles or buffer existing features, view them on the map, and export GeoJSON, KML or WKT.',
   'tool.buffer-circle.modeCircle': 'Equidistant circle',
   'tool.buffer-circle.modeBuffer': 'Buffer existing features',
   'tool.buffer-circle.pickOn': 'Picking from map… (click map)',
@@ -503,7 +500,7 @@ const en = {
   'tool.buffer-circle.bufferPlaceholder':
     'Paste GeoJSON, KML, GPX, CSV or WKT features, or one "longitude, latitude" pair per line…',
   'tool.buffer-circle.bufferHint':
-    'Points, lines and polygons are all supported; each feature is buffered once per radius. Points can also be pasted as coordinate lines.',
+    'Points, lines and polygons are supported; each feature is buffered once per radius. Points can also be pasted as coordinate lines.',
   'tool.buffer-circle.chooseFile': 'Choose file',
   'tool.buffer-circle.clearFile': 'Remove file',
   'tool.buffer-circle.fileLoading': 'Reading file…',
@@ -556,7 +553,7 @@ const en = {
   'tool.tile-coords.startDraw': 'Draw extent',
   'tool.tile-coords.stopDraw': 'Stop drawing',
   'tool.tile-coords.drawHint':
-    'Draw an extent or import GeoJSON — one replaces the other. Panning pauses while drawing.',
+    'Draw an extent or import GeoJSON; one replaces the other. Panning pauses while drawing.',
   'tool.tile-coords.bboxTitle': 'Current extent',
   'tool.tile-coords.clearSelection': 'Clear selection',
   'tool.tile-coords.west': 'West',
@@ -573,7 +570,7 @@ const en = {
   'tool.tile-coords.imported':
     'Imported {name}: {count} features. The original boundary is shown on the map.',
   'tool.tile-coords.boundaryNote':
-    'Tiles are filtered by the original boundary — only tiles intersecting it are kept.',
+    'Tiles are filtered by the original boundary; only tiles that intersect it are kept.',
   'tool.tile-coords.zoomTitle': 'Zoom levels',
   'tool.tile-coords.zoomMin': 'Minimum Z',
   'tool.tile-coords.zoomMax': 'Maximum Z',
@@ -586,7 +583,7 @@ const en = {
   'tool.tile-coords.cancelGenerate': 'Cancel',
   'tool.tile-coords.progress': '{done} / {total} processed',
   'tool.tile-coords.warnLarge':
-    'About {count} tiles. Generation, preview and download will be very slow, and the browser may stutter or run out of memory. Consider lowering the zoom levels or narrowing the extent.',
+    'About {count} tiles. Generation, preview and download will be very slow, and the browser may stutter or run out of memory. Try fewer zoom levels or a smaller extent.',
   'tool.tile-coords.total': '{total} tiles, sorted by Z → Y → X.',
   'tool.tile-coords.downloadCsv': 'Download CSV',
   'tool.tile-coords.downloadZip': 'Download ZIP (one CSV per zoom)',
@@ -774,7 +771,7 @@ const en = {
   'tool.attribute-join.unmatchedLabel': 'Unmatched',
   'tool.attribute-join.conflictsLabel': 'Field conflicts',
   'tool.attribute-join.conflictHint':
-    'When a table column has the same name as a feature field, the table value wins. The two join fields themselves are not counted as conflicts.',
+    'If a table column has the same name as a feature field, the table value wins. The two join fields are not counted as conflicts.',
   'tool.attribute-join.duplicateHint': '{n} duplicate keys were ignored; the first row wins.',
   'tool.attribute-join.download': 'Download GeoJSON',
   'tool.attribute-join.clear': 'Clear',
@@ -876,7 +873,7 @@ const en = {
   'tool.dissolve.errGeneric': 'Dissolve failed. Check that the data is valid.',
 
   /* ---------- Guides (P1 /guide/) ---------- */
-  'guide.title': 'Guides: coordinate systems, projections and vector formats | GeoToolbox',
+  'guide.title': 'Guides: projections, EPSG and vector formats | GeoToolbox',
   'guide.description':
     'Plain-language guides to map projections, EPSG codes and vector formats, with links to the matching browser-based tools.',
   'guide.h1': 'Guides',
@@ -893,7 +890,7 @@ const en = {
   'guide.count': '{n} articles',
   'guide.jump': 'Jump to a group',
   'guide.lead':
-    'Background reading for the concepts behind the tools: what a projection actually does, how to read EPSG codes, and which vector format to choose.',
+    'Background reading for the ideas behind the tools: what a projection actually does, how EPSG codes are read, and which vector format to pick.',
   'guide.readMore': 'Read the guide',
   'guide.minutes': '{count} min read',
   'guide.updated': 'Updated {date}',
@@ -906,7 +903,7 @@ const en = {
   /* ---------- T21 Plus Codes ---------- */
   'tool.plus-codes.h1': 'Plus Codes (Open Location Code)',
   'tool.plus-codes.lead':
-    'Convert between latitude/longitude and Plus Codes, an open location encoding. Everything is computed locally in your browser.',
+    'Convert between latitude/longitude and Plus Codes, an open location encoding. Everything runs in your browser; coordinates are not uploaded.',
   'tool.plus-codes.mode': 'Input type',
   'tool.plus-codes.mode.encode': 'Coordinates → Plus Code',
   'tool.plus-codes.mode.decode': 'Plus Code → Coordinates',
@@ -934,7 +931,7 @@ const en = {
   /* ---------- T22 MVT vector tile ---------- */
   'tool.mvt.h1': 'MVT Vector Tile Decoder',
   'tool.mvt.lead':
-    'Upload a .pbf/.mvt tile or paste its Base64, then read every layer, feature count and geometry as GeoJSON. Runs entirely in your browser.',
+    'Upload a .pbf/.mvt tile or paste its Base64 to read its layers, feature counts and geometry as GeoJSON. Everything is parsed in your browser.',
   'tool.mvt.modeFile': 'File',
   'tool.mvt.modePaste': 'Base64',
   'tool.mvt.fileHint': 'A .pbf / .mvt tile; gzip is detected automatically. Max 20 MB.',
@@ -990,7 +987,7 @@ const en = {
   /* ---------- T09 Map drawing ---------- */
   'tool.map-draw.h1': 'Online Map Drawing Tool',
   'tool.map-draw.lead':
-    'Draw points, lines, polygons, rectangles and circles on the map, measure them, edit attributes, and export GeoJSON, KML, GPX, WKT or CSV. Everything stays in your browser.',
+    'Draw points, lines, polygons, rectangles and circles on the map. Measure them, edit attributes, and export to GeoJSON, KML, GPX, WKT or CSV. Everything stays in your browser.',
   'tool.map-draw.modeSelect': 'Select',
   'tool.map-draw.modePoint': 'Point',
   'tool.map-draw.modeLine': 'Line',
@@ -1069,7 +1066,7 @@ const en = {
   /* ---------- FR-13 Batch ---------- */
   'batch.title': 'Batch processing',
   'batch.lead':
-    'Upload a CSV/TSV or Excel file, map columns, preview a few rows, then append computed columns and download. The file stays in your browser.',
+    'Upload a CSV/TSV or Excel file and map its columns. Preview a few rows, then append computed columns and download the result. The file stays in your browser.',
   'batch.desktopOnly': 'Desktop',
   'batch.chooseFile': 'Choose CSV/TSV/Excel',
   'batch.replaceFile': 'Choose another file',
@@ -1090,7 +1087,7 @@ const en = {
   'batch.bom': 'Add UTF-8 BOM (Excel)',
   'batch.parseWarnings': '{count} parse warnings. Check the preview before running.',
   'batch.mappingTitle': 'Column mapping',
-  'batch.mappingHint': 'Required columns are marked with *. Detection is a suggestion — confirm it.',
+  'batch.mappingHint': 'Required columns are marked with *. Detection is only a suggestion; confirm it.',
   'batch.notMapped': 'Not mapped',
   'batch.missingColumns': 'Map these required columns first:',
   'batch.optionsTitle': 'Options',
@@ -1191,7 +1188,7 @@ const en = {
   'lang.notAvailable': 'This tool is not available in {lang} yet. Showing the {shown} version.'
 } as const
 
-/** 全部合法文案键的联合类型。zh / ja 字典必须逐一实现。 */
+/** 全部合法文案键的联合类型。zh / en 字典必须逐一实现。 */
 export type UiKey = keyof typeof en
 
 export default en

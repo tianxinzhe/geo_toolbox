@@ -1,6 +1,6 @@
 ---
-title: "Map projections and EPSG codes: choosing UTM or Gauss-Krüger | GeoToolbox"
-description: What happens between longitude/latitude and planar coordinates, how UTM differs from Gauss-Krüger, how to read EPSG codes, and the zone, axis-order and unit traps.
+title: 'Choosing UTM or Gauss-Krüger by EPSG code | GeoToolbox'
+description: 'What happens between lon/lat and planar coordinates, how UTM differs from Gauss-Krüger, how to read EPSG codes, and the zone, axis and unit traps.'
 heading: Map projections and EPSG codes
 group: projection
 order: 2
@@ -8,7 +8,7 @@ readingMinutes: 5
 updated: 2026-11-23
 ---
 
-Longitude and latitude are angles on a sphere, so you cannot measure distance or area with them directly. Surveying, planning and map production all require flattening the sphere first, which is what a projection does.
+Longitude and latitude are angles on a sphere. You cannot measure distance or area with them directly. Surveying, planning and map production all need the sphere flattened first, and that is what a projection does.
 
 ## Every projection distorts something
 
@@ -29,13 +29,13 @@ Both are transverse Mercator variants with zones. The differences are the zone w
 | Zone width | 6° | 3° or 6° |
 | Central meridian scale | 0.9996 | 1 |
 | False easting | 500,000 m | 500,000 m (zone prefix varies) |
-| Typical use | Global | China, Japan and others |
+| Typical use | Global | China and others |
 
-UTM has globally consistent zone numbers, which simplifies cross-border data. Gauss-Krüger is common in Chinese and Japanese surveying, and the zone number and central meridian must match what the data provider used.
+UTM has globally consistent zone numbers, which simplifies cross-border data. Gauss-Krüger is common in Chinese surveying, and the zone number and central meridian must match what the data provider used.
 
 ## What an EPSG code means
 
-EPSG codes identify a coordinate reference system. One code fixes the datum, projection method, units and parameters:
+An EPSG code identifies a coordinate reference system. It fixes the datum, projection method, units and parameters:
 
 - `EPSG:4326`: WGS84 longitude/latitude
 - `EPSG:3857`: Web Mercator, used by web map tiles
@@ -47,7 +47,7 @@ EPSG codes identify a coordinate reference system. One code fixes the datum, pro
 ## Three traps
 
 1. **Zone edges**: data spanning two 3-degree zones should not be forced into one zone; distortion grows quickly at the edges.
-2. **Axis order**: Japan's plane rectangular coordinate system uses X for northing and Y for easting, the opposite of the usual convention. Field labels must follow the CRS.
+2. **Axis order**: projected coordinates are entered as X = easting, Y = northing; geographic coordinates as longitude, latitude. Field labels must follow the CRS.
 3. **Units**: projected coordinates are in metres, geographic coordinates in degrees. Mixing them in one column produces wrong results.
 
 ## How to choose
@@ -55,11 +55,10 @@ EPSG codes identify a coordinate reference system. One code fixes the datum, pro
 - Display only, no measurement: use `EPSG:4326` or `EPSG:3857`.
 - Engineering measurement or area statistics: pick a projection that covers the extent, preferably equal-area or locally equidistant.
 - Cross-border data: UTM. Chinese deliverables: the CGCS2000 3-degree or 6-degree zone required by the project.
-- Japan: JGD2011 with one of the 19 plane rectangular zones.
 
 ## Common mistakes and traps
 
-Most projection problems raise no error and simply shift the result. These four cover the usual cases.
+Most projection problems raise no error and simply shift the result. These four are the usual cases.
 
 1. **Feeding projected coordinates into a longitude/latitude field**
    - Symptom: `500000 4331000` in a lon/lat box lands in the Gulf of Guinea, or is rejected as out of range.

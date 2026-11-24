@@ -136,7 +136,7 @@ export function fmt(
 /**
  * 量测值 + 单位（SR-11「数字与单位间距」）：
  * en 在数字与单位之间留一个**不换行**空格（`1 234.56 km`），
- * zh / ja 不留（`1234.56km`）。
+ * zh 不留（`1234.56km`）。
  *
  * 空格用 U+00A0 不换行空格，防止在窄屏被拆到两行。
  */
@@ -147,7 +147,7 @@ export function fmtUnit(v: number, lang: Lang, kind: Kind, unit: string, digits?
 
 /** Lang → BCP 47 完整标签，与 config/i18n.ts 的 LOCALE 保持一致 */
 function localeOf(lang: Lang): string {
-  return lang === 'zh' ? 'zh-CN' : lang === 'ja' ? 'ja-JP' : 'en-US'
+  return lang === 'zh' ? 'zh-CN' : 'en-US'
 }
 
 /**

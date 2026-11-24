@@ -54,8 +54,7 @@ type PmLayer = import('leaflet').Layer & { __fid?: string }
 
 const DEFAULT_VIEW: Record<Lang, [number, number]> = {
   zh: [39.9088, 116.3974],
-  en: [51.5072, -0.1276],
-  ja: [35.6812, 139.7671]
+  en: [51.5072, -0.1276]
 }
 
 const EXPORT_TARGETS: VectorFormat[] = ['geojson', 'kml', 'gpx', 'wkt', 'csv', 'shapefile']
@@ -216,7 +215,7 @@ async function initGeoman(): Promise<void> {
   }
   if (!map.pm) return
 
-  map.pm.setLang(props.lang === 'zh' ? 'zh' : props.lang === 'ja' ? 'ja' : 'en')
+  map.pm.setLang(props.lang === 'zh' ? 'zh' : 'en')
   map.pm.addControls({
     position: 'topleft',
     drawMarker: true,

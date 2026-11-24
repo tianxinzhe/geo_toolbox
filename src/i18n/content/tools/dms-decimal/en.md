@@ -1,5 +1,5 @@
 ---
-title: 'DMS to Decimal Degrees Converter — Lat/Lon Formats | GeoToolbox'
+title: 'DMS to Decimal Degrees Converter | GeoToolbox'
 description: 'Convert latitude and longitude between decimal degrees, degrees-minutes and DMS. Auto-detects the input format. Runs entirely in your browser.'
 updated: 2026-11-16
 faq:
@@ -27,11 +27,11 @@ The same point can be written three ways. All three describe an identical locati
 
 Decimal degrees is the **computational** format: one number that can be added, compared, sorted and fed straight into a projection. DMS is the **reading** format: map margin annotations, boundary monument tables and gazetteers almost always use it. DM sits in between, and maritime and aviation practice still reports positions in degrees and minutes because one arcminute is very close to one nautical mile, which makes mental distance arithmetic easy.
 
-The real job of this tool is therefore not arithmetic but **bridging**: the DMS figure you copied off a paper sheet has to become a decimal number before it can enter a database, and the decimal number your API returned has to become DMS before it can go into a report.
+So the tool's real job is bridging. A DMS figure copied off a paper sheet has to become a decimal number before it can enter a database, and a decimal number returned by an API has to become DMS before it can go into a report.
 
 ## Sign convention: west and south are negative
 
-This is where tools disagree with each other most often, so the convention used here is stated explicitly.
+Tools disagree on this more than on anything else, so the convention here is stated explicitly.
 
 - **West longitudes and south latitudes are negative.** East and north are positive.
 - The minus sign lives **on the degrees only**; minutes and seconds are always non-negative. `-116°23'50.64"` is wrong. Write `116°23'50.64"W`, or `-116.3974` in decimal form.
@@ -79,7 +79,7 @@ With the symbolic or textual DMS target format, the same value is written as:
 - **Symbolic**: `39°54'31.68"N`. The three parts are separated by `°`, `'` and `"`, with the hemisphere letter at the end. This is the internationally common form — map margins, journal articles, GPS screens — and it pastes cleanly into most GIS software.
 - **Spelled out**: the local-language words for degrees, minutes and seconds, with the direction written as a word rather than a letter. On the Chinese page this reads as a full sentence-like string. It is meant for body text, reports and documentation, and above all for speech output and screen readers, which frequently swallow or mispronounce `°` and `"`.
 
-The English spelled-out form still uses symbols with spaces and a trailing direction letter (`39° 54' 31.68" N`), because English has no single-character words for these units. The Japanese form uses the Japanese glyph variants for "latitude" and "longitude", which are distinct characters from the simplified Chinese ones.
+The English spelled-out form still uses symbols with spaces and a trailing direction letter (`39° 54' 31.68" N`), because English has no single-character words for these units. The Chinese form uses the characters 度, 分 and 秒 with a direction word in front.
 
 ## Input mistakes worth checking for
 
@@ -89,7 +89,7 @@ A few inputs either fail or produce something other than what you expected:
 - **`E116.3974` typed into the latitude field.** A hemisphere symbol that contradicts the axis is not quietly ignored; the input is reported as unreadable. Ignoring it would let a swapped pair of fields pass unnoticed.
 - **Negative DMS with no hemisphere symbol.** `-39°54'31.68"` is fine and means south. `39°54'31.68"` carries no direction information at all, so it is taken as positive, that is, north. Direction has to be stated.
 - **Comma as a decimal separator** (`116,3974`). By default the comma is a field separator, so this reads as 116 degrees 3974 minutes and fails the range check. Replace the comma with a decimal point (`116.3974`).
-- **Full-width digits and punctuation**, common when pasting from a Japanese input method or from a PDF. The input is normalised to half-width before the format is recognised, so these parse correctly.
+- **Full-width digits and punctuation**, common when pasting from another application or from a PDF. The input is normalised to half-width before the format is recognised, so these parse correctly.
 - **Curly quotes.** Word processors turn `'` into `’` and `"` into `”`. Both variants are accepted as minute and second marks.
 
 ## Precision: how many decimal places to keep
@@ -103,7 +103,7 @@ The tool uses fixed decimals per format: 8 for decimal degrees, 4 for minutes, a
 | 6 | 0.11 m | 3 (0.001″) | 3.1 cm |
 | 8 | 1.1 mm | 4 | 3.1 mm |
 
-Three practical recommendations. **Store and exchange decimal degrees at eight places.** This tool always outputs eight places for decimal degrees, roughly a millimetre, which is far finer than any consumer GPS actually achieves (typically two to five metres), so it never becomes the limiting factor and never accumulates rounding error across repeated conversions. **Do not display more than two seconds digits** unless your data comes from geodetic-grade GNSS processing; quoting a coordinate to three millimetres when the measurement is accurate to three metres is misleading. **Never write the display format back into storage.** DMS has carry boundaries, and repeated cycles of formatting, copying and re-parsing introduce rounding. Keep decimal degrees in the database and format only at presentation time.
+Three rules are worth keeping. Store and exchange decimal degrees at eight places; this tool always outputs eight, roughly a millimetre. That is far finer than any consumer GPS achieves (typically two to five metres), so it never becomes the limiting factor, and repeated conversions do not accumulate rounding. Do not display more than two seconds digits unless your data comes from geodetic-grade GNSS processing. Quoting a coordinate to three millimetres when the measurement is accurate to three metres is misleading. And never write the display format back into storage: DMS has carry boundaries, and repeated cycles of formatting, copying and re-parsing introduce rounding. Keep decimal degrees in the database and format only at presentation time.
 
 ## Where to go next
 

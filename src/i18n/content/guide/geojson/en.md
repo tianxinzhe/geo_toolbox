@@ -1,6 +1,6 @@
 ---
-title: "GeoJSON explained: structure, coordinate order and limits | GeoToolbox"
-description: The FeatureCollection, Feature and Geometry structure of GeoJSON, its longitude-first WGS84 convention, polygon ring rules, and the size, attribute and CRS limits.
+title: 'GeoJSON explained: structure and limits | GeoToolbox'
+description: 'The FeatureCollection, Feature and Geometry structure, longitude-first WGS84 convention, polygon ring rules, and GeoJSON size and CRS limits.'
 heading: "GeoJSON explained: structure and limits"
 group: vector
 order: 4
@@ -8,11 +8,11 @@ readingMinutes: 6
 updated: 2026-11-23
 ---
 
-GeoJSON is the de facto standard for geodata on the web. It expresses points, lines, polygons and attributes as JSON, can be read by every language, parsed directly by browsers, and understood by almost every GIS and mapping library.
+GeoJSON is the de facto standard for geodata on the web. Points, lines, polygons and attributes go into plain JSON, which every language can read, browsers parse without help, and nearly every GIS and mapping library understands.
 
-The specification is IETF RFC 7946, published in 2016, with the registered media type `application/geo+json`. Repository map previews, open data APIs and mapping component data sources mostly consume it directly. Its value is not compactness but universality: one `.geojson` file can be opened by a browser, Python, PostGIS and a desktop GIS.
+The specification is IETF RFC 7946, published in 2016 and registered as `application/geo+json`. Repository map previews, open data APIs and mapping libraries usually consume it directly. What it offers is reach, not compactness: one `.geojson` file opens in a browser, Python, PostGIS and a desktop GIS.
 
-The trade-off is size and limited expressiveness. Coordinate order, ring rules and the fixed coordinate system account for most cases of a file that opens but puts features in the wrong place.
+The price is size and limited expressiveness. Most files that load but put features in the wrong place come down to coordinate order, ring rules or the fixed coordinate system.
 
 ## Minimal example
 
@@ -45,7 +45,7 @@ In the example, the point's `coordinates` is one pair of numbers, while the poly
 
 ## Structure and fields
 
-The three levels divide their fields cleanly:
+Fields split cleanly across the three levels:
 
 | Level | Field | Required | Meaning |
 |---|---|---|---|
@@ -89,19 +89,19 @@ A position is `[longitude, latitude]` or `[longitude, latitude, elevation]`. Cou
 
 ## Common mistakes and pitfalls
 
-**Swapped longitude and latitude.** The symptom is a point in the sea, on another continent, or clipped at the edge of the map. The cause is `[latitude, longitude]` used where `[longitude, latitude]` is required. The consequence is no error at all, just a displaced dataset; Times Square should be `[-73.9855, 40.7580]`, while `[40.7580, -73.9855]` lands in the southern hemisphere. Check ranges first: a latitude beyond ±90 is swapped unless the data is projected.
+**Swapped longitude and latitude.** A point lands in the sea, on another continent, or gets clipped at the map edge, because the file stores `[latitude, longitude]` where `[longitude, latitude]` is required. Nothing errors; the dataset is simply displaced. Times Square is `[-73.9855, 40.7580]`, while `[40.7580, -73.9855]` falls in the southern hemisphere. Check the ranges first: a latitude beyond ±90 means swapped values, unless the data is projected.
 
-**An unclosed polygon ring.** Browsers or desktop GIS show no polygon, or area calculations come out wrong. The cause is a last coordinate that differs from the first, or a ring with only three positions. The consequence is invalid geometry: some tools close the ring automatically, others drop the feature. Close the ring before writing, and keep at least four positions including the repeated first point.
+**Unclosed polygon ring.** No polygon appears in the browser or desktop GIS, or the area comes out wrong. The last coordinate differs from the first, or the ring has only three positions. Some tools close the ring for you, others drop the feature, because the geometry is invalid. Write the ring closed and keep at least four positions, counting the repeated first point.
 
-**Projected coordinates inside GeoJSON.** Values such as `500000` and `4400000` appear, and the map stays blank. The cause is UTM or Gauss-Krüger data exported without conversion to WGS84. The consequence is coordinates outside the valid longitude/latitude range, which readers may clip, clamp or draw in the wrong place. Reproject first, then export.
+**Projected coordinates inside GeoJSON.** You see values like `500000` or `4400000` and a blank map. The data came from UTM or Gauss-Krüger without conversion to WGS84, so the coordinates fall outside the valid longitude/latitude range; readers clip them, clamp them, or draw them in the wrong spot. Reproject before exporting.
 
-**Too many decimal places.** File size doubles and version diffs fill with meaningless digits. The cause is 15 decimal places, while 1e-7 degrees is about 1 cm of latitude. The consequence is larger files and slower parsing with no real gain. Six or seven decimals, roughly 0.1 m and 1 cm, cover most uses.
+**Too many decimal places.** Files double in size and version diffs fill with digits that mean nothing. Fifteen decimals is far past the point where 1e-7 degrees, about 1 cm of latitude, stops mattering. You get bigger files and slower parsing for no gain. Six or seven decimals, roughly 0.1 m and 1 cm, cover most work.
 
-**Geometry or bulk data stuffed into `properties`.** After import, attributes disappear, column types turn into text, or the file balloons. The cause is WKT, base64 images or deeply nested objects in properties while the target system accepts only scalars. The consequence is attributes that cannot be queried, indexes that stop working and slower transfers. Keep geometry in `geometry`, properties flat, and large objects elsewhere.
+**Geometry or bulk data stuffed into `properties`.** After import, attributes vanish, column types turn to text, or the file balloons. Someone put WKT, base64 images or deeply nested objects into properties, and the target system accepts only scalars. Those attributes then cannot be queried, indexes stop working, transfers slow down. Keep geometry in `geometry`, properties flat, and large objects somewhere else.
 
-**Comments, trailing commas or `NaN` in the JSON.** The whole file fails to parse, and the error gives only a line and column. The cause is that JSON does not support comments, trailing commas, `NaN` or `Infinity`. The consequence is an unreadable file with no fallback. Remove comments and trailing commas, and use `null` for missing values.
+**Comments, trailing commas or `NaN` in the JSON.** The file will not parse, and the error points at a line and column. JSON does not support comments, trailing commas, `NaN` or `Infinity`, so there is no fallback reader. Strip the comments and trailing commas, and use `null` for missing values.
 
-**Using a `crs` member to declare a projection.** The file says `EPSG:3857`, yet the map is offset or wrongly scaled. The cause is that RFC 7946 removed `crs`, so modern readers ignore it and assume WGS84. The consequence is projected coordinates interpreted as degrees. Convert to WGS84 instead of relying on `crs`.
+**Using a `crs` member to declare a projection.** The file declares `EPSG:3857` but the map is offset or at the wrong scale. RFC 7946 removed `crs`, so current readers ignore it and assume WGS84, which means projected coordinates get read as degrees. Convert to WGS84 rather than leaning on `crs`.
 
 ## Comparison with neighbouring formats
 
@@ -117,7 +117,7 @@ GeoJSON is built for exchange and display, not for storing every detail. The sam
 | Direct browser read | Yes | Needs a library | Needs a library | Needs a library |
 | Attributes | `properties`, free types | `properties` | `ExtendedData` | DBF, 10-character names |
 
-TopoJSON suits administrative data with many shared edges; KML suits styled presentations with balloons; Shapefile suits traditional GIS pipelines but carries hard limits on field names and geometry types. GeoPackage and FlatGeobuf are better for archiving or millions of features.
+TopoJSON fits administrative data with many shared edges. KML fits styled presentations with balloons. Shapefile still works for traditional GIS pipelines, though field names and geometry types are limited. For archiving or millions of features, GeoPackage and FlatGeobuf are the better choices.
 
 ## Conversion and tools
 

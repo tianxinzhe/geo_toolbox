@@ -35,9 +35,9 @@ export interface ParseCtx {
   commaAs: 'auto' | 'decimal' | 'separator'
   /**
    * 是否先做全角归一化。
-   * SR-01：日文输入法可能产出全角数字与全角标点，
+   * SR-01：用户粘贴的坐标可能带全角数字与全角标点，
    * 必须在识别格式**之前**归一化，否则会静默解析失败。
-   * ja 页面必开；zh / en 也建议开（用户可能从任何来源粘贴）。
+   * zh / en 都建议开启。
    */
   fullWidth: boolean
   /** 默认轴序。SR-01：两个数值都 ≤90 时的歧义默认按「经度在前」（GeoJSON 约定） */
@@ -165,8 +165,8 @@ export function normalizeFullWidth(input: string): { text: string; changed: bool
 /** 显式度分秒标记：出现即适用 SR-01 规则 ①「逗号一律视为分隔符」 */
 const EXPLICIT_DMS_RE = /[°º'"’′″]|[:：]|\d\s*[dmsDMS]\s*\d|度|分|秒/
 
-/** 半球符号（含中日文方向词） */
-const HEMISPHERE_TOKEN_RE = /[nsewNSEW]|北纬|南纬|东经|西经|北緯|南緯|東経|西経/
+/** 半球符号（含中英文方向词） */
+const HEMISPHERE_TOKEN_RE = /[nsewNSEW]|北纬|南纬|东经|西经/
 
 /**
  * 规则 ③ 的启发式：「数字 + 逗号 + 4~8 位数字」且后面不再跟数字或逗号。
@@ -214,7 +214,7 @@ export function resolveCommaMeaning(input: string, ctx: ParseCtx): 'decimal' | '
   // 规则 ①：带 ° ' " 或 N/S/E/W 时，逗号一律视为分隔符
   if (EXPLICIT_DMS_RE.test(input) || HEMISPHERE_TOKEN_RE.test(input)) return 'separator'
 
-  // 规则 ②：默认逗号是分隔符（zh / en / ja 用户的习惯均符合此解释）
+  // 规则 ②：默认逗号是分隔符（zh / en 用户的习惯均符合此解释）
   return 'separator'
 }
 

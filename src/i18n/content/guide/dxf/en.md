@@ -1,6 +1,6 @@
 ---
-title: "DXF explained: group codes, entities and coordinate limits | GeoToolbox"
-description: How DXF pairs group codes with values, the SECTION/ENTITIES structure, POINT, LINE and LWPOLYLINE entities, and why CRS declarations, arcs and attributes go missing.
+title: 'DXF explained: group codes and entities | GeoToolbox'
+description: 'How DXF pairs group codes with values, the SECTION/ENTITIES structure, common entities, and why CRS declarations, arcs and attributes go missing.'
 heading: "DXF explained: group codes, entities and coordinate limits"
 group: vector
 order: 15
@@ -10,7 +10,7 @@ updated: 2026-11-23
 
 DXF (Drawing Exchange Format) is AutoCAD's exchange format, widely used to move data between CAD and GIS. The ASCII version is plain text made of paired group codes and values.
 
-It exists to solve a compatibility problem: DWG is AutoCAD's native binary format, its structure is not published, and other software struggles to read or write it. DXF expresses the same drawing content in an open structure and became the de facto exchange standard. The cost is that it is built for drafting, not for geographic data: attributes, coordinate systems and topology have no natural place in the format.
+It exists to solve a compatibility problem: DWG is AutoCAD's native binary format, its structure is not published, and other software struggles to read or write it. DXF expresses the same drawing content in an open structure and became the de facto exchange standard. What it was never meant for is geographic data. Attributes, coordinate systems and topology have no natural place in the format.
 
 DXF comes in ASCII and binary encodings. The ASCII version can be opened in a text editor; the binary version is more compact but starts with a binary marker and cannot be parsed as text.
 
@@ -54,7 +54,7 @@ EOF
 
 Other common entities include `LWPOLYLINE` (lightweight polyline), `CIRCLE`, `ARC`, `TEXT` and `INSERT` (block reference).
 
-From a reader's point of view, the smallest file can hold only an `ENTITIES` section with one entity, plus `EOF`. Real drawings nearly always include `HEADER` and `TABLES`, because units, extents and layer definitions live there. In the ASCII version each group code and value sits on its own line, always in that order: code first, value second.
+A reader can get away with very little: an `ENTITIES` section holding one entity, plus `EOF`. Real drawings nearly always include `HEADER` and `TABLES`, because units, extents and layer definitions live there. In the ASCII version each group code and value sits on its own line, always in that order: code first, value second.
 
 ## Structure and fields
 
@@ -104,15 +104,15 @@ On top of that, DXF has no topology, no CRS and no notion of null. One layer may
 
 ## Common errors and traps
 
-**Reading binary DXF as text**: garbage appears at the start and the parser fails on the first group code; the cause is the binary marker and compact encoding; the result is a trip back to CAD to save an ASCII copy.
+**Reading binary DXF as text**: garbage shows up at the start and the parser dies on the first group code. The file begins with a binary marker and stores values in compact encoding. You have to go back to CAD and save an ASCII copy.
 
-**Using CAD coordinates as longitude and latitude**: data lands in the ocean or far outside any map; the cause is that DXF declares no CRS and engineering coordinates have a completely different magnitude; the result is a layer that will not overlay until the origin and projection are established.
+**Using CAD coordinates as longitude and latitude**: data lands in the ocean or far outside any map. DXF declares no CRS, and engineering coordinates have a completely different magnitude. Nothing overlays until you establish the origin and projection.
 
-**Ignoring the bulge on polylines**: boundaries with arcs turn into faceted lines and area and length drift; the cause is that `LWPOLYLINE` uses group code `42` for arc segments while simple parsers read only the vertices; the result is altered geometry, and the loss is usually irreversible.
+**Ignoring the bulge on polylines**: boundaries with arcs turn into faceted lines, and area and length drift. `LWPOLYLINE` stores arc segments in group code `42`, while simple parsers read only the vertices. The geometry is altered, and the loss is usually irreversible.
 
-**Never exploding block references**: only insertion points appear and the geometry inside the block is missing; the cause is that `INSERT` references geometry stored in `BLOCKS`; the result is a wrong feature count, fixed by exploding or recursively reading block definitions.
+**Never exploding block references**: only insertion points appear; the geometry inside each block is missing. `INSERT` points at geometry stored in `BLOCKS`. The feature count comes out wrong until you explode the blocks or read block definitions recursively.
 
-**Leaving every entity on layer `0`**: after conversion nothing can be filtered by category and everything sits in one pile; the cause is drafting without layers, or an export that merges them into the default; the result is lost classification that has to be inferred from geometry or text.
+**Leaving every entity on layer `0`**: after conversion nothing can be filtered by category, and everything sits in one pile. The drawing was made without layers, or an export merged them into the default. Classification is gone and has to be inferred from geometry or text.
 
 ## Comparison with nearby formats
 

@@ -1,6 +1,6 @@
 ---
-title: 'Google Tile Coordinates — Export an XYZ tile list | GeoToolbox'
-description: 'Draw a rectangle on the map or import GeoJSON, compute Google / XYZ tile numbers for the zoom levels you choose, and export x/y/z CSV files or tile polygons as GeoJSON.'
+title: 'Google Tile Coordinates — Export XYZ lists | GeoToolbox'
+description: 'Draw a rectangle or import GeoJSON, compute Google/XYZ tile numbers at the zooms you choose, and export x/y/z CSV or tile polygons as GeoJSON.'
 updated: 2026-11-23
 faq:
   - q: 'What is the difference between XYZ and TMS tiles?'
@@ -50,9 +50,9 @@ The defaults are 12–14: 12 for a metropolitan area, 13 for a city district, 14
 
 ## Drawing and importing
 
-**Map selection.** Click “Draw extent” first — map panning pauses while you draw. Hold the left mouse button and drag a rectangle, or click two opposite corners in turn; the second method suits touch screens and precise placement. Drawing stops automatically when the rectangle is complete and panning resumes. The extent takes effect immediately and the panel shows the west, south, east and north bounds. When the extent and zoom levels look right, click “Generate tile coordinates” to run the calculation; the page shows only the total and a download button, with no tile list. A progress bar appears while generating and while preparing the CSV or GeoJSON, and you can cancel at any time. Changing either requires generating again. Use “Clear selection” to start over.
+To draw an extent, click “Draw extent” first. Map panning pauses while you draw. Hold the left mouse button and drag a rectangle, or click two opposite corners in turn; the second way suits touch screens and precise placement. Drawing stops when the rectangle is complete, and panning resumes. The extent takes effect immediately, and the panel shows the west, south, east and north bounds. When the extent and zoom levels look right, click “Generate tile coordinates” to run the calculation. The page shows only the total and a download button, with no tile list. A progress bar appears while generating and while preparing the CSV or GeoJSON, and you can cancel at any time. Change either one and you have to generate again. “Clear selection” starts over.
 
-**Importing data.** Click the upload icon in the map bar to import GeoJSON (`.geojson` / `.json`); points, lines and polygons are all supported. It is an either/or choice with drawing: importing replaces a manually drawn extent. For other formats, convert them first with the [format converter](/en/tools/format-convert/). After importing, the original boundary is drawn on the map and the feature count is shown. Tile generation keeps only tiles that intersect that boundary, so empty space inside the bounding box is not included. Coordinates are treated as WGS84 longitude/latitude — projected coordinates are not read. After importing, click “Generate tile coordinates” as well.
+To import data, click the upload icon in the map bar and choose GeoJSON (`.geojson` / `.json`); points, lines and polygons are all supported. Importing and drawing are either/or: an import replaces a manually drawn extent. Convert other formats first with the [format converter](/en/tools/format-convert/). After an import, the original boundary is drawn on the map and the feature count is shown. Tile generation keeps only tiles that intersect that boundary, so empty space inside the bounding box is not included. Coordinates are treated as WGS84 longitude/latitude; projected coordinates are not read. After importing, click “Generate tile coordinates” as well.
 
 If the data crosses the 180° meridian, the tool picks the shorter side and says so explicitly. It never mistakes “170° west and 170° east” for a trip around the whole planet.
 
@@ -61,7 +61,7 @@ If the data crosses the 180° meridian, the tool picks the shorter side and says
 - Longitude must be within −180…180 and latitude within −90…90. Out-of-range coordinates raise an error instead of being silently dropped or truncated.
 - There is no hard tile limit. Above 1,000,000 tiles a red warning explains the performance risk, but generation can continue.
 - The download is split by zoom level: one CSV per level with the header `x, y, z`; multiple levels are packed into a ZIP so a single huge table does not have to be opened.
-- **Tile polygons as GeoJSON** are also available: one closed rectangle per tile with `z`, `x` and `y` properties, ready to drop into QGIS or the site's map preview. A single level produces one `.geojson` file; multiple levels are packed into a ZIP. To protect browser memory the GeoJSON export is capped at 200,000 tiles — above that the button is disabled with an explanation, while CSV export keeps working.
+- Tile polygons as GeoJSON are also available: one closed rectangle per tile with `z`, `x` and `y` properties, ready to drop into QGIS or the site's map preview. A single level produces one `.geojson` file; multiple levels go into a ZIP. To protect browser memory the GeoJSON export stops at 200,000 tiles. Above that the button is disabled with an explanation, while CSV export keeps working.
 - Everything runs in the browser. Imported files are never uploaded, and the page calls no calculation service.
 
 ## Common questions
@@ -80,7 +80,7 @@ USGS topographic maps are published as 7.5-minute quadrangles: 7.5 minutes of la
 
 In Great Britain, web maps from Ordnance Survey and OSM use XYZ in Web Mercator, but printed OS maps are indexed by National Grid squares such as `TQ 30 80`, which are not tile numbers. The two systems answer different questions: a grid reference locates a point on paper, an XYZ triplet locates a rendered image.
 
-Finally, bulk downloading from public tile servers is usually restricted. Generate the list here, but fetch tiles from a service whose terms allow it — your own server, or a provider with an offline-use licence.
+Bulk downloading from public tile servers is usually restricted. Generate the list here, but fetch tiles from a service whose terms allow it: your own server, or a provider with an offline-use licence.
 
 ## References
 

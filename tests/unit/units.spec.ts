@@ -3,7 +3,7 @@
  *
  * 三条硬规则的验证：
  *   ① 所有换算以平方米 / 米为**唯一中间基准**，不做单位间直接换算
- *   ② 循环小数值（亩 2000/3、坪 400/121、丈 10/3）保留完整精度
+ *   ② 循环小数值（亩 2000/3、丈 10/3）保留完整精度
  *   ③ 单位清单的**呈现**随语言变化，换算关系与语言无关
  *
  * 断言值全部来自 SR-04 的等值表，是硬编码字面量。
@@ -22,7 +22,6 @@ import {
   convertLength,
   DEFAULT_AREA_UNITS,
   DEFAULT_LENGTH_UNITS,
-  JA_FARMLAND_UNITS,
   LENGTH_TO_M,
   lengthFromBase,
   lengthToBase
@@ -70,19 +69,6 @@ describe('SR-04 面积等值表', () => {
     expect(AREA_TO_M2.mu).toBeCloseTo(666.6666666666666, 10)
   })
 
-  it('坪 = 400/121 ≈ 3.305785123966942（SR-04 给出的精确值）', () => {
-    expect(AREA_TO_M2.tsubo).toBe(400 / 121)
-    expect(AREA_TO_M2.tsubo).toBeCloseTo(3.305785123966942, 12)
-  })
-
-  it('反 = 300 坪，町歩 = 10 反 = 3000 坪（SR-04，OQ-13）', () => {
-    expect(AREA_TO_M2.tan).toBe(300 * AREA_TO_M2.tsubo)
-    expect(AREA_TO_M2.tan).toBeCloseTo(991.7355371900826, 10)
-    expect(AREA_TO_M2.cho).toBe(10 * AREA_TO_M2.tan)
-    expect(AREA_TO_M2.cho).toBe(3000 * AREA_TO_M2.tsubo)
-    expect(AREA_TO_M2.cho).toBeCloseTo(9917.355371900826, 9)
-  })
-
   it('英制面积与英制长度自洽：1 平方码 = (0.9144)²，1 平方英里 = 640 英亩', () => {
     expect(AREA_TO_M2.yd2).toBeCloseTo(LENGTH_TO_M.yd ** 2, 12)
     expect(AREA_TO_M2.ft2).toBeCloseTo(LENGTH_TO_M.ft ** 2, 12)
@@ -94,7 +80,7 @@ describe('SR-04 面积等值表', () => {
     expect(AREA_TO_M2.ha).toBe(AREA_TO_M2.km2 / 100)
   })
 
-  it('不纳入畳与韩国单位（SR-04：地区差异大，给不出唯一值）', () => {
+  it('不纳入韩国单位（SR-04：地区差异大，给不出唯一值）', () => {
     expect(ALL_AREA_UNITS).not.toContain('jo')
     expect(ALL_AREA_UNITS).not.toContain('tatami')
     expect(ALL_AREA_UNITS).not.toContain('madiji')
@@ -109,8 +95,8 @@ describe('换算一律经过基准，不做单位间直接换算', () => {
 
   it('areaToBase / areaFromBase 互逆', () => {
     expect(areaFromBase(areaToBase(2.5, 'ha'), 'ha')).toBeCloseTo(2.5, 12)
-    expect(areaFromBase(areaToBase(60, 'mu'), 'tsubo')).toBeCloseTo(
-      (60 * (2000 / 3)) / (400 / 121),
+    expect(areaFromBase(areaToBase(60, 'mu'), 'acre')).toBeCloseTo(
+      (60 * (2000 / 3)) / 4046.8564224,
       9
     )
   })
@@ -127,12 +113,6 @@ describe('换算一律经过基准，不做单位间直接换算', () => {
     // 这是国内最常问的换算。1 ha = 10000 ㎡，1 亩 = 2000/3 ㎡
     // → 10000 / (2000/3) = 15，精确成立
     expect(convertArea(1, 'ha', 'mu')).toBeCloseTo(15, 12)
-  })
-
-  it('convertArea：1 亩 = 0.15 坪 × 1000 / … 用基准验证', () => {
-    // 1 亩 = 2000/3 ㎡；1 坪 = 400/121 ㎡
-    // → (2000/3) / (400/121) = 2000*121 / (3*400) = 242000/1200 = 201.6666…
-    expect(convertArea(1, 'mu', 'tsubo')).toBeCloseTo(242000 / 1200, 9)
   })
 
   it('convertArea：1 英亩 = 4046.8564224 ㎡', () => {
@@ -166,22 +146,12 @@ describe('SR-11 / SR-04 单位清单的呈现随语言变化', () => {
     expect(DEFAULT_AREA_UNITS.zh).toEqual(['m2', 'mu', 'ha', 'km2'])
   })
 
-  it('ja 默认：平方米、坪、公顷、平方千米', () => {
-    expect(DEFAULT_AREA_UNITS.ja).toEqual(['m2', 'tsubo', 'ha', 'km2'])
-  })
-
   it('en 默认：平方米、公顷、英亩、平方英尺', () => {
     expect(DEFAULT_AREA_UNITS.en).toEqual(['m2', 'ha', 'acre', 'ft2'])
   })
 
-  it('反 / 町歩只对 ja 提供（日本农业场景专属）', () => {
-    expect(JA_FARMLAND_UNITS).toEqual(['tan', 'cho'])
-    expect(DEFAULT_AREA_UNITS.zh).not.toContain('tan')
-    expect(DEFAULT_AREA_UNITS.en).not.toContain('cho')
-  })
-
   it('每个语言的默认单位都是合法单位，且都以平方米打头', () => {
-    for (const lang of ['zh', 'en', 'ja'] as const) {
+    for (const lang of ['zh', 'en'] as const) {
       const list = DEFAULT_AREA_UNITS[lang]
       expect(list[0], lang).toBe('m2')
       for (const u of list) {
@@ -194,15 +164,12 @@ describe('SR-11 / SR-04 单位清单的呈现随语言变化', () => {
     expect(DEFAULT_LENGTH_UNITS.zh).toContain('li') // 市里
     expect(DEFAULT_LENGTH_UNITS.en).toContain('mi') // 英里
     expect(DEFAULT_LENGTH_UNITS.en).toContain('ft') // 英尺
-    expect(DEFAULT_LENGTH_UNITS.ja).not.toContain('mi')
   })
 
-  it('换算关系与语言无关 —— 同一个换算在三种语言下结果相同', () => {
+  it('换算关系与语言无关 —— 同一个换算在不同语言下结果相同', () => {
     // 这条是「呈现随语言、数值不随语言」的形式化表达
     const zh = convertArea(1, 'mu', 'm2')
     const en = convertArea(1, 'mu', 'm2')
-    const ja = convertArea(1, 'mu', 'm2')
     expect(zh).toBe(en)
-    expect(en).toBe(ja)
   })
 })

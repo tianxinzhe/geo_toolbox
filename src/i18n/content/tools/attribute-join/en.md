@@ -1,6 +1,6 @@
 ---
-title: 'Attribute Join — Attach CSV or Excel tables to vectors | GeoToolbox'
-description: 'Load a vector file and a CSV, TSV or Excel table, match them by a shared field, merge the table columns into feature attributes and export GeoJSON. Everything runs locally in the browser.'
+title: 'Attribute Join — Attach CSV or Excel to vectors | GeoToolbox'
+description: 'Load a vector file and a CSV, TSV or Excel table, match them by a shared field, merge the columns into feature attributes and export GeoJSON locally.'
 updated: 2026-11-13
 faq:
   - q: 'How is this different from VLOOKUP in Excel?'
@@ -13,11 +13,11 @@ faq:
 
 ## What this tool solves
 
-Vector files usually carry geometry and a few fields, while population, area, district codes and category names live in a separate CSV or Excel sheet. Putting them together is called a table join in a desktop GIS, a JOIN in a database and VLOOKUP in a spreadsheet.
+Vector files usually carry geometry and a few fields. Population, area, district codes and category names tend to live in a separate CSV or Excel sheet. Putting them together is called a table join in a desktop GIS, a JOIN in a database and VLOOKUP in a spreadsheet.
 
-This tool turns the operation into four choices: a vector layer, an attribute table, one field on each side and a Join button. Matched features appear on the map, every table column is merged into the feature properties, and the result can be downloaded as GeoJSON for previewing, clipping or further analysis.
+This tool turns the operation into four choices: a vector layer, an attribute table, one field on each side and a Join button. Matched features appear on the map, every table column is merged into the feature properties, and the result downloads as GeoJSON for previewing, clipping or further analysis.
 
-Typical uses include attaching land-use classes to parcels, adding district names and population to POIs, matching survey points with an inventory sheet by identifier, and joining spreadsheet statistics to map units for thematic mapping.
+Typical uses: attaching land-use classes to parcels, adding district names and population to POIs, matching survey points with an inventory sheet by identifier, joining spreadsheet statistics to map units for thematic mapping.
 
 ## How to use
 
@@ -33,7 +33,7 @@ On the map, green features are the joined result and blue features are the origi
 
 ## Types and results
 
-- Join keys are converted to text and trimmed. The number 1 and the string "1" therefore match; booleans compare as true / false. Missing values, null and empty strings never match, so all blank keys cannot collapse into one record.
+- Join keys are converted to text and trimmed. The number 1 and the string "1" therefore match; booleans compare as true / false. Missing values, null and empty strings never match, so blank keys never collapse into a single record.
 - When the table contains duplicate keys, the first row wins. The remaining rows are ignored and counted in the duplicate hint instead of overwriting the same feature repeatedly.
 - If a table column has the same name as a feature field, the table value overwrites the feature value. The number of affected features is reported as field conflicts; the two join fields themselves are excluded.
 - The result keeps the original geometry, feature order and every attribute, and exports as GeoJSON. Feature order follows the source vector layer, not the table.
@@ -45,7 +45,7 @@ On the map, green features are the joined result and blue features are the origi
 - Matching is a single-field equality join. Range joins, fuzzy matching and composite keys are not supported; build a helper column in the table if you need several fields combined.
 - Attribute tables are read as UTF-8. If Chinese headers or values appear garbled, save the sheet as a UTF-8 CSV first.
 - Only attributes are changed. Coordinates are not reprojected, so data that is not WGS84 longitude/latitude will sit in the wrong place; convert it with the EPSG tool first.
-- Everything runs locally in the browser. Files are never uploaded and nothing is written to server logs.
+- Everything runs locally in the browser: no uploads, no server logs.
 
 ## Common questions
 

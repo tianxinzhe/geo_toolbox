@@ -7,7 +7,6 @@
  */
 import { getCollection } from 'astro:content'
 import { LAUNCHED, type Lang } from '../../config/i18n'
-import { site } from '../../config/site'
 import { GUIDE_GROUPS } from '../../i18n/guideGroups'
 import { t } from '../../i18n/ui'
 import { CATEGORIES, CATEGORY_META, getToolsByCategory } from '../../i18n/tools'
@@ -46,7 +45,7 @@ const featuredGuides = GUIDE_GROUPS.flatMap((group) => {
 <ContentPage
   lang={lang}
   path={path}
-  title={`${site.name[lang]} — ${site.tagline[lang]}`}
+  title={t(lang, 'home.seoTitle')}
   description={t(lang, 'home.intro')}
   h1={t(lang, 'home.h1')}
   lead={t(lang, 'home.intro')}

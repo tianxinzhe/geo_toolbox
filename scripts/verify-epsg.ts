@@ -1,5 +1,5 @@
 /**
- * OQ-15 核验：日本平面直角坐标系 EPSG 代码清单
+ * OQ-15 核验：中国高斯-克吕格与全球常用 EPSG 代码清单
  *
  * PRD 10 章 OQ-15 要求「逐一核对官方注册表后才能写入代码。错一个代码就会
  * 给出错误坐标」。本脚本在构建前把代码里的期望值逐条与 EPSG 注册表数据比对，
@@ -9,17 +9,11 @@
  *   - 主数据：npm `epsg-index` v2.0.0（由 EPSG.io 的注册表数据集生成，
  *     含 8112 个 CRS 的官方名称与 proj4 定义）
  *   - 交叉校验：npm `epsg` v0.5.0（proj4js-defs 派生，用于确认旧代码段）
- *
- * 已知并已纠正的 PRD 笔误：
- *   PRD 原文写 JGD2000 平面直角 = 2451~2469。
- *   实际 2451 是第 IX 系，2469 是 Pulkovo 1942 的投影；
- *   JGD2000 的正确区间是 2443~2461。
  */
 
 import { createRequire } from 'node:module'
 
 import { CN_CM_3, CN_CM_6, CN_DATUMS, chinaGkEpsg, chinaZoneOfCm } from '../src/lib/crs/china'
-import { JP_DATUMS, JP_ZONES, japanPlaneEpsg, japanZoneOfCode, toRoman } from '../src/lib/crs/japan'
 
 const require = createRequire(import.meta.url)
 const registry = require('epsg-index/all.json') as Record<
@@ -72,30 +66,6 @@ function expectProj4Number(code: number, key: string, expected: number): void {
     `+${key} 应为 ${expected}，实际为 ${m?.[1] ?? '缺失'}`,
     Number.isFinite(actual) && Math.abs(actual - expected) < 1e-9
   )
-}
-
-/* ------------------------------------------------------------------ *
- * 日本：3 个 datum × 19 区带
- * ------------------------------------------------------------------ */
-
-for (const d of JP_DATUMS) {
-  for (const z of JP_ZONES) {
-    const code = japanPlaneEpsg(d.id, z.zone)
-    expectContains(code, `Japan Plane Rectangular CS ${toRoman(z.zone)}`)
-    expectProj4(code, '+proj=tmerc')
-    expectProj4Number(code, 'lat_0', z.lat0)
-    expectProj4Number(code, 'lon_0', z.lon0)
-    expectProj4Number(code, 'k', 0.9999)
-    expectProj4Number(code, 'x_0', 0)
-    expectProj4Number(code, 'y_0', 0)
-    expectProj4(code, `+ellps=${d.ellps}`)
-    // Tokyo 的 towgs84 是 EPSG 现行值，不是旧 proj4js 表的 -148,507,685
-    expectProj4(code, `+towgs84=${d.towgs84}`)
-    check(code, `代码应映射回第 ${z.zone} 系`, japanZoneOfCode(code) === z.zone)
-  }
-  const geo = d.epsg
-  expectContains(geo, d.id === 'jgd2011' ? 'JGD2011' : d.id === 'jgd2000' ? 'JGD2000' : 'Tokyo')
-  expectProj4(geo, `+ellps=${d.ellps}`)
 }
 
 /* ------------------------------------------------------------------ *
@@ -154,6 +124,5 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`✓ EPSG 核验通过：${checked} 条（日本 3 datum × 19 区带、中国 32 个高斯带、全球 7 个）`)
+console.log(`✓ EPSG 核验通过：${checked} 条（中国 32 个高斯带、全球 7 个）`)
 console.log('  来源：epsg-index v2.0.0（EPSG 注册表数据集）')
-console.log('  已纠正 PRD 笔误：JGD2000 平面直角应为 2443~2461，不是 2451~2469')

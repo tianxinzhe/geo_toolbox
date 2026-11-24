@@ -1,6 +1,6 @@
 ---
-title: 'How vector formats are parsed: 16 inputs explained | GeoToolbox'
-description: How GeoJSON, TopoJSON, KML, KMZ, GPX, GML, CSV, XLSX, WKT, GMT, DXF, MIF/MID, Shapefile, FlatGeobuf and GeoPackage are detected, parsed and written, each with a minimal example.
+title: 'How 16 vector formats are parsed | GeoToolbox'
+description: 'How 16 vector formats are detected, parsed and written, with a minimal example for each, from GeoJSON and Shapefile to WKT and GeoPackage.'
 heading: 'How vector formats are parsed: 16 inputs with minimal examples'
 group: vector
 order: 19
@@ -17,9 +17,9 @@ faq:
     a: 'The parser only accepts explicit column names such as lat, latitude, y and lng, lon, longitude, x. When nothing matches it does not guess that the first column is longitude; it shows the header so you can pick the columns yourself and avoid swapping the axis order.'
 ---
 
-The same points, lines and polygons can arrive as GeoJSON, Shapefile, Excel, DXF and a dozen other formats. The reliable way to convert between them is not one converter per pair, but a single intermediate model that every input is translated into and every output is translated from.
+The same points, lines and polygons can arrive as GeoJSON, Shapefile, Excel, DXF and a dozen other formats. Converting between them pair by pair does not scale. A single intermediate model does: every input is translated into it, and every output is translated out of it.
 
-This article covers that pipeline: **how a format is detected, how it is parsed, and what survives the trip**. Each format comes with a minimal example you can compare against your own file.
+The rest of this page follows that pipeline: **how a format is detected, how it is parsed, and what survives the trip**. Each format comes with a minimal example you can compare against your own file.
 
 ## The three-step pipeline
 
@@ -50,7 +50,7 @@ Every format ends up as the same structure: a **feature collection**, where each
 
 Before serialising, three things happen uniformly: coordinates are rounded to the requested number of decimals, empty properties can be removed, and features with no geometry are dropped and counted. Then the serialiser runs.
 
-If the target cannot hold a geometry type — polygons into GPX, for example — conversion stops and asks before skipping. That is deliberate: the dangerous failure mode is not an error, it is losing half the data quietly.
+If the target cannot hold a geometry type, say polygons into GPX, conversion stops and asks before skipping anything. The failure mode worth worrying about is not an error message. It is losing half the data quietly.
 
 ## All 16 inputs at a glance
 
@@ -340,7 +340,7 @@ At most 200 issues are shown, so large files cannot flood the page. None of them
 
 ## Runnable Python example per format
 
-Every format has a **standalone** Python script. No package to install from this repository — download one file and run it:
+Every format has a **standalone** Python script. There is no package to install from this repository: download one file and run it:
 
 ```bash
 python kml_parser.py data.kml                 # print GeoJSON

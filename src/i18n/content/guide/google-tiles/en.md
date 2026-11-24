@@ -1,6 +1,6 @@
 ---
-title: "How Google map tiles work: XYZ, zoom and coordinates | GeoToolbox"
-description: "From Web Mercator to XYZ numbering: how each zoom level multiplies tiles, how longitude and latitude become x/y/z, why y grows southwards, and what tile lists are used for."
+title: 'How Google map tiles work: XYZ and zoom | GeoToolbox'
+description: 'From Web Mercator to XYZ numbering: how zoom levels multiply tiles, how lon/lat become x/y/z, why y grows southwards, and what tile lists are for.'
 heading: "How Google map tiles work: XYZ, zoom and coordinates"
 group: tile
 order: 18
@@ -8,11 +8,11 @@ readingMinutes: 4
 updated: 2026-11-19
 ---
 
-When you open a web map, the browser does not download one complete world map. It assembles dozens of small images for the current view. These images are **tiles**, and each has an identifier made of `z`, `x` and `y`. Once you understand that identifier, you can produce your own tile list for offline caching, cache warming or data partitioning.
+Open a web map and the browser does not download one complete world map. It assembles dozens of small images for the current view. Those images are **tiles**, each identified by `z`, `x` and `y`. Get comfortable with that identifier and you can build your own tile lists for offline caching, cache warming or data partitioning.
 
 ## Why tiles are square
 
-The prerequisite is the Web Mercator projection (EPSG:3857). It lays the world on a square: longitude is fixed to -180°–180°, and latitude is clipped at ±85.0511°. Further towards the poles the projected y tends to infinity, so clipping is necessary.
+It starts with the Web Mercator projection (EPSG:3857). It lays the world on a square: longitude runs from -180°–180°, and latitude is clipped at ±85.0511°. Closer to the poles the projected y tends to infinity, so the clip is unavoidable.
 
 ![World map in the Mercator projection with high latitudes enlarged](/images/projections/mercator.jpg)
 
@@ -101,7 +101,7 @@ Bulk tile fetching must respect the provider's terms of service. Google map tile
 
 ## Generating your own XYZ list
 
-Doing the formulas by hand is error-prone, especially across levels and the antimeridian. Use [Google tile coordinates](/en/tools/tile-coords/) to draw an area on the map or import GeoJSON, choose the zoom levels, and export a CSV of `x, y, z` that opens directly in Excel — or export the same tiles as GeoJSON polygons to check in QGIS or the map preview.
+Doing the formulas by hand is error-prone, especially across levels and the antimeridian. Use [Google tile coordinates](/en/tools/tile-coords/) to draw an area on the map or import GeoJSON, choose the zoom levels, and export a CSV of `x, y, z` that opens directly in Excel; you can also export the same tiles as GeoJSON polygons to check in QGIS or the map preview.
 
 ## Frequently asked
 

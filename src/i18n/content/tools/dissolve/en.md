@@ -1,6 +1,6 @@
 ---
-title: 'Dissolve by Field — Merge features sharing a field value | GeoToolbox'
-description: 'Load a vector file, choose a field and dissolve features with the same value: polygons are unioned, lines and points become multi-geometries, mixed groups become collections. Export GeoJSON.'
+title: 'Dissolve by Field — Merge features by value | GeoToolbox'
+description: 'Load a vector file, pick a field and dissolve features with the same value: polygons are unioned and lines or points become multi-geometries.'
 updated: 2026-11-13
 faq:
   - q: 'How is dissolve different from merging layers?'
@@ -13,11 +13,11 @@ faq:
 
 ## What this tool solves
 
-A parcel dataset stores one record per parcel and every record has a land-use class. A road dataset stores one record per segment and every segment has a road class. When you only care about the extent of each class, you need to combine parcels or segments of the same class into one feature; otherwise the map is full of small adjacent polygons and duplicated boundaries. Desktop GIS calls this Dissolve.
+A parcel dataset holds one record per parcel, each tagged with a land-use class. A road dataset does the same per segment, tagged with a road class. When you only care about the extent of each class, you need to combine parcels or segments of the same class into one feature; otherwise the map is full of small adjacent polygons and duplicated boundaries. Desktop GIS calls this Dissolve.
 
-This tool reads one vector file, groups features by the field you choose, combines the geometry of each group and reports the feature count and geometry type per result. The dissolved layer can be exported as GeoJSON for cartography, preparing area summaries, or further clipping and buffering.
+This tool reads one vector file, groups features by the field you choose, combines the geometry of each group and reports the feature count and geometry type per result. Export the dissolved layer as GeoJSON for cartography, area summaries, or further clipping and buffering.
 
-Typical uses include dissolving parcels into a land-use map, dissolving road segments by class, dissolving districts into provinces, combining POIs by category into a single multipoint layer, and merging linear records of one facility into a single multiline.
+Typical uses: dissolve parcels into a land-use map, road segments by class, or districts into provinces. You can also combine POIs by category into one multipoint layer, or merge the linear records of a single facility into one multiline.
 
 ## How to use
 
@@ -46,7 +46,7 @@ On the map, green features are the dissolved result and blue features are the so
 - Line dissolve does not connect end-to-end segments into one line and does not split at intersections. Use a dedicated network tool for connectivity.
 - The result does not compute area. Export it and summarise area together with feature_count and the class field if needed.
 - Coordinates are read as WGS84 longitude/latitude and are not reprojected. Projected coordinates appear in the wrong place; convert them with the EPSG tool first.
-- Everything runs locally in the browser. Files are never uploaded and nothing is written to server logs.
+- The browser does all the work: files are never uploaded, and nothing reaches server logs.
 
 ## Common questions
 

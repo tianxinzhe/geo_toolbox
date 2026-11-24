@@ -1,6 +1,6 @@
 ---
-title: "Map projections at a glance: coverage and use cases | GeoToolbox"
-description: WGS84, Web Mercator, UTM, Gauss-Krüger, Japan Plane Rectangular and British National Grid — how the projections on this site group up, where they cover, and when to use each.
+title: 'Map projections at a glance: coverage and use | GeoToolbox'
+description: WGS84, Web Mercator, UTM, Gauss-Krüger and British National Grid — how the projections on this site group up, where they cover, and when to use each.
 heading: "Map projections at a glance: coverage and use cases"
 group: projection
 order: 1
@@ -8,9 +8,9 @@ readingMinutes: 7
 updated: 2026-11-09
 ---
 
-The [projection converter](/en/tools/epsg-convert/) accepts over seven hundred EPSG coordinate systems, but they are not seven hundred unrelated projections. Almost all fall into five groups: unprojected longitude/latitude, Web Mercator, UTM, Gauss-Krüger (including Japan Plane Rectangular) and British National Grid.
+The [projection converter](/en/tools/epsg-convert/) accepts over seven hundred EPSG coordinate systems, but they are not seven hundred unrelated projections. Almost all fall into five groups: unprojected longitude/latitude, Web Mercator, UTM, Gauss-Krüger and British National Grid.
 
-This page covers each group: where it applies, what it suits, and where it goes wrong. The illustrations below show the shape and trade-offs of the main methods.
+For each group below: where it applies, what it suits, where it goes wrong. The illustrations show the shape and trade-offs of the main methods.
 
 ## Three layers behind one EPSG code
 
@@ -28,16 +28,15 @@ So `EPSG:4548` and `EPSG:32650` both use transverse Mercator, but with different
 
 | Family | Options on this site | Coverage | Typical use |
 |---|---|---|---|
-| Geographic (unprojected) | WGS84 `4326`, CGCS2000 `4490`, Xian 1980 `4610`, Beijing 1954 `4214`, ETRS89 `4258`, NAD83 `4269`, NAD27 `4267`, OSGB36 `4277`, JGD2011 `6668`, JGD2000 `4612`, Tokyo `4301` | Global and continental | Storage, exchange, GPS, APIs |
+| Geographic (unprojected) | WGS84 `4326`, CGCS2000 `4490`, Xian 1980 `4610`, Beijing 1954 `4214`, ETRS89 `4258`, NAD83 `4269`, NAD27 `4267`, OSGB36 `4277` | Global and continental | Storage, exchange, GPS, APIs |
 | Web Mercator | `3857` | Global (about 85°S–85°N) | Web maps, tiles, visualisation |
-| UTM | WGS84 `32601–32660` (north), `32701–32760` (south); JGD2011 `6688–6692` | 60 zones, 6° each | Cross-border works, remote sensing, mapping |
+| UTM | WGS84 `32601–32660` (north), `32701–32760` (south) | 60 zones, 6° each | Cross-border works, remote sensing, mapping |
 | Gauss-Krüger | 3° and 6° bands for CGCS2000, Xian 1980 and Beijing 1954 | China, central meridians 75°E–135°E | National mapping, planning, cadastre |
-| Japan Plane Rectangular | JGD2011 `6669–6687`, JGD2000 `2443–2461`, Tokyo `30161–30179` | Japan, 19 zones | Surveying, registration, construction |
 | British National Grid | `27700` | United Kingdom | Terrain, addresses, planning |
 
 ## Unprojected longitude and latitude
 
-Coordinates such as `EPSG:4326` and `EPSG:4490` are in degrees, not metres. They are the right choice for storage and exchange: every piece of software reads them and every API can carry them. The drawback is that an angle cannot measure distance or area directly — one degree of longitude is about 111 km at the equator but only about 85 km at Beijing.
+Coordinates such as `EPSG:4326` and `EPSG:4490` are in degrees, not metres. They are the right choice for storage and exchange: every piece of software reads them and every API can carry them. The drawback is that an angle cannot measure distance or area directly: one degree of longitude is about 111 km at the equator but only about 85 km at Beijing.
 
 Most coordinates people encounter are of this kind. Project them only when measurement is needed.
 
@@ -61,17 +60,16 @@ UTM is the global zoned form of transverse Mercator: 60 zones of 6° each, centr
 
 - `EPSG:326xx` for the northern hemisphere, `327xx` for the southern, where `xx` is the zone.
 - Most of China falls in zones 43–53; Beijing is zone 50, `EPSG:32650`.
-- Japan uses JGD2011 zones 51–55 (`EPSG:6688–6692`).
 
 ![World map of UTM zones, each 6° wide and numbered](/images/projections/utm-zones.jpg)
 
 *UTM divides the world into 60 zones of 6°, each projected and numbered independently. Image: public domain (US Government work), [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Utm-zones.jpg)*
 
-The advantage is a globally consistent zone numbering, which makes cross-border data easy to assemble. The disadvantage is slightly larger distortion at zone edges, so works sitting on a zone boundary need a cross-zone check.
+Zone numbering is globally consistent, so cross-border data assembles easily. Distortion grows slightly at zone edges, so works that sit on a boundary need a cross-zone check.
 
 ## Gauss-Krüger
 
-The standard for Chinese engineering work. It is also transverse Mercator, with two important differences:
+The standard for Chinese engineering work. It is also transverse Mercator, with two differences:
 
 - **Narrower zones**: 3° bands dominate, with 6° bands for small-scale mapping.
 - **Central-meridian scale factor of 1**, so there is no scale reduction at the central meridian.
@@ -85,18 +83,6 @@ This site covers three datums × two band widths:
 | Beijing 1954 | `2422–2442` | `21453–21463` |
 
 Central meridians run from 75°E to 135°E. When picking a band, confirm the central meridian of the data rather than the words "3-degree band".
-
-## Japan Plane Rectangular
-
-Japanese surveying and registration use 19 zones, each with its own origin, a scale factor of 0.9999 and zero false easting and northing.
-
-| Datum | Zones I–XIX EPSG |
-|---|---|
-| JGD2011 | `6669–6687` |
-| JGD2000 | `2443–2461` |
-| Tokyo | `30161–30179` |
-
-One quirk: **the axis order is X = north, Y = east**, the reverse of the usual X = east, Y = north. The converter on this site labels fields as "north (X) / east (Y)" according to the coordinate system so they are not swapped.
 
 ## British National Grid (EPSG:27700)
 
@@ -138,7 +124,7 @@ A compromise projection: neither conformal nor equal-area, but with moderate err
 
 *Image: Strebe, CC BY-SA 3.0, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Robinson_projection_SW.jpg)*
 
-The rule for choosing among them is unchanged: decide first what must be preserved — angles, area, or distance from one point.
+The rule for choosing among them is the same: decide first what must be preserved, whether angles, area, or distance from one point.
 
 ## Same projection, different datum
 
@@ -147,8 +133,6 @@ With identical projection parameters, different datums shift coordinates by tens
 - **CGCS2000 and WGS84**: centimetre-level in practice, effectively interchangeable.
 - **Xian 1980**: no official seven-parameter transform is published, so this site will not silently treat it as WGS84; you must supply the parameters.
 - **Beijing 1954**: Krassovsky ellipsoid, hundreds of metres from WGS84.
-- **Tokyo (Bessel ellipsoid)**: hundreds of metres from JGD2011; Japan moved to JGD2011 after the 2011 earthquake.
-- **JGD2000 and JGD2011**: the Tōhoku earthquake shifted the datum, so the two differ by tens of centimetres in eastern Japan.
 
 This is why, when a conversion is off by tens of metres, you check the datum before the projection parameters.
 
@@ -160,7 +144,6 @@ This is why, when a conversion is off by tens of metres, you check the datum bef
 | Building a web map | `EPSG:3857` |
 | Measuring distance or area in China | CGCS2000 3° band, chosen by central meridian |
 | Cross-border or continental works | UTM, chosen by longitude |
-| Japanese surveying or registration | JGD2011 Plane Rectangular, by prefecture zone |
 | UK addresses and planning | `EPSG:27700` |
 | Just seeing where a point is | Anything, but do not compute with it |
 
@@ -168,6 +151,6 @@ This is why, when a conversion is off by tens of metres, you check the datum bef
 
 1. **Confirm the zone and central meridian together**. "3-degree band" alone is not enough; state the zone number or the central meridian.
 2. **Do not force a cross-zone conversion**. Edge distortion grows noticeably when data spans two bands; split by zone or use a projection with wider coverage.
-3. **Axis order and units follow the coordinate system**. Japan Plane Rectangular is X = north; projected coordinates are in metres while geographic coordinates are in degrees.
+3. **Axis order and units follow the coordinate system**. Projected coordinates are X = easting, Y = northing; units are metres, while geographic coordinates are in degrees.
 
 For the underlying theory and how to choose, see [map projections and EPSG](/en/guide/projections-epsg/); for actual conversion use the [projection converter](/en/tools/epsg-convert/).

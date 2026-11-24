@@ -1,6 +1,6 @@
 ---
 title: 'MVT Vector Tile Decoder - PBF and Base64 | GeoToolbox'
-description: 'Decode a .pbf or .mvt vector tile or a base64 string: inspect layers, version, extent, attributes and geometry, convert to WGS84 with z/x/y, and export GeoJSON locally.'
+description: 'Decode a .pbf or .mvt vector tile or a base64 string: inspect layers, attributes and geometry, convert to WGS84 from z/x/y, and export GeoJSON.'
 updated: 2026-11-18
 faq:
   - q: 'Why do I need z/x/y to get longitude and latitude?'
@@ -15,7 +15,7 @@ faq:
     a: 'No. Files are read into memory through the browser File API and base64 is decoded in the page. There are no network requests, and a refresh clears everything.'
 ---
 
-MVT (Mapbox Vector Tile) is the de facto standard for vector tiles. Instead of a rendered image, the client receives a compact binary containing several layers, each with features, attributes and geometry encoded as integers. This tool turns that binary back into readable layer structure and GeoJSON, which helps when debugging tile services, verifying exports, or feeding tile content into another pipeline.
+MVT (Mapbox Vector Tile) is the de facto standard for vector tiles. Instead of a rendered image, the client receives a compact binary holding several layers, each with features, attributes and geometry encoded as integers. This tool decodes that binary back into readable layer structure and GeoJSON.
 
 ## Inputs
 
@@ -53,20 +53,20 @@ Below the table you get a GeoJSON preview and any warnings. The preview shows th
 
 The decoder is written from scratch instead of pulling in a protobuf runtime, which keeps every error under control:
 
-- **protobuf layer**: only the varint and length-delimited wire types are handled, and unknown fields are skipped by wire type, so newer encoders stay compatible;
-- **geometry commands**: `MoveTo(1)`, `LineTo(2)`, `ClosePath(7)`, with zigzag-encoded deltas accumulated into absolute coordinates;
-- **multi-part geometry**: consecutive `MoveTo` commands start new lines or rings; a point `MoveTo` with a larger count becomes `MultiPoint`;
-- **polygons and holes**: rings are separated by signed area. The spec puts exterior rings clockwise in screen space, but a few encoders reverse that, so the decoder adapts to the majority direction and then normalises to GeoJSON winding;
-- **tolerance**: rings without `ClosePath` are closed with a warning, while unknown geometry types, broken commands and odd tag counts are counted instead of aborting the whole tile.
+- Only the varint and length-delimited protobuf wire types are handled, and unknown fields are skipped by wire type, so newer encoders stay compatible;
+- Geometry commands are `MoveTo(1)`, `LineTo(2)` and `ClosePath(7)`, with zigzag-encoded deltas accumulated into absolute coordinates;
+- Consecutive `MoveTo` commands start new lines or rings. A point `MoveTo` with a larger count becomes `MultiPoint`;
+- Rings are separated by signed area. The spec puts exterior rings clockwise in screen space, but a few encoders reverse that, so the decoder follows the majority direction and then normalises to GeoJSON winding;
+- Rings without `ClosePath` are closed with a warning. Unknown geometry types, broken commands and odd tag counts are counted instead of aborting the whole tile.
 
 Layer version, extent and value types follow the Mapbox Vector Tile 2.x specification. MVT has no `srsName` concept, so no reprojection is attempted.
 
 ## Typical uses
 
-- **Debug a tile service**: when a road is missing, check whether it exists in the tile, which layer it belongs to and what its attributes say;
-- **Verify an export**: compare a self-built tile pipeline output against the source data;
-- **Extract a sample**: convert one tile to GeoJSON and open it in QGIS or the site's preview tool;
-- **Learn the format**: see the actual layer structure and geometry encoding instead of only reading the spec.
+- A road is missing: check whether it exists in the tile, which layer it belongs to, and what its attributes say;
+- Compare a self-built tile pipeline output against the source data;
+- Convert one tile to GeoJSON and open it in QGIS or the site's preview tool;
+- Read the actual layer structure and geometry encoding instead of only the spec.
 
 ## Limits
 

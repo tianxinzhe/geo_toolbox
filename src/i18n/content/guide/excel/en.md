@@ -1,6 +1,6 @@
 ---
-title: "Excel (XLSX / XLS) for coordinates: structure and traps | GeoToolbox"
-description: The ZIP + XML structure of XLSX, how legacy XLS differs, and why date serial numbers, scientific notation, leading zeros, formulas and merged cells corrupt coordinate data.
+title: 'Excel coordinate traps: XLSX and XLS | GeoToolbox'
+description: 'The ZIP + XML structure of XLSX, how legacy XLS differs, and why date serials, scientific notation, leading zeros or merged cells corrupt coordinates.'
 heading: Excel (XLSX / XLS) coordinate data
 group: vector
 order: 9
@@ -8,9 +8,9 @@ readingMinutes: 6
 updated: 2026-11-23
 ---
 
-Excel is the most common source of coordinate data and the least suitable format for programmatic exchange. It is convenient for people to edit, and it quietly changes values while saving and displaying them.
+Excel is where most coordinate data starts, and about the worst format to move it programmatically. It is pleasant to edit, and it quietly changes values while saving and displaying them.
 
-Nothing is broken in Excel itself. The trouble is that it separates display from storage: a cell may hold a number and display a date, hold a formula and cache an old result, or sit inside a merged range where only the top-left cell has a value. A program reads the storage layer while a person sees the display layer, and when the two disagree the sheet still looks perfectly normal.
+Nothing in Excel is broken. The trouble is that it separates display from storage: a cell may hold a number and display a date, hold a formula and cache an old result, or sit inside a merged range where only the top-left cell has a value. A program reads the storage layer while a person sees the display layer, and when the two disagree the sheet still looks perfectly normal.
 
 ## What is inside an XLSX
 
@@ -121,7 +121,7 @@ Two further habits help: convert formula columns to values before delivery, and 
 | GeoJSON | JSON text | points, lines, polygons | WGS84 by default | web maps, APIs |
 | GeoPackage | SQLite database | points, lines, polygons, many layers | SRS table | GIS projects, offline data |
 
-Excel wins on editing: colour, comments, frozen panes and side-by-side sheets have no equivalent in plain text. It loses on exchange: a binary container, hidden formatting and the gap between formula and display can each make a program read something different from what a person sees. CSV is steadier for long-term storage and machine reading; GeoJSON or GeoPackage is better once geometry and a CRS matter.
+Excel is the better place to edit. Colour, comments, frozen panes and side-by-side sheets have no equivalent in plain text. It is the worse place to exchange data: a binary container, hidden formatting and the gap between formula and display can each make a program read something different from what a person sees. CSV holds up better for long-term storage and machine reading; GeoJSON or GeoPackage is better once geometry and a CRS matter.
 
 ## Converting and tools
 

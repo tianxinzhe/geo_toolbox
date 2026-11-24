@@ -49,8 +49,7 @@ type Mode = 'circle' | 'buffer'
 
 const DEFAULT_CENTER: Record<Lang, [number, number]> = {
   zh: [39.9088, 116.3974],
-  en: [51.5072, -0.1276],
-  ja: [35.6812, 139.7671]
+  en: [51.5072, -0.1276]
 }
 
 const mode = ref<Mode>('circle')

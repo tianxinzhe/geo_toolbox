@@ -1,12 +1,12 @@
 ---
 title: 'Contact | GeoToolbox'
-description: 'How to contact GeoToolbox by email or GitHub Issues: report a wrong calculation, suggest a tool, ask about the privacy policy or point out an error in the documentation. Includes bug report guidance.'
+description: 'How to reach GeoToolbox by email or GitHub Issues: report a wrong calculation, suggest a tool, or flag an error in the documentation.'
 updated: 2026-11-23
 ---
 
 ## When it is worth contacting us
 
-This site has no comment section and no user accounts. The email address at the top of this page and [GitHub Issues](https://github.com/tianxinzhe/geo_toolbox/issues) are the two direct channels. Please put the feedback type in the subject line (for example "Wrong result · Coordinate conversion"); reproducible calculation errors and feature requests can also be filed as an issue so they can be tracked. Anything involving personal data, sensitive coordinates or material you would rather not publish should go by email only — do not paste it into an issue.
+This site has no comment section and no user accounts. The email address at the top of this page and [GitHub Issues](https://github.com/tianxinzhe/geo_toolbox/issues) are the two direct channels. Please put the feedback type in the subject line (for example "Wrong result · Coordinate conversion"); reproducible calculation errors and feature requests can also be filed as an issue so they can be tracked. Anything involving personal data, sensitive coordinates or material you would rather not publish should go by email only. Do not paste it into an issue.
 
 The categories below are the most useful, ordered by how quickly they get handled:
 
@@ -33,7 +33,7 @@ One reproducible example is worth more than ten paragraphs of description.
 
 ## What we cannot do
 
-To avoid wasting your time and ours, there are several requests this site cannot fulfil:
+A few requests this site cannot fulfil, so you do not waste your time:
 
 - **Processing data on your behalf** — there is no backend, so we cannot run jobs for you, and please do not send data files by email. All computation happens in your browser. For large datasets, use a tool's batch mode and run it locally
 - **Providing legally binding survey output** — cadastral work, land registration and construction setting-out require certified tooling and a qualified workflow. This site issues no certification of any kind
@@ -42,7 +42,7 @@ To avoid wasting your time and ours, there are several requests this site cannot
 
 ## Response times
 
-This is a side project with no support team, so no response-time guarantee is possible. In practice:
+This is a side project with no support team, so response times cannot be guaranteed. In practice:
 
 - **Wrong calculations** are handled first, usually with a reply or a fix within a few days
 - **Everything else** is processed in the order it arrives and may take longer
@@ -52,4 +52,4 @@ If your report concerns a security issue — for example, an input that causes d
 
 ## Reusing content
 
-Documentation from this site may be republished provided the source is credited and a link back to the original page is included. The tools themselves are static pages built on an open-source stack, and you are welcome to deploy your own copy locally — but note that use of coordinate system and projection algorithms must comply with local regulations.
+Documentation from this site may be republished provided the source is credited and a link back to the original page is included. The tools themselves are static pages built on an open-source stack, and you are welcome to deploy your own copy locally, but note that use of coordinate system and projection algorithms must comply with local regulations.

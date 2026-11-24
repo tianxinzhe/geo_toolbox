@@ -1,6 +1,6 @@
 ---
-title: "MIF/MID explained: geometry and attribute in two files | GeoToolbox"
-description: The Version, Charset, Columns and Data structure of MIF, the Point, Line and Region geometry keywords, how MID rows pair up, and the encoding and CRS limits.
+title: 'MIF/MID explained: geometry and attributes | GeoToolbox'
+description: 'MIF Version, Charset, Columns and Data structure, the Point, Line and Region keywords, how MID rows pair up, and its encoding and CRS limits.'
 heading: "MIF/MID explained: geometry and attribute in two files"
 group: vector
 order: 17
@@ -12,7 +12,7 @@ MIF/MID is MapInfo's exchange format, made of two files: `.mif` holds geometry a
 
 MapInfo Professional has used the pair since the 1990s to export and exchange layers. It still shows up in surveying, cadastral, telecom network and retail site-selection workflows. GDAL reads and writes it through the MITAB driver, and QGIS opens it directly. Because both files are plain text, a text editor is often enough to inspect a suspicious file and compare two exports.
 
-One layer is one pair. The first part of the `.mif` file is a header; the rest is a sequence of geometry objects. The `.mid` file has no header row, and each of its lines corresponds to one object in the `.mif` file. Once the header-plus-objects layout and the row alignment are clear, the rest of the format follows.
+One layer is one pair. The first part of the `.mif` file is a header; the rest is a sequence of geometry objects. The `.mid` file has no header row, and each of its lines corresponds to one object in the `.mif` file. Two rules explain most of the format: a header plus objects in the `.mif`, rows aligned by order in the `.mid`.
 
 ## Minimal example
 
@@ -84,19 +84,19 @@ A `.mif` header may contain a `CoordSys` clause. Geographic data commonly appear
 
 ## Common mistakes and pitfalls
 
-**Non-ASCII attributes turn into question marks or boxes.** The symptom is `???` or mojibake in a name column while geometry looks fine. The cause is a `Charset` declaration that does not match the bytes, for example a UTF-8 file still marked `WindowsLatin1`, which the reader decodes as declared. The consequence is unreadable attributes: joins, filters and labels based on names all fail, while the geometry survives and makes the file look healthy. Align the declaration with the actual encoding, or specify the source encoding when reading.
+**Non-ASCII attributes turn into question marks or boxes.** A name column shows `???` or mojibake while the geometry looks fine. The cause is a `Charset` declaration that does not match the bytes, such as a UTF-8 file still marked `WindowsLatin1`, which the reader then decodes as declared. Joins, filters and labels built on names then fail, while the geometry survives and makes the file look healthy. Align the declaration with the actual encoding, or specify the source encoding when reading.
 
 **Every attribute is off by one row.** The first feature looks correct, then each later feature receives the next feature's attributes. The cause is an extra blank line, a deleted row, or an interrupted export in the MID file. The consequence is silent, systematic mislabelling that survives visual inspection and corrupts every statistic. Count MIF objects against non-empty MID rows before trusting the file.
 
-**The delimiter does not match the file.** The symptom is the whole row collapsing into the first column, with later columns empty and numeric fields turning into text. The cause is a header that says `Delimiter ","` while the MID file uses semicolons, tabs or spaces. The consequence is shifted fields and failed type conversion for any reader that addresses columns by position. Normalise the delimiter or rewrite the file before parsing.
+**The delimiter does not match the file.** Every row collapses into the first column, later columns sit empty, and numeric fields turn into text. The header says `Delimiter ","` while the MID file uses semicolons, tabs or spaces. Fields shift, and type conversion fails for any reader that addresses columns by position. Normalise the delimiter or rewrite the file before parsing.
 
-**Projected coordinates are treated as degrees.** Points pile up near the origin, or coordinate values reach hundreds of thousands or millions. The cause is that MIF stores bare `x y` numbers and leaves the unit to `CoordSys`; without a declaration the reader cannot tell metres from degrees. The consequence is an empty map or a layer displaced to the wrong part of the world. Confirm the projection with the data provider and reproject to WGS84 before conversion when needed.
+**Projected coordinates are treated as degrees.** Points pile up near the origin, or coordinate values reach hundreds of thousands or millions. MIF stores bare `x y` numbers and leaves the unit to `CoordSys`; without a declaration the reader cannot tell metres from degrees. The result is an empty map, or a layer displaced to the wrong part of the world. Confirm the projection with the data provider and reproject to WGS84 before conversion when needed.
 
 **The section or point counts in a `Region` or `Pline` are wrong.** Parsing fails halfway, or the objects after the broken one vanish. The cause is the counts: the number after `Region` is the section count, and each section starts with its own point count; one missing number makes the reader treat the next keyword as a number. The consequence is truncated geometry followed by shifted attributes. Check the "section count, point count, coordinate lines" levels one by one.
 
-**Only the `.mif` file is delivered.** The recipient sees shapes but no attribute table. The cause is a missing `.mid` file. The consequence is a silent loss of every name, identifier and category. Pack the two same-named files together, or export to a single-file format.
+**Only the `.mif` file is delivered.** The recipient sees shapes but no attribute table. The `.mid` file is missing. Every name, identifier and category is lost without a warning. Pack the two same-named files together, or export to a single-file format.
 
-**A BOM or blank line precedes the header.** Some readers report that the first line is not `Version`. The cause is a UTF-8 BOM or an empty line added by an editor. The consequence is a file that cannot be parsed at all. Save as UTF-8 without a BOM and keep `Version` on the first line.
+**A BOM or blank line precedes the header.** Some readers report that the first line is not `Version`. Either a UTF-8 BOM or an empty line added by an editor sits in front of it. The file then cannot be parsed at all. Save as UTF-8 without a BOM and keep `Version` on the first line.
 
 ## Comparison with neighbouring formats
 

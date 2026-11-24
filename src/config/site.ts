@@ -12,15 +12,13 @@ export const site = {
   /** 站名，各语言自称。`<title>` 模板：{核心关键词} - {补充说明} | {站名} */
   name: {
     zh: '地理工具箱',
-    en: 'GeoToolbox',
-    ja: 'ジオツールボックス'
+    en: 'GeoToolbox'
   },
 
   /** 一句话定位，用于首页与 og:description */
   tagline: {
-    zh: '15 个地理信息小工具，全部在浏览器本地计算，数据不上传',
-    en: '15 geospatial utilities. Everything runs locally in your browser.',
-    ja: '15 の地理情報ツール。すべてブラウザ内で計算、データは送信されません'
+    zh: '15 个地理信息小工具，计算都在浏览器里完成，数据不上传',
+    en: '15 geospatial tools. All calculations run in your browser; nothing is uploaded.'
   },
 
   /**

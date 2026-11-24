@@ -1,6 +1,6 @@
 ---
-title: "GML explained: OGC XML features and axis order | GeoToolbox"
-description: How GML structures FeatureCollection, featureMember, gml:pos and srsName, the namespace rules, the EPSG:4326 axis-order ambiguity, and why GML files are so large.
+title: 'GML explained: XML features and axis order | GeoToolbox'
+description: 'How GML structures features, gml:pos and srsName, the namespace rules, the EPSG:4326 axis-order ambiguity, and why GML files are large.'
 heading: "GML explained: OGC XML features and axis order"
 group: vector
 order: 11
@@ -39,7 +39,7 @@ A file may also use `gml:featureMembers` to wrap several features at once and av
 
 ## Structure and fields
 
-GML is a family of XML schemas, not one fixed document layout. Real files follow an application schema and use only part of the vocabulary. The table lists the parts a generic parser meets most often.
+GML is a family of XML schemas, not one fixed document layout. Real files follow an application schema and use only part of the vocabulary. A generic parser mostly meets the parts below.
 
 | Element or attribute | Required | Common values or units |
 | --- | --- | --- |
@@ -61,16 +61,16 @@ Because GML is an encoding rather than one dataset format, two files that both v
 
 The official axis order of EPSG:4326 puts **latitude first**, yet many real files write longitude first. `srsName` alone cannot tell you which, so check the value ranges (longitude is usually -180 to 180, latitude -90 to 90) and ask the data provider.
 
-The problem is more visible in GML than in other formats because GML follows the CRS definition strictly, while desktop tools and hand-written files usually put longitude first. In China the ranges are distinct enough to guess, but data near the equator or the prime meridian can look plausible either way, leaving the data description or a known landmark as the only reliable check.
+The problem shows up more often in GML than elsewhere because GML follows the CRS definition strictly, while desktop tools and hand-written files usually put longitude first. In China the ranges are distinct enough to guess, but data near the equator or the prime meridian can look plausible either way, leaving the data description or a known landmark as the only reliable check.
 
 ## Common mistakes and pitfalls
 
-- **Missing namespace or mismatched prefix**: the parser reports an unbound prefix or cannot find the element; `xmlns:gml` was never declared, or the file uses `gml2:` while the reader looks for `gml:`; the whole document fails to parse.
-- **Mixed GML versions**: schema validation fails or geometry elements are not recognised; the file declares the GML 3.2 namespace but uses a 2.x structure; strict validation rejects it, while lenient parsers silently drop parts.
-- **Wrong axis-order assumption**: features are shifted or flipped; the official axis order was mistaken for the written order; positions are wrong without any error, and spatial queries and overlays become unreliable.
-- **Bad `posList` separator**: the coordinate count does not add up or numbers fail to parse; commas were used between tuples; lines and polygons become misaligned and may even span the whole map.
-- **Namespace prefixes left on attributes**: converted field names look like `app:name`; the raw tag was copied unchanged; downstream lookups for `name` all return nothing.
-- **Non-4326 coordinates left unprojected**: everything falls outside the map extent; the tool was assumed to reproject from `srsName`; the data must be reprojected and any derived output rebuilt.
+- **Missing namespace or mismatched prefix.** The parser reports an unbound prefix or cannot find the element. Either `xmlns:gml` was never declared, or the file uses `gml2:` while the reader looks for `gml:`. The whole document fails to parse.
+- **Mixed GML versions.** Schema validation fails, or geometry elements go unrecognised. The file declares the GML 3.2 namespace but uses a 2.x structure. Strict validation rejects it; lenient parsers silently drop parts.
+- **Wrong axis-order assumption.** Features come out shifted or flipped. The official axis order was confused with the order actually written, and nothing warns you. Positions are wrong, so spatial queries and overlays cannot be trusted.
+- **Bad `posList` separator.** The coordinate count does not add up, or numbers fail to parse. Commas between tuples cause it. Lines and polygons become misaligned and may even span the whole map.
+- **Namespace prefixes left on attributes.** Converted field names look like `app:name` because the raw tag was copied unchanged. Any downstream lookup for `name` returns nothing.
+- **Non-4326 coordinates left unprojected.** Everything falls outside the map extent. The tool was assumed to reproject from `srsName`, and it does not. Reproject the data and rebuild any derived output.
 
 ## Limits
 

@@ -1,6 +1,6 @@
 ---
-title: "Shapefile explained: the multi-file format and its limits | GeoToolbox"
-description: What .shp, .shx, .dbf, .prj and .cpg each do, the 2 GB ceiling, 10-character field names and single geometry type, and how to package a Shapefile correctly.
+title: 'Shapefile explained: multi-file limits | GeoToolbox'
+description: 'What .shp, .shx, .dbf, .prj and .cpg each do, the 2 GB ceiling, 10-character field names, single geometry type, and how to package one.'
 heading: "Shapefile explained: the multi-file format and its limits"
 group: vector
 order: 12
@@ -77,17 +77,17 @@ None of this is a bug in a particular implementation; the constraints are part o
 
 ## Common errors and traps
 
-**Sending only the `.shp`**: the file opens without attributes, or the software errors out; the cause is that `.dbf` and `.shx` were left behind; the result is unusable data and a second delivery.
+**Sending only the `.shp`**: the file opens with no attributes, or the software errors out. The `.dbf` and `.shx` were left behind. You get unusable data and have to deliver it a second time.
 
-**Non-ASCII text turns into mojibake**: characters appear as question marks or boxes; the cause is that `.dbf` stores bytes in a code page while `.cpg` is missing or names the wrong encoding; the result is unreadable attributes and broken filtering, joins and exports, usually with no way to recover the original encoding from the file.
+**Non-ASCII text turns into mojibake**: characters show up as question marks or boxes. `.dbf` stores bytes in a code page, and `.cpg` is missing or names the wrong encoding. Attributes become unreadable, filtering, joins and exports break, and the original encoding usually cannot be recovered from the file.
 
-**Field names become `NAME_1` or `FIELD_2`**: long or non-ASCII names are replaced; the cause is the 10-character limit together with ASCII-only names in older implementations; the result is lost meaning and joins that need remapping.
+**Field names become `NAME_1` or `FIELD_2`**: long or non-ASCII names get replaced. The 10-character limit is part of it, and older implementations also accept ASCII only. Meaning is lost, and joins need remapping.
 
-**Points, lines and polygons in one layer**: only some features appear after import, or empty geometries show up; the cause is that effective features in one `.shp` must share a geometry type — the spec allows Null records, but most software will not split the types for you; the result is incomplete data that has to be divided into separate files.
+**Points, lines and polygons in one layer**: only some features appear after import, or empty geometries show up. Features in one `.shp` must share a geometry type. The spec does allow Null records, but most software will not split the types for you, so the data has to be divided into separate files.
 
-**Features land millions of metres off the map**: the extent does not match the basemap; the cause is a missing or wrong `.prj`, or data that is really in engineering coordinates; the result is that nothing overlays and the CRS must be confirmed before reprojection.
+**Features land millions of metres off the map**: the extent does not match the basemap. Either `.prj` is missing or wrong, or the data is really in engineering coordinates. Nothing overlays, and the CRS has to be confirmed before reprojection.
 
-**Writing fails halfway or the file is corrupt**: everything after a certain feature is lost; the cause is the 32-bit offsets and the 2 GB per-file ceiling; the result is that the remainder cannot be written and the data has to be split by extent or feature count.
+**Writing fails halfway or the file is corrupt**: everything after a certain feature is lost. The 32-bit offsets and the 2 GB per-file ceiling cause it. The remainder cannot be written, and the data has to be split by extent or feature count.
 
 ## Comparison with nearby formats
 

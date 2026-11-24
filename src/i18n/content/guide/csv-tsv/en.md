@@ -1,6 +1,6 @@
 ---
 title: "CSV and TSV for coordinates: layout and traps | GeoToolbox"
-description: Two ways to arrange longitude and latitude in CSV / TSV, when to use a WKT column, encoding and delimiter traps, and why spreadsheets are the most error-prone geodata format.
+description: 'Two ways to lay out longitude and latitude in CSV/TSV, when to use a WKT column, and the encoding and delimiter traps that break spreadsheets.'
 heading: CSV and TSV for coordinates
 group: vector
 order: 8
@@ -8,9 +8,9 @@ readingMinutes: 6
 updated: 2026-11-23
 ---
 
-CSV and TSV are ordinary tabular text, and the most error-prone way to deliver geodata: there is no CRS declaration and no geometry type, so everything depends on column names and convention.
+CSV and TSV are ordinary tabular text, and the most error-prone way to deliver geodata. Neither declares a CRS or a geometry type, so everything depends on column names and convention.
 
-CSV syntax has RFC 4180 to point at; TSV has only an IANA media type and long-standing habit, and neither says anything about geography. Whether a table becomes a map depends on three facts stated outside the file: which coordinate system applies, which two columns hold coordinates, and whether the geometry is a point or a WKT string. None of these makes the file unreadable. They make it wrong quietly.
+CSV syntax has RFC 4180 to point at. TSV has only an IANA media type and long-standing habit, and neither says anything about geography. Three facts stated outside the file decide whether a table becomes a map: which coordinate system applies, which two columns hold coordinates, and whether the geometry is a point or a WKT string. Get any of them wrong and the file still opens fine. It just goes wrong quietly.
 
 ## Minimal example: two layouts
 
@@ -22,7 +22,7 @@ Tiananmen,116.3974,39.9088,landmark
 Forbidden City,116.3970,39.9163,landmark
 ```
 
-This is the least demanding layout: any spreadsheet opens it and any language reads it. The cost is that it only carries points — one row per point, nowhere to put a line, a polygon or a geometry type. A header of `lng,lat` is much clearer than `x,y`, because x may mean longitude or a projected easting depending on the tool. The file records no EPSG code, so the delivery note has to say "WGS84 longitude and latitude, longitude first".
+It is the least demanding layout: any spreadsheet opens it and any language reads it. What it cannot do is carry anything but points. One row per point, and nowhere to put a line, a polygon or a geometry type. A header of `lng,lat` is much clearer than `x,y`, because x may mean longitude or a projected easting depending on the tool. The file records no EPSG code, so the delivery note has to say "WGS84 longitude and latitude, longitude first".
 
 **One WKT geometry column plus attributes**, for mixed geometry:
 
@@ -44,7 +44,7 @@ Tiananmen	116.3974	39.9088
 Forbidden City	116.3970	39.9163
 ```
 
-The cost is that a literal tab cannot appear in a field, and copy-paste often replaces tabs with spaces. TSV also has no widely implemented escape convention of the CSV kind: when a field really does contain a tab or a newline, parsers disagree about what to do. It suits machine-written, machine-read files better than data pasted through a chat window.
+The catch is that a literal tab cannot appear in a field, and copy-paste often turns tabs into spaces. TSV also has no widely implemented escape convention of the CSV kind: when a field really does contain a tab or a newline, parsers disagree about what to do. It suits machine-written, machine-read files better than data pasted through a chat window.
 
 ## Structure and fields
 
@@ -58,7 +58,7 @@ The cost is that a literal tab cannot appear in a field, and copy-paste often re
 | Encoding | not specified; UTF-8 dominates in practice | required, often ignored | UTF-8, UTF-8 BOM, GBK |
 | CRS | no such field exists | cannot be stored | state EPSG:4326 separately |
 
-A few details are worth remembering separately. RFC 4180 allows the final record to end with or without a line break, so one trailing newline is not an error; two in a row, however, form an empty record, and whether it is skipped is up to the reader. Leading and trailing spaces belong to the field; the specification does not ask parsers to strip them, so ` 116.3974` needs trimming. A newline inside quotes is legal, so one record can span several lines and line count is not a reliable record count. Numbers have no type here: `116.3974` and `"116.3974"` are both text, and the reader decides whether to interpret them as numeric.
+A few details deserve their own note. RFC 4180 allows the final record to end with or without a line break, so one trailing newline is not an error; two in a row, however, form an empty record, and whether it is skipped is up to the reader. Leading and trailing spaces belong to the field; the specification does not ask parsers to strip them, so ` 116.3974` needs trimming. A newline inside quotes is legal, so one record can span several lines and line count is not a reliable record count. Numbers have no type here: `116.3974` and `"116.3974"` are both text, and the reader decides whether to interpret them as numeric.
 
 Encoding is outside RFC 4180. The registered `text/csv` type accepts a `charset` parameter, but when the file does not declare one the reader has to guess. UTF-8 and GBK disagree about the same bytes, and Chinese headers and labels are where it shows first.
 
@@ -121,7 +121,7 @@ Encoding is outside RFC 4180. The registered `text/csv` type accepts a `charset`
 | WKT text | points, lines, polygons, one per line | none | optional SRID prefix | pasting a single geometry |
 | GeoJSON | points, lines, polygons | yes | WGS84 by default | web maps, APIs |
 
-Tables win on universality: databases, spreadsheets and scripts all read them. They lose on meaning, because they describe values and not intent. When geometry types, a declared CRS and nested attributes matter, GeoJSON is the better container; when the task is to describe one geometry, WKT is shorter; when a person must check every cell before delivery, Excel is easier, but it is not an interchange format.
+Tables are universal: databases, spreadsheets and scripts all read them. What they do not carry is intent. They describe values, not what those values are supposed to mean. When geometry types, a declared CRS and nested attributes matter, GeoJSON is the better container; when the task is to describe one geometry, WKT is shorter; when a person must check every cell before delivery, Excel is easier, but it is not an interchange format.
 
 ## Converting and tools
 

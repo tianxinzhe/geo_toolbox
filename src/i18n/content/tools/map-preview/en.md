@@ -1,6 +1,6 @@
 ---
 title: 'Map Preview — View local vector data on a map | GeoToolbox'
-description: 'Choose a GeoJSON, KML, GPX, Shapefile or Excel file and see it on a map instantly. Formats are detected automatically, can be picked manually, and files never leave your browser.'
+description: 'Choose a GeoJSON, KML, GPX, Shapefile or Excel file and see it on a map. Formats are detected automatically and files never leave your browser.'
 updated: 2026-11-10
 faq:
   - q: 'Is my data uploaded to a server?'
@@ -13,9 +13,9 @@ faq:
 
 ## What this tool solves
 
-You have a GeoJSON, KML, GPX, or a spreadsheet of coordinates exported from another system, and you want to know where it actually lands on the ground. The usual route is a desktop GIS install or an online service that wants an account and an upload. This tool makes it one step: choose a file, look at the map.
+You have a GeoJSON, KML, GPX or a spreadsheet of coordinates exported from another system, and you want to know where it actually lands on the ground. The usual route is a desktop GIS install, or an online service that wants an account and an upload. Here it is one step: choose a file, look at the map.
 
-The file is read once in the browser, normalised to GeoJSON, and handed to the map renderer. Nothing is registered, uploaded, or stored, so it is safe for internal or client data that should not leave your machine.
+The file is read once in the browser, normalised to GeoJSON, then handed to the map renderer. Nothing is registered, uploaded or stored, so internal or client data that should not leave your machine is safe.
 
 ## Supported formats
 
@@ -31,13 +31,13 @@ The file is read once in the browser, normalised to GeoJSON, and handed to the m
 | WKT / GML | `.wkt` `.gml` | Text geometry and the OGC exchange format |
 | DXF / MIF / MID / GMT | `.dxf` `.mif` `.mid` `.gmt` | Common CAD and desktop GIS exports |
 
-Leaflet only renders GeoJSON, so everything except GeoJSON is parsed and converted to GeoJSON in the page with JavaScript before drawing. There is no need to run the format converter first.
+Leaflet only renders GeoJSON. Everything else is parsed and converted to GeoJSON in the page with JavaScript before drawing, so you don't need to run the format converter first.
 
 ## Detection and manual override
 
 After you choose a file, the tool looks at the content (JSON structure, XML root element, CSV header) together with the extension. Most files are recognised immediately.
 
-When the content is ambiguous — no extension, a renamed file, or a bare list of coordinates without headers — the page says it cannot recognise the format. Pick the right entry in the “File format” list on the left and the tool parses the same file again with that format; there is no need to choose the file twice.
+When the content is ambiguous (no extension, a renamed file, or a bare list of coordinates without headers), the page says it cannot recognise the format. Pick the right entry in the “File format” list on the left and the tool parses the same file again. You do not have to choose the file twice.
 
 Choosing the wrong format usually ends in a parse error, or in coordinates that fall outside the valid longitude/latitude range. The second case often means the file holds projected coordinates rather than degrees.
 

@@ -1,6 +1,6 @@
 ---
-title: 'Merge Layers — Combine vector files into one layer | GeoToolbox'
-description: 'Select several GeoJSON, KML, Shapefile or GeoPackage files, choose a layer for multi-layer containers, merge features while keeping attributes, review geometry counts and export GeoJSON locally.'
+title: 'Merge Layers — Combine vector files | GeoToolbox'
+description: 'Select several GeoJSON, KML, Shapefile or GeoPackage files, choose a layer in multi-layer containers, merge features and export GeoJSON locally.'
 updated: 2026-11-13
 faq:
   - q: 'How is merging different from dissolve?'
@@ -13,11 +13,11 @@ faq:
 
 ## What this tool solves
 
-Data that was split by district, month or map sheet usually needs to become one complete layer at the end. Desktop GIS calls this Merge or Append, and a database calls it UNION ALL. Joining files by hand is slow and easy to get wrong.
+Data that was split by district, month or map sheet usually needs to become one complete layer in the end. Desktop GIS calls this Merge or Append, and a database calls it UNION ALL. Joining files by hand is slow and easy to get wrong.
 
 This tool lets you select several vector files at once, choose a layer for any multi-layer container, and merge everything with one click. The result reports the number of files, the total feature count and the geometry-type distribution, and can be exported as GeoJSON for map preview, attribute joins, clipping or dissolve.
 
-Typical uses include combining parcel layers from several districts into a city-wide layer, merging monthly POI exports into a yearly dataset, stitching contour sheets into one map, collecting KML tracks into a single file, and inspecting layers from different sources that share a similar schema.
+Typical uses: combine parcel layers from several districts into a city-wide layer, merge monthly POI exports into a yearly dataset, stitch contour sheets into one map, or collect KML tracks into a single file. It also helps when layers from different sources share a similar schema.
 
 ## How to use
 
@@ -43,7 +43,7 @@ Files do not need to share a format: GeoJSON, KML, GPX, Shapefile, GeoPackage an
 - A failed file does not block the others: its reason appears on its own card while the remaining files still participate. Common causes are a damaged file, an extension that does not match the content, or an archive with no readable layer.
 - Only features are appended. Fields are not mapped or renamed, so identical names naturally merge into one column and different names stay separate, possibly with many empty values.
 - Shapefile ZIP and GeoPackage are parsed from raw bytes and must be complete. Uploading only a .shp file loses attributes or the coordinate-system declaration.
-- All parsing and merging run locally in the browser. Files are never uploaded and nothing is written to server logs.
+- All parsing and merging run locally in the browser: files are never uploaded, and nothing reaches server logs.
 
 ## Common questions
 

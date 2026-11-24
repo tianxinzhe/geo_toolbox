@@ -1,6 +1,6 @@
 ---
-title: 'GeoHash Encoder and Decoder — Coordinates & Strings | GeoToolbox'
-description: 'Encode latitude and longitude into a GeoHash, or decode a GeoHash into its centre, bounding box, ground size and eight neighbours. Runs locally in your browser.'
+title: 'GeoHash Encoder and Decoder | GeoToolbox'
+description: 'Encode latitude and longitude into a GeoHash, or decode one into its centre, bounding box, size and neighbours. Runs locally in your browser.'
 updated: 2026-11-08
 faq:
   - q: 'Why is a seven-character GeoHash often described as 150 metres?'
@@ -19,9 +19,9 @@ faq:
 
 A GeoHash is a short string that encodes a latitude and longitude using a public, deterministic algorithm. It does not project the coordinates or change what they mean. Instead it repeatedly bisects the surface along longitude and latitude: each bisection records which half the point falls into, and every five bits are mapped to one character from a 32-symbol alphabet. The longitude and latitude bits are interleaved, so each character carries information about both axes.
 
-The useful property is that **a shared prefix means a shared rectangular cell**. A longer string is a smaller cell, and it always extends the shorter string. The point `116.3974, 39.9088` near Tiananmen Square, Beijing, encodes to `wx4g09n` at seven characters; its first five characters `wx4g0` cover a much larger area around the city. Encoding and decoding are deterministic: the same coordinate at the same length always produces the same string.
+The property to remember is simple: a shared prefix means a shared rectangular cell. A longer string is a smaller cell, and it always extends the shorter string. The point `116.3974, 39.9088` near Tiananmen Square, Beijing, encodes to `wx4g09n` at seven characters; its first five characters `wx4g0` cover a much larger area around the city. Encoding and decoding are deterministic: the same coordinate at the same length always produces the same string.
 
-GeoHash is not the only spatial encoding. Google's S2 and Uber's H3 solve a similar problem with different cell shapes: S2 uses spherical cells, H3 uses hexagons, and GeoHash uses latitude-longitude rectangles. GeoHash remains popular because it is easy to implement, short enough for a URL and directly storable in an ordinary text column.
+Other spatial encodings exist. Google's S2 and Uber's H3 solve a similar problem with different cell shapes: S2 uses spherical cells, H3 uses hexagons, and GeoHash uses latitude-longitude rectangles. GeoHash remains popular because it is easy to implement, short enough for a URL and directly storable in an ordinary text column.
 
 ## A prefix is a spatial index
 
@@ -52,7 +52,7 @@ The table below gives the approximate error and cell size for 1 to 12 characters
 
 The exact numbers depend slightly on the implementation and on latitude, but the scale is stable: each extra character shrinks the cell to roughly one quarter or one fifth of its previous width. The precision table in the tool is generated from the same constants as the calculation, and the result area highlights the length currently in use so that the choice between seven and eight characters is not guesswork.
 
-Seven characters are common because they reduce the cell to about 150 metres, close to a city block, while keeping the string at seven characters for URLs, cache keys and log lines. Door-level or device-level work usually needs 9 to 10 characters. Deliberately coarse city-level aggregation or privacy protection often uses 5 to 6 characters so that the cell is too large to identify an individual.
+Seven characters are common: the cell is about 150 metres, close to a city block, and the string stays short enough for URLs, cache keys and log lines. Door-level or device-level work usually needs 9 to 10 characters. Deliberately coarse city-level aggregation or privacy protection often uses 5 to 6 characters so that the cell is too large to identify an individual.
 
 ## The eight neighbours and nearby search
 

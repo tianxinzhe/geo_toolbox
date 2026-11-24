@@ -23,35 +23,31 @@ export type CategoryKey = (typeof CATEGORIES)[number]
 /** 分类显示名与一句话说明 */
 export const CATEGORY_META: Record<CategoryKey, { names: Record<Lang, string>; desc: Record<Lang, string> }> = {
   coordinate: {
-    names: { zh: '坐标与转换', en: 'Coordinates & Conversion', ja: '座標と変換' },
+    names: { zh: '坐标与转换', en: 'Coordinates & Conversion' },
     desc: {
       zh: '经纬度写法转换，以及基准面与投影坐标的换算',
-      en: 'Coordinate notation, datum and projection conversions',
-      ja: '経緯度表記・測地系・投影座標の変換'
+      en: 'Coordinate notation, datum and projection conversions'
     }
   },
   format: {
-    names: { zh: '数据格式', en: 'Data Formats', ja: 'データ形式' },
+    names: { zh: '数据格式', en: 'Data Formats' },
     desc: {
-      zh: 'GeoJSON / KML / GPX / TopoJSON / WKT 的解析与互转',
-      en: 'Parse and convert GeoJSON, KML, GPX, TopoJSON and WKT',
-      ja: 'GeoJSON / KML / GPX / TopoJSON / WKT の変換'
+      zh: 'GeoJSON、KML、GPX、TopoJSON、WKT、CSV 等矢量格式的解析与互转，说明各自的字段结构、坐标顺序与转换时容易丢失的信息，全部在浏览器本地处理。',
+      en: 'Parse and convert GeoJSON, KML, GPX, TopoJSON and WKT'
     }
   },
   encoding: {
-    names: { zh: '空间编码', en: 'Spatial Encoding', ja: '空間エンコーディング' },
+    names: { zh: '空间编码', en: 'Spatial Encoding' },
     desc: {
-      zh: '把坐标压缩成短字符串，便于索引与分享',
-      en: 'Compress coordinates into short indexable strings',
-      ja: '座標を短い文字列に符号化'
+      zh: '把坐标压缩成短字符串，便于索引、分享与口述。说明 GeoHash 与 Plus Codes 的原理、精度分级、适用场景与常见误区，全部在浏览器本地计算。',
+      en: 'Compress coordinates into short indexable strings'
     }
   },
   map: {
-    names: { zh: '地图与可视化', en: 'Map & Visualization', ja: '地図と可視化' },
+    names: { zh: '地图与可视化', en: 'Map & Visualization' },
     desc: {
-      zh: '在地图上绘制要素、生成缓冲区与 XYZ 瓦片坐标',
-      en: 'Draw features, generate buffers and XYZ tile coordinates on a map',
-      ja: '地図上での作図、バッファ生成、XYZ タイル座標の算出'
+      zh: '在地图上绘制要素、生成缓冲区与 XYZ 瓦片坐标，并导出 GeoJSON、KML 等格式。说明画图、量算与瓦片编号的常见问题，全部在浏览器本地完成。',
+      en: 'Draw features on a map, generate buffers and XYZ tile coordinates'
     }
   }
 }
@@ -97,16 +93,14 @@ export const TOOLS: ToolMeta[] = [
     batch: true,
     mobileTier: 'B',
     gps: false,
-    names: { zh: '经纬度格式转换', en: 'DMS ↔ Decimal Degrees', ja: '度分秒 ↔ 10進数' },
+    names: { zh: '经纬度格式转换', en: 'DMS ↔ Decimal Degrees' },
     desc: {
-      zh: '度分秒与十进制度双向互转',
-      en: 'Convert DMS and decimal degrees both ways',
-      ja: '度分秒と10進度の相互変換'
+      zh: '度分秒和十进制度互相换算',
+      en: 'Convert DMS and decimal degrees both ways'
     },
     keywords: {
       all: ['dms', 'decimal', 'degrees', 'minutes', 'seconds', 'lat', 'lon'],
       zh: ['度分秒', '十进制', '经纬度', '分秒', '角度', '格式'],
-      ja: ['度分秒', '10進法', '経度', '緯度', '分', '秒']
     },
     related: [
       'epsg-convert',
@@ -128,16 +122,14 @@ export const TOOLS: ToolMeta[] = [
     batch: true,
     mobileTier: 'C',
     gps: false,
-    names: { zh: '投影坐标转换（EPSG）', en: 'Projected CRS Converter (EPSG)', ja: '投影座標変換（EPSG）' },
+    names: { zh: '投影坐标转换（EPSG）', en: 'Projected CRS Converter (EPSG)' },
     desc: {
-      zh: '按 EPSG 代码在任意坐标系间转换',
-      en: 'Convert between any two EPSG coordinate systems',
-      ja: 'EPSG コードで任意の座標系を変換'
+      zh: '输入 EPSG 代码，在两个坐标系间换算',
+      en: 'Convert between any two EPSG coordinate systems'
     },
     keywords: {
-      all: ['epsg', 'utm', 'crs', 'srs', 'projection', 'proj4', 'wgs84', 'jgd2011', 'cgcs2000'],
-      zh: ['高斯克吕格', '投影带', '西安80', '北京54', '国家2000', '平面直角', '中央子午线'],
-      ja: ['平面直角座標系', '日本測地系2011', 'JGD2011', 'JGD2000', '東京測地系', '系番号', '投影']
+      all: ['epsg', 'utm', 'crs', 'srs', 'projection', 'proj4', 'wgs84', 'cgcs2000'],
+      zh: ['高斯克吕格', '投影带', '西安80', '北京54', '国家2000', '中央子午线']
     },
     related: [
       'dms-decimal',
@@ -159,16 +151,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'C',
     gps: false,
-    names: { zh: '矢量格式转换', en: 'Vector Format Converter', ja: 'ベクター形式変換' },
+    names: { zh: '矢量格式转换', en: 'Vector Format Converter' },
     desc: {
-      zh: 'GeoJSON、KML、GPX、Shapefile、GeoPackage、FlatGeobuf、CSV、Excel、WKT 等十余种格式互转',
-      en: 'Convert GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV, Excel, WKT and more',
-      ja: 'GeoJSON・KML・GPX・Shapefile・GeoPackage・FlatGeobuf・CSV・Excel・WKT など十数形式の相互変換'
+      zh: '十余种格式互转：GeoJSON、KML、GPX、Shapefile、GeoPackage、FlatGeobuf、CSV、Excel、WKT',
+      en: 'Convert GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV, Excel, WKT and more'
     },
     keywords: {
       all: ['geojson', 'kml', 'kmz', 'gpx', 'topojson', 'wkt', 'well-known text', 'shapefile', 'flatgeobuf', 'fgb', 'gpkg', 'geopackage', 'convert', 'vector'],
       zh: ['格式转换', '转', '导出', '奥维', '谷歌地球', '轨迹', '矢量', '几何', '多边形'],
-      ja: ['形式変換', '変換', '書き出し', 'トラック', 'ベクター', 'ジオメトリ', 'ポリゴン']
     },
     related: [
       'map-draw',
@@ -190,16 +180,14 @@ export const TOOLS: ToolMeta[] = [
     batch: true,
     mobileTier: 'C',
     gps: false,
-    names: { zh: 'GeoHash 编解码', en: 'GeoHash Encode / Decode', ja: 'GeoHash 変換' },
+    names: { zh: 'GeoHash 编解码', en: 'GeoHash Encode / Decode' },
     desc: {
-      zh: '坐标与 GeoHash 字符串双向转换',
-      en: 'Encode coordinates to GeoHash and decode back',
-      ja: '座標と GeoHash 文字列の相互変換'
+      zh: '经纬度和 GeoHash 字符串互相转换',
+      en: 'Encode coordinates as GeoHash, or decode one back'
     },
     keywords: {
       all: ['geohash', 'hash', 'encode', 'decode', 'prefix', 'spatial index'],
       zh: ['编码', '解码', '空间索引', '前缀', '网格', '精度'],
-      ja: ['エンコード', 'デコード', '空間索引', '精度', 'メッシュ']
     },
     related: [
       'clip-overlay',
@@ -221,16 +209,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'A',
     gps: true,
-    names: { zh: '在线地图绘制器', en: 'Map Drawing Tool', ja: 'オンライン地図作図' },
+    names: { zh: '在线地图绘制器', en: 'Map Drawing Tool' },
     desc: {
       zh: '在地图上画点线面并导出矢量数据',
-      en: 'Draw points, lines and polygons, then export',
-      ja: '点・線・面を描いてベクターデータを書き出す'
+      en: 'Draw points, lines and polygons, then export'
     },
     keywords: {
       all: ['draw', 'polygon', 'polyline', 'marker', 'geojson', 'kml', 'vertex'],
       zh: ['绘制', '画', '勾画', '地块', '边界', '顶点', '面积', '导出'],
-      ja: ['作図', '描画', '区画', '境界', '頂点', '面積', '書き出し']
     },
     related: [
       'buffer-circle',
@@ -252,16 +238,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'A',
     gps: true,
-    names: { zh: '等距圈与缓冲区', en: 'Buffer & Radius Circles', ja: 'バッファと等距圏' },
+    names: { zh: '等距圈与缓冲区', en: 'Buffer & Radius Circles' },
     desc: {
       zh: '生成指定半径的圆形与缓冲面',
-      en: 'Generate radius circles and buffer polygons',
-      ja: '指定半径の円とバッファ領域を生成'
+      en: 'Generate radius circles and buffer polygons'
     },
     keywords: {
       all: ['buffer', 'circle', 'radius', 'isochrone', 'coverage', 'polygon', 'turf'],
       zh: ['缓冲区', '等距圈', '半径', '覆盖范围', '圆', '公里', '范围'],
-      ja: ['バッファ', '半径', '圏内', 'カバー範囲', '円', 'キロ']
     },
     related: [
       'map-draw',
@@ -285,18 +269,15 @@ export const TOOLS: ToolMeta[] = [
     gps: true,
     names: {
       zh: 'Google 瓦片坐标生成',
-      en: 'Google Tile Coordinates',
-      ja: 'Google タイル座標生成'
+      en: 'Google Tile Coordinates'
     },
     desc: {
       zh: '框选或导入 GeoJSON，按层级导出 XYZ 瓦片 CSV',
-      en: 'Export XYZ tile CSVs from a box or GeoJSON',
-      ja: '範囲選択や GeoJSON から XYZ タイル CSV を出力'
+      en: 'Export XYZ tile CSVs from a box or GeoJSON'
     },
     keywords: {
       all: ['tile', 'xyz', 'zxy', 'slippy map', 'google maps', 'web mercator', 'tms'],
       zh: ['瓦片', '切片', '缩放级别', '谷歌地图', '地图瓦片', '经纬度网格', '瓦片编号'],
-      ja: ['タイル', 'タイル座標', 'ズーム', 'グーグルマップ', '地図タイル', 'メルカトル']
     },
     related: [
       'map-draw',
@@ -320,13 +301,11 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: {
       zh: '地图速览',
-      en: 'Map Preview',
-      ja: 'マッププレビュー'
+      en: 'Map Preview'
     },
     desc: {
-      zh: '把本地矢量数据直接叠加到地图上快速查看',
-      en: 'Preview local vector data on a map',
-      ja: 'ローカルのベクタデータを地図に表示'
+      zh: '把本地矢量数据叠加到地图上查看',
+      en: 'Preview local vector data on a map'
     },
     keywords: {
       all: [
@@ -342,7 +321,6 @@ export const TOOLS: ToolMeta[] = [
         'flatgeobuf'
       ],
       zh: ['地图速览', '查看数据', '数据查看', '导入数据', '矢量数据', '地图预览', '叠加显示', '格式识别'],
-      ja: ['データ表示', '地図表示', 'ベクタデータ', '読み込み', 'プレビュー']
     },
     related: [
       'map-draw',
@@ -366,13 +344,11 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: {
       zh: '图层裁切与叠加',
-      en: 'Clip & Overlay',
-      ja: 'クリップとオーバーレイ'
+      en: 'Clip & Overlay'
     },
     desc: {
       zh: '裁切、相交、擦除与几何简化',
-      en: 'Clip, intersect, difference and simplify',
-      ja: 'クリップ・交差・差分・簡略化'
+      en: 'Clip, intersect, difference and simplify'
     },
     keywords: {
       all: [
@@ -386,7 +362,6 @@ export const TOOLS: ToolMeta[] = [
         'qgis'
       ],
       zh: ['裁切', '裁剪', '相交', '擦除', '叠加', '叠加分析', '几何简化', '抽稀', '矢量叠加'],
-      ja: ['クリップ', '交差', '差分', '簡略化', 'オーバーレイ', 'ベクタ']
     },
     related: [
       'map-draw',
@@ -410,18 +385,15 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: {
       zh: '按属性提取要素',
-      en: 'Extract by Attribute',
-      ja: '属性で抽出'
+      en: 'Extract by Attribute'
     },
     desc: {
       zh: '按字段条件筛选要素并导出 GeoJSON',
-      en: 'Filter features by an attribute value',
-      ja: '属性条件でフィーチャを絞り込む'
+      en: 'Filter features by an attribute value'
     },
     keywords: {
       all: ['attribute', 'filter', 'query', 'extract', 'select', 'where', 'property'],
       zh: ['属性', '筛选', '过滤', '提取', '查询', '条件', '字段', '属性查询'],
-      ja: ['属性', '抽出', 'フィルタ', '条件', 'クエリ']
     },
     related: [
       'clip-overlay',
@@ -443,16 +415,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'B',
     gps: false,
-    names: { zh: '属性连接', en: 'Attribute Join', ja: '属性結合' },
+    names: { zh: '属性连接', en: 'Attribute Join' },
     desc: {
-      zh: '按字段把属性表连接到矢量要素',
-      en: 'Join a table to features by a shared field',
-      ja: '属性表をキーでベクターに結合'
+      zh: '用字段把属性表连到矢量要素上',
+      en: 'Join a table to features by a shared field'
     },
     keywords: {
       all: ['join', 'attribute', 'table', 'csv', 'excel', 'vlookup', 'property'],
       zh: ['属性连接', '连接', '属性表', '字段匹配', '表格', 'Excel'],
-      ja: ['属性結合', '結合', '属性テーブル', 'キー結合', 'CSV']
     },
     related: [
       'attribute-extract',
@@ -474,16 +444,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'B',
     gps: false,
-    names: { zh: '合并图层', en: 'Merge Layers', ja: 'レイヤー統合' },
+    names: { zh: '合并图层', en: 'Merge Layers' },
     desc: {
       zh: '把多个矢量文件合并为一个图层',
-      en: 'Merge several vector files into one layer',
-      ja: '複数のベクターファイルを1つに統合'
+      en: 'Merge several vector files into one layer'
     },
     keywords: {
       all: ['merge', 'append', 'combine', 'concat', 'layer', 'vector'],
       zh: ['合并图层', '合并', '追加', '拼接', '多文件', '图层'],
-      ja: ['レイヤー統合', '結合', 'マージ', '追記', '複数ファイル']
     },
     related: [
       'format-convert',
@@ -505,16 +473,14 @@ export const TOOLS: ToolMeta[] = [
     batch: false,
     mobileTier: 'B',
     gps: false,
-    names: { zh: '按字段融合', en: 'Dissolve by Field', ja: 'フィールドで融合' },
+    names: { zh: '按字段融合', en: 'Dissolve by Field' },
     desc: {
       zh: '按字段值融合相邻要素',
-      en: 'Dissolve features that share a field value',
-      ja: '同じ属性値のフィーチャを融合'
+      en: 'Dissolve features that share a field value'
     },
     keywords: {
       all: ['dissolve', 'aggregate', 'group', 'union', 'field', 'merge'],
       zh: ['按字段融合', '融合', '融合面', '分组', '聚合', '字段'],
-      ja: ['融合', 'ディゾルブ', '集約', 'グループ化', '属性値']
     },
     related: [
       'attribute-join',
@@ -538,18 +504,15 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: {
       zh: 'Plus Codes 位置编码',
-      en: 'Plus Codes (Open Location Code)',
-      ja: 'Plus Codes（Open Location Code）'
+      en: 'Plus Codes (Open Location Code)'
     },
     desc: {
-      zh: '经纬度与 Plus Code 双向转换，离线可算',
-      en: 'Coordinates ↔ Plus Code, offline',
-      ja: '座標と Plus Code の相互変換'
+      zh: '经纬度和 Plus Code 互相转换，可离线计算',
+      en: 'Coordinates ↔ Plus Code, offline'
     },
     keywords: {
       all: ['plus code', 'plus codes', 'open location code', 'olc', 'location code'],
       zh: ['加号编码', '位置编码', '地点编码', '开放位置编码', '短地址'],
-      ja: ['プラスコード', '位置コード', '地点コード', '住所コード']
     },
     related: [
       'geohash',
@@ -573,18 +536,15 @@ export const TOOLS: ToolMeta[] = [
     gps: false,
     names: {
       zh: 'MVT 矢量瓦片解析',
-      en: 'MVT Vector Tile Decoder',
-      ja: 'MVT ベクタタイル解析'
+      en: 'MVT Vector Tile Decoder'
     },
     desc: {
       zh: '上传 PBF 或粘贴 Base64，解出图层与 GeoJSON',
-      en: 'Decode PBF or Base64 tiles into GeoJSON',
-      ja: 'PBF / Base64 タイルを GeoJSON に変換'
+      en: 'Decode PBF or Base64 tiles into GeoJSON'
     },
     keywords: {
       all: ['mvt', 'mapbox vector tile', 'vector tile', 'pbf', 'protobuf', 'tile'],
       zh: ['矢量瓦片', '瓦片解析', '矢量切片', '二进制瓦片', '瓦片解码'],
-      ja: ['ベクタタイル', 'タイル解析', 'プロトコルバッファ', 'タイルデコード']
     },
     related: [
       'tile-coords',

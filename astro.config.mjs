@@ -28,9 +28,9 @@ export default defineConfig({
     rehypePlugins: [rehypeLazyImages]
   },
 
-  // 三语言统一为 /{lang}/…，根路径 / 完全由 src/pages/index.astro 自己控制
+  // 两语言统一为 /{lang}/…，根路径 / 完全由 src/pages/index.astro 自己控制
   i18n: {
-    locales: ['en', 'zh', 'ja'],
+    locales: ['en', 'zh'],
     defaultLocale: 'en', // ← OQ-08 决定后改这一行
     routing: {
       prefixDefaultLocale: true,

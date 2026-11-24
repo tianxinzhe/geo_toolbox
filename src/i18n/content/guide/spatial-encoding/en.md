@@ -1,6 +1,6 @@
 ---
-title: "Spatial encoding explained: GeoHash vs Plus Codes | GeoToolbox"
-description: "GeoHash prefix grids and precision levels, Plus Codes character structure and short codes, how they differ for indexing, sharing, dictation and privacy, and when to use each."
+title: 'GeoHash vs Plus Codes: spatial encoding | GeoToolbox'
+description: 'GeoHash prefix grids and precision, Plus Codes structure and short codes, how they differ for indexing, sharing and privacy, and when to use each.'
 heading: "Spatial encoding explained: GeoHash vs Plus Codes"
 group: projection
 order: 3
@@ -64,21 +64,21 @@ A short code removes leading characters, not a suffix. It has no prefix-containm
 
 S2 and H3 are two other spatial index families. S2 projects the sphere onto a cube and subdivides it, with 64-bit cell IDs ordered along a Hilbert curve. H3 uses a hexagonal grid on an icosahedron, with integer IDs and a resolution parameter.
 
-Both are not meant to be read aloud. They need a library to compute cells, boundaries and neighbours, and they excel at hierarchical indexing, database sharding and aggregation. When the output has to be dictated or printed, GeoHash and Plus Codes fit better.
+Neither is meant to be read aloud. Both need a library to compute cells, boundaries and neighbours, and both are at their best with hierarchical indexing, database sharding and aggregation. When the output has to be dictated or printed, GeoHash and Plus Codes fit better.
 
 ## Common mistakes and pitfalls
 
-**Treating a GeoHash prefix as an exact radius.** Queries miss objects just across a boundary, or the code is assumed to describe a 150 m circle. The cause is that a prefix is a rectangle, neighbouring points outside it carry different codes, and cells narrow with latitude. The consequence is missed results in nearby search, worse as distance grows. Query the nine-cell neighbourhood and filter by real distance.
+**Treating a GeoHash prefix as an exact radius.** Queries miss objects just across a boundary, or the code is assumed to describe a 150 m circle. A prefix is a rectangle, not a circle: points just outside it carry different codes, and cells narrow with latitude. Nearby search returns fewer results than it should, and the gap grows with distance. Query the nine-cell neighbourhood and filter by real distance.
 
-**Using truncation as anonymisation.** A published six-character code still pinpoints a neighbourhood. The cause is that six characters cover about 1.2 km, and time, device identifiers and business records narrow it further. The consequence is a privacy leak that cannot be recalled. Choose precision by scenario, add random offset when needed, or omit precise timestamps.
+**Using truncation as anonymisation.** A published six-character code still pinpoints a neighbourhood. Six characters cover about 1.2 km, and time, device identifiers and business records narrow it further. Once that leak is out, you cannot recall it. Choose precision by scenario, add random offset when needed, or omit precise timestamps.
 
-**Using a short Plus Code without its reference.** `W95W+GX` may decode to a completely wrong place in another city. The cause is that a short code omits the leading area code and needs a sufficiently close reference point. The consequence is an error of tens or hundreds of kilometres, with no failure signal. Share the city name alongside the short code, or use the full ten-digit code.
+**Using a short Plus Code without its reference.** `W95W+GX` may decode to a completely wrong place in another city. A short code omits the leading area code, so it needs a reference point that is close enough. Get that wrong and you land tens or hundreds of kilometres away, with no failure signal. Share the city name alongside the short code, or use the full ten-digit code.
 
-**Treating a Plus Code as a postal address.** Delivery forms and courier systems reject it and still ask for a street and number. The cause is that Plus Codes encode coordinates, with no administrative or house-number semantics and no guarantee of integration. The consequence is an address that needs manual conversion. Use it alongside a conventional address, not instead of one.
+**Treating a Plus Code as a postal address.** Delivery forms and courier systems reject it and still ask for a street and number. Plus Codes encode coordinates. They carry no administrative or house-number meaning, and courier systems are not guaranteed to accept them. Someone ends up converting the address by hand. Use it alongside a conventional address, not instead of one.
 
-**Mixing up the two alphabets.** A lowercase `o` in GeoHash is read as zero, or `O`, `I` or `L` appears in a Plus Code. The cause is that both alphabets remove easily confused characters, but not the same ones. The consequence is a decode failure or a cell next door. Validate against the correct alphabet and normalise case before decoding.
+**Mixing up the two alphabets.** A lowercase `o` in GeoHash is read as zero, or `O`, `I` or `L` appears in a Plus Code. Both alphabets drop easily confused characters, but not the same ones. Decoding fails, or you get the cell next door. Validate against the correct alphabet and normalise case before decoding.
 
-**Computing neighbours near the poles or the antimeridian.** Longitude jumps from 179.9 to -179.9 and the neighbour appears on the far side of the planet. The cause is that longitude needs wrapping while latitude must be clamped at the poles. The consequence is missed points or invalid cells. Normalise longitude to ±180 first, and handle polar cells separately.
+**Computing neighbours near the poles or the antimeridian.** Longitude jumps from 179.9 to -179.9 and the neighbour appears on the far side of the planet. Longitude has to wrap while latitude is clamped at the poles. Miss either rule and you get missed points or invalid cells. Normalise longitude to ±180 first, and handle polar cells separately.
 
 ## Comparison with neighbouring encodings
 

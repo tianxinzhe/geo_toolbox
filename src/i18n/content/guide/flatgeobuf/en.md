@@ -1,6 +1,6 @@
 ---
-title: "FlatGeobuf explained: FlatBuffers and spatial indexing | GeoToolbox"
-description: The FlatGeobuf file header, layer schema, packed R-tree spatial index and streaming reads, plus its single-layer and unreadable-file limits and where it fits.
+title: 'FlatGeobuf explained: FlatBuffers and R-tree | GeoToolbox'
+description: 'The FlatGeobuf header, layer schema, packed R-tree index and streaming reads, plus its single-layer limit and where it fits.'
 heading: "FlatGeobuf explained: FlatBuffers and spatial indexing"
 group: vector
 order: 14
@@ -69,15 +69,15 @@ The index is usually generated but the spec allows omitting it, so files with th
 
 ## Common errors and traps
 
-**Opening it in a text editor and seeing garbage**: the screen fills with unreadable characters and the file looks corrupt; the cause is that the content is binary; the result is wasted debugging time, when GDAL or a dedicated library is the right tool.
+**Opening it in a text editor and seeing garbage**: the screen fills with unreadable characters and the file looks corrupt. The content is binary. Use GDAL or a dedicated library instead of burning time on the wrong tool.
 
-**Assuming a spatial index is always present**: some reader fails with an error about node size; the cause is that certain exporters write only the header and features, leaving the index node size unset; the result is that extent reads fail and you must parse sequentially or rebuild the index.
+**Assuming a spatial index is always present**: some reader fails with an error about node size. Certain exporters write only the header and features and leave the index node size unset. Extent reads fail, and you have to parse sequentially or rebuild the index.
 
-**A web server that ignores Range requests**: the front end still downloads the whole file when loading by extent; the cause is that the server returns a full response and ignores the Range header; the result is that on-demand loading stops working and bandwidth and first paint suffer.
+**A web server that ignores Range requests**: the front end downloads the whole file even when loading by extent. The server returns a full response and ignores the Range header. On-demand loading stops working, and bandwidth and first paint suffer.
 
-**Exporting several layers into one `.fgb`**: only the first layer survives; the cause is that the format holds a single layer; the result is silent loss of the rest, so split the layers before exporting.
+**Exporting several layers into one `.fgb`**: only the first layer survives, because the format holds a single layer. The rest is lost silently, so split the layers before exporting.
 
-**No declared CRS and a direct overlay**: data appears in the wrong place or at the wrong scale; the cause is an empty CRS in the header, so the reader treats coordinates as longitude and latitude; the result is a misaligned overlay, fixed only by converting the coordinates at the source.
+**No declared CRS and a direct overlay**: data appears in the wrong place or at the wrong scale. The CRS in the header is empty, so the reader treats coordinates as longitude and latitude. The overlay stays misaligned until you convert the coordinates at the source.
 
 ## Comparison with nearby formats
 

@@ -56,17 +56,13 @@ export const TOOL_KEYS = {
     'tool.epsg-convert.errNeedBoth',
     'tool.epsg-convert.errGeneric',
     'tool.epsg-convert.autoNeedGeo',
-    'tool.epsg-convert.japanUtmRange',
     'tool.epsg-convert.loadingFull',
     'tool.epsg-convert.loadFailed',
-    'tool.epsg-convert.axisNoteJapan',
     'tool.epsg-convert.axisNoteXY',
-    // 六个轴序标签由 axisLabels() 按 kind / axisOrder 动态取，
+    // 四个轴序标签由 axisLabels() 按 kind 动态取，
     // 少一个就会在某一类坐标系上渲染出 undefined
     'tool.epsg-convert.eastX',
     'tool.epsg-convert.northY',
-    'tool.epsg-convert.northX',
-    'tool.epsg-convert.eastY',
     'tool.epsg-convert.xLongitude',
     'tool.epsg-convert.yLatitude',
     'tool.epsg-convert.swapXY',

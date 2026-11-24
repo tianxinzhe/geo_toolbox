@@ -16,7 +16,7 @@
  * 这个页面不复用 Base.astro：它没有单一 lang，且必须在任何渲染之前
  * 就完成跳转判断，结构越简单越好。
  */
-import { DEFAULT_LANG, LAUNCHED, LOCALE } from '../config/i18n'
+import { DEFAULT_LANG, LABEL, LAUNCHED, LOCALE } from '../config/i18n'
 import { site } from '../config/site'
 import { CATEGORY_META, TOOLS } from '../i18n/tools'
 import { absolute, homePath, toolPath } from '../lib/paths'
@@ -70,7 +70,7 @@ const groups = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
     <title>{site.name.en} — choose your language</title>
     <meta
       name="description"
-      content="Choose your language for GeoToolbox: English, Chinese or Japanese. 11 browser-based geospatial tools for coordinates, projections, formats and map tiles."
+      content="Choose your language for GeoToolbox: English or Chinese. 15 browser-based geospatial tools for coordinates, projections, formats and map tiles."
     />
     <link rel="canonical" href={absolute(site.url, '/')} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -235,7 +235,7 @@ const groups = TOOLS.reduce<Record<string, typeof TOOLS>>((acc, t) => {
           LAUNCHED.map((l) => (
             <li>
               <a href={homePath(l)} lang={LOCALE[l]} hreflang={l}>
-                {l === 'zh' ? '简体中文' : l === 'ja' ? '日本語' : 'English'}
+                {LABEL[l]}
               </a>
             </li>
           ))

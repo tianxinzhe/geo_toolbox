@@ -1,6 +1,6 @@
 ---
-title: "GMT explained: multi-segment ASCII and plotting conventions | GeoToolbox"
-description: How GMT multi-segment ASCII marks segments with >, writes longitude, latitude and z values, how -R and -J control extent and projection, and what it cannot express.
+title: 'GMT explained: multi-segment ASCII and -R/-J | GeoToolbox'
+description: 'How GMT multi-segment ASCII marks segments, writes lon/lat/z values, how -R and -J control extent and projection, and what it cannot express.'
 heading: "GMT explained: multi-segment ASCII and plotting conventions"
 group: vector
 order: 16
@@ -71,51 +71,27 @@ Styling is absent too. Colour, symbol and line width come from options such as `
 
 ### Missing segment headers
 
-**Symptom**: two separate lines are joined by a long stroke, or several polygons merge into one.
-
-**Cause**: the `>` line between segments is absent. A blank line is not a separator, so the reader keeps appending coordinates to the same segment.
-
-**Consequence**: geometry is connected wrongly. The plot shows an obvious crossing, but the data itself raises no error and spot checks rarely catch it.
+Two separate lines get joined by a long stroke, or several polygons merge into one. The `>` line between segments is missing, and a blank line is not a separator, so the reader keeps appending coordinates to the same segment. The geometry is connected wrongly. The plot shows an obvious crossing, but the data raises no error and spot checks rarely catch it.
 
 ### Swapped axes or wrong units
 
-**Symptom**: a blank map, every point outside the region, or all points stacked in a corner.
-
-**Cause**: the columns are latitude then longitude, or the file holds projected metres while `-J` applies a geographic projection.
-
-**Consequence**: the region and the data do not intersect; the command succeeds but draws nothing. Confirm the column order and units, then fix them with `-i` or the right projection.
+The map comes out blank, every point sits outside the region, or all points stack in a corner. Either the columns are latitude then longitude, or the file holds projected metres while `-J` applies a geographic projection. Region and data do not intersect; the command succeeds but draws nothing. Confirm the column order and units, then fix them with `-i` or the right projection.
 
 ### Longitudes written as 0–360
 
-**Symptom**: western-hemisphere points appear at the far side of the map, or a line crossing 180° circles the globe.
-
-**Cause**: some sources write longitudes from 0 to 360, while geographic projections assume −180 to 180.
-
-**Consequence**: points shift and long lines sweep across the figure. Subtract 360 from values above 180, or settle on one convention for the whole dataset.
+Western-hemisphere points appear at the far side of the map, or a line crossing 180° circles the globe. Some sources write longitudes from 0 to 360, while geographic projections assume −180 to 180. Points shift and long lines sweep across the figure. Subtract 360 from values above 180, or settle on one convention for the whole dataset.
 
 ### Comma-separated values
 
-**Symptom**: the read fails, or the whole line is treated as one invalid record.
-
-**Cause**: GMT splits on whitespace; a comma is not a delimiter. Copying from CSV or a document often brings commas along.
-
-**Consequence**: the module errors or skips the row, and data quietly goes missing. Replace commas with spaces or tabs before publishing.
+The read fails, or the whole line is treated as one invalid record. GMT splits on whitespace, and a comma is not a delimiter; copying from CSV or a document often brings commas along. The module errors or skips the row, and data quietly goes missing. Replace commas with spaces or tabs before publishing.
 
 ### Writing attributes into the segment header
 
-**Symptom**: after conversion only the name survives; categories and numeric fields are gone.
-
-**Cause**: a GMT table has no attribute table. The header is a free-text label, not a key-value structure.
-
-**Consequence**: you cannot colour or filter by attribute. Use GeoJSON or GeoPackage when attributes matter, or keep a separate table and rely on row order.
+After conversion only the name survives; categories and numeric fields are gone. A GMT table has no attribute table. The header is a free-text label, not a key-value structure. You cannot colour or filter by attribute. Use GeoJSON or GeoPackage when attributes matter, or keep a separate table and rely on row order.
 
 ### Unclosed polygons
 
-**Symptom**: a filled area appears as an outline, or the fill is malformed.
-
-**Cause**: the first and last points differ, or the last point is wrong. Closure can only be judged from coordinates, since the file has no polygon type.
-
-**Consequence**: `-L` closes the ring forcibly and may add an edge across the shape; without it the ring is treated as a line. Neither case reports an error.
+A filled area appears as an outline, or the fill is malformed. The first and last points differ, or the last point is wrong. Closure can only be judged from coordinates, since the file has no polygon type. `-L` closes the ring forcibly and may add an edge across the shape; without it the ring is treated as a line. Neither case reports an error.
 
 ## Where it fits
 
@@ -135,7 +111,7 @@ Styling is absent too. Colour, symbol and line width come from options such as `
 | GeoJSON | yes | explicit points, lines, polygons | WGS84 by default | web maps and GIS |
 | WKT | none | explicit, one per line | optional SRID | GIS and databases |
 
-GMT's niche is narrow: preparing data for GMT plots, or reading coordinates back out of them. It is simple enough to write by hand, and therefore has no self-description at all. When data must be exchanged, carry attributes or be understood by someone else, CSV or GeoJSON fits better.
+GMT's niche is narrow: preparing data for GMT plots, or reading coordinates back out. The format is simple enough to write by hand, and as a result carries no self-description at all. When data has to be exchanged, carry attributes or be understood by someone else, CSV or GeoJSON fits better.
 
 ## Converting and tools
 

@@ -1,5 +1,5 @@
 ---
-title: 'Online Map Drawing Tool: Points, Lines, Polygons | GeoToolbox'
+title: 'Map Drawing Tool: Points, Lines, Polygons | GeoToolbox'
 description: 'Draw points, lines, polygons, rectangles and circles on a map, measure length and area, edit attributes, and export GeoJSON, KML, GPX, WKT or CSV.'
 updated: 2026-11-23
 readingMinutes: 6
@@ -16,7 +16,7 @@ faq:
 
 ## What this tool does
 
-Some data is not worth writing code for, and opening a desktop GIS is overkill: mark a parcel, pin a few locations, sketch a route, circle a service area. This tool lets you draw directly on the map and immediately get standard vector data back.
+Some data is not worth writing code for, and opening a desktop GIS is overkill. Maybe you need to mark a parcel, pin a few locations, sketch a route or circle a service area. Draw it on the map here and get standard vector data straight back.
 
 There are five drawing modes:
 
@@ -44,7 +44,7 @@ The coordinate system is fixed to WGS 84. Every export format writes the origina
 
 One second after each change, the features are written to browser local storage. Reopening the page restores them and reports how many were recovered. If storage is full, autosave stops and the tool asks you to export promptly rather than overwriting existing data.
 
-The basemap defaults to keyless Esri street tiles, falling back to OpenStreetMap if Esri is unreachable, with a top-right switch to Esri satellite imagery or the Esri topographic map. Esri's online street data for mainland China goes to zoom 13; beyond that the last level is stretched. If tiles fail, drawing, measurement and export remain fully usable, only without a visual reference. Above 2,000 features the tool warns about performance but does not block further work.
+The basemap defaults to keyless Esri street tiles, falling back to OpenStreetMap if Esri is unreachable, with a top-right switch to Esri satellite imagery or the Esri topographic map. Esri's online street data for mainland China goes to zoom 13; beyond that the last level is stretched. If tiles fail, drawing, measurement and export still work. You just lose the visual reference. Above 2,000 features the tool warns about performance but does not block further work.
 
 ## Inputs and outputs
 
@@ -60,7 +60,7 @@ Drawing does not validate geometry. A self-intersecting polygon can be drawn and
 
 Repeated points are not merged. Clicking the same spot twice creates a zero-length edge; length totals ignore it, yet the exported file carries a duplicate coordinate. Removing duplicates is data repair, so it is not done silently while drawing.
 
-Undo covers deletes, clears and property changes, but the history holds 50 steps. Autosave depends on the browser quota; when storage is full, saving pauses and the page asks for an export. A missing basemap does not affect the data.
+Undo covers deletes, clears and property changes, but it holds only 50 steps. Autosave is capped by the browser's storage quota; once that fills, saving pauses and the page asks for an export. A missing basemap leaves the data untouched.
 
 ## Precision and performance
 
@@ -68,7 +68,7 @@ Drawing accuracy is bounded by screen pixels. At low zoom a pixel can represent 
 
 Length is summed edge by edge along geodesics and area uses spherical excess on the authalic sphere, so neither depends on a projected plane and high latitudes do not stretch the area. The cost is per-edge geodesic work: a single polygon with tens of thousands of vertices makes selection and statistics noticeably slower. Above 2,000 features the page already warns about smoothness, and at that size editing, redrawing and export previews all feel sluggish.
 
-Local browser computation suits manual drawing and light cleanup from a handful to a few hundred features. Batch editing, topology checks and layer overlays at thousands of features belong in a desktop GIS or a command-line tool; bring the result back here for inspection.
+Everything runs locally, which suits hand drawing and light cleanup: a handful of features, maybe a few hundred. Batch editing, topology checks and layer overlays at thousands of features are desktop GIS or command-line work. Bring the result back here to look at it.
 
 ## Compared with alternatives
 
@@ -80,7 +80,7 @@ Local browser computation suits manual drawing and light cleanup from a handful 
 | Where data lives | In the browser | Local project files | Local scripts and files |
 | Automation | None | Models and scripts, partly | Best suited |
 
-For a quick extent or a few pins this tool is fastest. Precise snapping, topology rules and attribute joins fit a desktop GIS. A fixed daily pipeline is better served by a command-line script.
+A quick extent or a handful of pins is fastest here. Snapping, topology rules and attribute joins are desktop GIS work. If you run the same pipeline every day, write a script.
 
 ## A worked example
 
@@ -95,13 +95,13 @@ If only the points are needed downstream, delete the circle before export. If th
 
 ## Working in feet, miles and acres
 
-The map reports length in metres and area in square metres, which is what GeoJSON and Shapefile expect. When the brief or the deed is written in imperial units, convert before comparing numbers: one foot is 0.3048 m, one mile is 1609.344 m, one acre is 4046.86 m², and one hectare is 10,000 m² (2.471 acres). A 100 ft × 200 ft lot is 20,000 sq ft, or 1,858 m² — about 0.46 acre. A quarter-section in the Public Land Survey System is 160 acres, roughly 0.65 km²; that is large for hand drawing but still workable, since the statistics bar recomputes area after every vertex edit.
+The map reports length in metres and area in square metres, which is what GeoJSON and Shapefile expect. When the brief or the deed is written in imperial units, convert before comparing numbers: one foot is 0.3048 m, one mile is 1609.344 m, one acre is 4046.86 m², and one hectare is 10,000 m² (2.471 acres). A 100 ft × 200 ft lot is 20,000 sq ft, or 1,858 m², about 0.46 acre. A quarter-section in the Public Land Survey System is 160 acres, roughly 0.65 km²; that is large for hand drawing but still workable, since the statistics bar recomputes area after every vertex edit.
 
 Circle radius comes from the drag, not from a typed number, so the honest way to record an exact radius is a property. Draw the circle, add a `radius_ft` or `radius_m` field, and let downstream users convert it; do not round-trip it through the polygon.
 
 ## Checking a drawing against US and UK reference data
 
-NAD83, the datum behind US Census TIGER/Line and most state and county data, sits within a metre or two of WGS 84. Drawing against Esri imagery or an OSM basemap in the United States is therefore safe at street scale — a metre is well below the precision of a hand-placed vertex. State Plane coordinates are a different matter: they are on a local grid in feet or metres and must be converted with the [projected CRS converter](/en/tools/epsg-convert/) before they can be compared with anything drawn here.
+NAD83, the datum behind US Census TIGER/Line and most state and county data, sits within a metre or two of WGS 84. Drawing against Esri imagery or an OSM basemap in the United States is therefore safe at street scale: a metre is well below the precision of a hand-placed vertex. State Plane coordinates are a different matter: they are on a local grid in feet or metres and must be converted with the [projected CRS converter](/en/tools/epsg-convert/) before they can be compared with anything drawn here.
 
 In Great Britain, Ordnance Survey data is published on the British National Grid (EPSG:27700), whose OSGB36 datum is about 100 m from WGS 84. That offset is visible on a map: if a boundary from a planning portal lands beside the building instead of on it, suspect the datum rather than the drawing. Northern Ireland uses the Irish Grid, a separate system again.
 

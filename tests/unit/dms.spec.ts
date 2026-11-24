@@ -227,13 +227,6 @@ describe('parseDmsInput 自动识别格式', () => {
     expect(w.ok && w.decimal).toBeCloseTo(-116.3974, 10)
   })
 
-  it('日文方向词用日文字形（SR-11）', () => {
-    const r = parseDmsInput('北緯35.6812', 'lat')
-    expect(r.ok && r.detectedHemisphere).toBe('N')
-    const e = parseDmsInput('東経139.7671', 'lng')
-    expect(e.ok && e.detectedHemisphere).toBe('E')
-  })
-
   it('detectedHemisphere 只在输入真的写了符号时才有值', () => {
     // 这条防止把 decimalToDms 合成的 hemisphere 误当成「用户写了符号」——
     // 那会让 parseCoord 的轴序判定把每个输入都当成 high 置信度
@@ -327,17 +320,6 @@ describe('文本式输出按语言本地化（SR-11）', () => {
   it('zh 用「度分秒」与中文方向词', () => {
     expect(formatDmsTextual(dms, 'zh', 2)).toBe('北纬39度54分31.68秒')
     expect(formatDmsTextual(west, 'zh', 2)).toBe('西经116度23分50.64秒')
-  })
-
-  it('ja 用日文字形的「緯」「経」，不是中文的「纬」「经」', () => {
-    const ja = formatDmsTextual(dms, 'ja', 2)
-    expect(ja).toBe('北緯39度54分31.68秒')
-    expect(ja).toContain('緯')
-    expect(ja).not.toContain('纬')
-
-    const jaWest = formatDmsTextual(west, 'ja', 2)
-    expect(jaWest).toContain('西経')
-    expect(jaWest).not.toContain('西经')
   })
 
   it('en 仍用符号式加方向字母', () => {

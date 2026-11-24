@@ -8,17 +8,16 @@
  *   ③ 文案           构建期由 ToolPage 以 props 传入，客户端只带本页字符串
  *
  * 必须写清楚的取舍：
- *   ① **X / Y 轴序**：日本平面直角是 X=北、Y=東，与 GIS 惯例相反。
- *      `CrsInfo.axisOrder` 决定字段标签与输入顺序，组件里没有一处
- *      硬编码「第一个框是东方向」。
- *   ② **负坐标合法**：平面直角坐标系没有 false easting/northing，
+ *   ① **X / Y 轴序**：地理坐标用经度 / 纬度，投影坐标用东方向 / 北方向。
+ *      字段标签由 `CrsInfo.kind` 决定，组件里没有一处硬编码。
+ *   ② **负坐标合法**：投影坐标系没有 false easting/northing 时，
  *      原点西南方全是负值。本组件不做「必须为正」的校验。
  *   ③ **无基准变换不静默执行**：datumShift='missing' 时必须由用户
  *      勾选确认后才出结果（PRD 6.4 异常表）。
  *   ④ **完整 EPSG 表异步**：常用列表内置；用户输入其他代码时
  *      `resolveCrs` 才动态加载，加载期间显示提示并自动重试。
- *   ⑤ **三语言常用列表不同**：列表来自 shortlist.ts，顺序体现
- *      zh / en / ja 的高频场景；本组件不写任何语言分支。
+ *   ⑤ **两语言常用列表不同**：列表来自 shortlist.ts，顺序体现
+ *      zh / en 的高频场景；本组件不写任何语言分支。
  *
  * ⛔ 不直接调用 toFixed / 手工拼数字：显示走 fmt / fmtUnit / stdFixed。
  */
@@ -37,7 +36,6 @@ import {
   geoComponents,
   hasBuiltinCrs,
   isFullEpsgLoaded,
-  isJapanPlane,
   isValidEpsgCode,
   normalizeTowgs84,
   parseEpsgId,
@@ -206,7 +204,7 @@ const invalid = computed(() => ({
   y: yInput.value.trim() !== '' && liveY.value === null
 }))
 
-/** 源坐标系的字段标签。由 axisOrder / kind 决定，绝不硬编码 */
+/** 源坐标系的字段标签。由 kind 决定，绝不硬编码 */
 function axisLabels(info: CrsInfo | null): [string, string] {
   if (!info) return [props.ui['tool.epsg-convert.eastX'], props.ui['tool.epsg-convert.northY']]
   if (info.kind === 'geographic') {
@@ -214,9 +212,6 @@ function axisLabels(info: CrsInfo | null): [string, string] {
       props.ui['tool.epsg-convert.xLongitude'],
       props.ui['tool.epsg-convert.yLatitude']
     ]
-  }
-  if (info.axisOrder === 'yx') {
-    return [props.ui['tool.epsg-convert.northX'], props.ui['tool.epsg-convert.eastY']]
   }
   return [props.ui['tool.epsg-convert.eastX'], props.ui['tool.epsg-convert.northY']]
 }
@@ -361,7 +356,6 @@ function mapError(e: unknown): string {
     if (e.code === 'auto-needs-location' || e.code === 'auto-source-unsupported') {
       return 'tool.epsg-convert.autoNeedGeo'
     }
-    if (e.code === 'japan-utm-zone') return 'tool.epsg-convert.japanUtmRange'
     if (e.code === 'load-failed') return 'tool.epsg-convert.loadFailed'
     return 'tool.epsg-convert.loadFailed'
   }
@@ -456,7 +450,7 @@ watch(
             type="text"
             inputmode="numeric"
             autocomplete="off"
-            placeholder="6669"
+            placeholder="4548"
             @input="allowMissing = false"
           />
           <span class="field__hint">{{ ui['tool.epsg-convert.customCodeHint'] }}</span>
@@ -487,11 +481,8 @@ watch(
       </div>
     </div>
 
-    <!-- 日本平面直角的轴序警示：填反不会报错，只会得到几百公里外的位置 -->
-    <p v-if="fromInfo && isJapanPlane(fromInfo)" class="note note--warn">
-      {{ ui['tool.epsg-convert.axisNoteJapan'] }}
-    </p>
-    <p v-else-if="fromInfo && fromInfo.kind === 'projected'" class="hint">
+    <!-- 投影坐标的轴序提示：填反不会报错，只会得到错位的坐标 -->
+    <p v-if="fromInfo && fromInfo.kind === 'projected'" class="hint">
       {{ ui['tool.epsg-convert.axisNoteXY'] }}
     </p>
 

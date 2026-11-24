@@ -3,9 +3,7 @@
 
    两条硬规则：
    1. 一律走系统字体栈，**不自托管 CJK**（单个字重 3~10MB，会毁掉 LCP）
-   2. 页面 <html lang> 必须准确设置，三种语言分别指定，不得用一套字体覆盖全部
-      —— 中日共享汉字存在字形差异（骨/直/今/次/勉），用中文字体渲染日文
-         日本用户会立刻察觉「这不是日文」，严重损害专业信任
+   2. 页面 <html lang> 必须准确设置，按语言分别指定字体栈，不得用一套字体覆盖全部
    ============================================================ */
 
 /* ---------- 拉丁基准（en） ---------- */
@@ -31,24 +29,6 @@ html[lang|='zh'] {
     ui-monospace, 'SF Mono', Menlo, Consolas, 'PingFang SC',
     'Microsoft YaHei', monospace;
   --lh-body: var(--lh-cjk);
-}
-
-/* ---------- 日本語（ja） ----------
-   日文字体必须排在拉丁字体之后、中文字体之前：
-   日文页面会同时出现汉字、平假名、片假名、拉丁字母与全角标点五类字符，
-   字体栈需保证全部正确回退，不出现豆腐字。
-   Hiragino Sans（macOS/iOS）→ Yu Gothic（Windows）→ Noto Sans JP（Linux/Android） */
-html[lang|='ja'] {
-  --font:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans',
-    'Hiragino Kaku Gothic ProN', 'Yu Gothic', YuGothic, 'Meiryo',
-    'Source Han Sans JP', 'Noto Sans CJK JP', sans-serif;
-  --mono:
-    ui-monospace, 'SF Mono', Menlo, Consolas, 'Hiragino Sans',
-    'Yu Gothic', monospace;
-  --lh-body: var(--lh-cjk);
-  /* 日文标点（「」、。）使用日文字形与间距规则 */
-  font-feature-settings: 'palt' 1;
 }
 
 /* 未匹配到已知语言时的兜底 */
@@ -79,7 +59,7 @@ textarea {
   font-variant-numeric: tabular-nums;
 }
 
-/* 英文数字与单位之间留一个不换行空格（1 234.56 km）；中日不留空格（1234.56km）。
+/* 英文数字与单位之间留一个不换行空格（1 234.56 km）；中文不留空格（1234.56km）。
    由 lib/coord/format.ts 在输出时决定，这里只保证该空格不被换行拆开 */
 .unit-gap {
   white-space: nowrap;

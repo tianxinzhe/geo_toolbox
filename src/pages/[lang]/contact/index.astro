@@ -28,13 +28,11 @@ const slug = 'contact' as const
 // 这是构建期可见的：开发时打开联系页就能看到，不会带着空地址上线。
 const MAILTO_LABEL: Record<Lang, string> = {
   zh: '发送邮件至',
-  en: 'Send an email to',
-  ja: 'メールを送る：'
+  en: 'Send an email to'
 }
 const MISSING_LABEL: Record<Lang, string> = {
   zh: '联系邮箱尚未配置（src/config/site.ts 的 contactEmail）。',
-  en: 'Contact email is not configured yet (contactEmail in src/config/site.ts).',
-  ja: '連絡先メールアドレスが未設定です（src/config/site.ts の contactEmail）。'
+  en: 'Contact email is not configured yet (contactEmail in src/config/site.ts).'
 }
 ---
 

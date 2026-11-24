@@ -605,10 +605,8 @@ describe('SR-04 面积基准值与换算闭环', () => {
     expect(convertArea(1, 'km2', 'ha')).toBeCloseTo(100, 12)
   })
 
-  it('坪 = 400/121 ㎡，1 亩 ≈ 201.67 坪（PRD 8.2 点名的最易混淆项）', () => {
-    expect(AREA_TO_M2.tsubo).toBe(400 / 121)
-    expect(AREA_TO_M2.tsubo).toBeCloseTo(3.305785123966942, 12)
-    expect(convertArea(1, 'mu', 'tsubo')).toBeCloseTo(201.6666666666667, 8)
+  it('1 亩 ≈ 0.164737 英亩（跨基准换算）', () => {
+    expect(convertArea(1, 'mu', 'acre')).toBeCloseTo(0.1647369, 6)
   })
 
   it('英亩 / 平方英里 / 平方码 / 平方英尺 与 SR-04 表格逐项一致', () => {

@@ -3,9 +3,7 @@
  *
  * 职责边界：
  *   - 本文件只做「EPSG → proj4 → 坐标」的通用变换，不含任何 UI 文案；
- *   - 常用 CRS 随主包注册，完整 EPSG 表在真正需要时才异步加载；
- *   - axisOrder 是返回值的一部分：日本平面直角为 `yx`（X=北、Y=東），
- *     UI 必须据此渲染字段标签，不能假设 x=easting。
+ *   - 常用 CRS 随主包注册，完整 EPSG 表在真正需要时才异步加载。
  *
  * 转换路径：proj4 内部统一走「源 → 地心 → WGS84 → 目标」，
  * 与 PRD 要求的「源 → WGS84 → 目标」一致，不需要维护 N² 条规则。
@@ -24,11 +22,9 @@ import {
   type BandWidth,
   type ChinaDatumId
 } from './china'
-import { isJapanPlaneCode, japanDatumOfCode, japanPlaneCrs, japanGeographicCrs, JP_DATUMS, type JapanDatumId } from './japan'
 import {
   AUTO_GK_CGCS2000_3,
   AUTO_GK_CGCS2000_6,
-  AUTO_UTM_JGD2011,
   AUTO_UTM_WGS84
 } from './shortlist'
 import {
@@ -61,15 +57,8 @@ function globalCrs(
     name,
     proj4: proj4Str,
     kind: proj4Str.includes('+proj=longlat') ? 'geographic' : 'projected',
-    axisOrder: 'xy',
     datum
   }
-}
-
-// 日本：3 个 datum 的地理坐标 + 19 区带 × 3
-for (const d of JP_DATUMS) {
-  register(japanGeographicCrs(d.id as JapanDatumId))
-  for (let zone = 1; zone <= 19; zone++) register(japanPlaneCrs(d.id as JapanDatumId, zone))
 }
 
 // 中国：3 个 datum 的地理坐标 + CGCS2000 的 3°/6° CM 条目
@@ -178,12 +167,9 @@ export function isFullEpsgLoaded(): boolean {
  * ------------------------------------------------------------------ */
 
 /** 与 WGS84 在实用精度内一致的 datum（SR-03） */
-const WGS_ALIGNED = new Set(['WGS84', 'CGCS2000', 'ETRS89', 'NAD83', 'JGD2011', 'JGD2000'])
+const WGS_ALIGNED = new Set(['WGS84', 'CGCS2000', 'ETRS89', 'NAD83'])
 
 function datumFromName(name: string): string | undefined {
-  if (/\bJGD2011\b/.test(name)) return 'JGD2011'
-  if (/\bJGD2000\b/.test(name)) return 'JGD2000'
-  if (/\bTokyo\b/.test(name)) return 'TOKYO'
   if (/\bCGCS2000\b/.test(name)) return 'CGCS2000'
   if (/\bXian 1980\b/.test(name)) return 'XIAN1980'
   if (/\bBeijing 1954\b/.test(name)) return 'BEIJING1954'
@@ -206,11 +192,6 @@ function datumFromProj4(proj4Str: string): string {
 export function datumShiftOf(from: CrsInfo, to: CrsInfo): DatumShift {
   if (from.datum === to.datum) return 'none'
 
-  // ⚠️ PRD 明令禁止把 JGD2000 与 JGD2011 等值处理：
-  // 东日本 2011 年地震后的地壳位移达米级，需要半动态补正，本期不提供。
-  const pair = new Set([from.datum, to.datum])
-  if (pair.has('JGD2000') && pair.has('JGD2011')) return 'missing'
-
   // 西安 1980 在 EPSG 注册表中没有官方 towgs84
   if (from.datum === 'XIAN1980' || to.datum === 'XIAN1980') return 'missing'
 
@@ -229,23 +210,15 @@ export function datumShiftOf(from: CrsInfo, to: CrsInfo): DatumShift {
 function autoCrs(id: string, anchor?: { lng: number; lat: number }): CrsInfo {
   if (!anchor) throw new CrsError('auto-needs-location', id)
 
-  if (id === AUTO_UTM_WGS84 || id === AUTO_UTM_JGD2011) {
+  if (id === AUTO_UTM_WGS84) {
     const zone = utmZoneForLongitude(anchor.lng)
     const south = anchor.lat < 0
-    const datum = id === AUTO_UTM_WGS84 ? 'wgs84' : 'jgd2011'
-    const code = utmEpsg(datum, zone, south)
-    if (code === undefined) throw new CrsError('japan-utm-zone', `zone ${zone}`)
-    const name =
-      datum === 'wgs84'
-        ? `WGS 84 / UTM zone ${zone}${south ? 'S' : 'N'}`
-        : `JGD2011 / UTM zone ${zone}N`
     return register({
-      code,
-      name,
-      proj4: utmProj4(datum, zone, south),
+      code: utmEpsg(zone, south),
+      name: `WGS 84 / UTM zone ${zone}${south ? 'S' : 'N'}`,
+      proj4: utmProj4(zone, south),
       kind: 'projected',
-      axisOrder: 'xy',
-      datum: datum === 'wgs84' ? 'WGS84' : 'JGD2011'
+      datum: 'WGS84'
     })
   }
 
@@ -268,7 +241,6 @@ async function fullCrs(code: number): Promise<CrsInfo> {
   const kind = def.includes('+proj=longlat') ? 'geographic' : 'projected'
   const datum =
     datumFromName(name) ??
-    (isJapanPlaneCode(code) ? japanDatumOfCode(code)?.toUpperCase() : undefined) ??
     (isChinaGkCode(code) ? chinaDatumOfCode(code) : undefined) ??
     datumFromProj4(def)
   return register({
@@ -276,7 +248,6 @@ async function fullCrs(code: number): Promise<CrsInfo> {
     name,
     proj4: def,
     kind,
-    axisOrder: isJapanPlaneCode(code) ? 'yx' : 'xy',
     datum
   })
 }
@@ -289,7 +260,7 @@ function chinaDatumOfCode(code: number): string | undefined {
   return undefined
 }
 
-/** `epsg:6669` → CrsInfo */
+/** `epsg:4548` → CrsInfo */
 export async function resolveCrsId(
   id: string,
   opts: { anchor?: { lng: number; lat: number }; role?: 'from' | 'to' } = {}
@@ -339,14 +310,6 @@ function applyTowgs84(proj4Str: string, towgs84: string): string {
   return `${proj4Str} +towgs84=${towgs84}`
 }
 
-function toNative(v: [number, number], order: 'xy' | 'yx'): [number, number] {
-  return order === 'yx' ? [v[1], v[0]] : [v[0], v[1]]
-}
-
-function fromNative(v: [number, number], order: 'xy' | 'yx'): [number, number] {
-  return order === 'yx' ? [v[1], v[0]] : [v[0], v[1]]
-}
-
 /**
  * 创建转换器。
  *
@@ -380,23 +343,16 @@ export async function createTransform(
   const converter = proj4(from.proj4, toInfo.proj4)
   const datumShift: DatumShift = custom ? 'custom' : datumShiftOf(fromInfo, toInfo)
 
-  const forward = (x: number, y: number): [number, number] => {
-    const native = toNative([x, y], from.axisOrder)
-    const out = converter.forward(native) as [number, number]
-    return fromNative(out, toInfo.axisOrder)
-  }
-  const inverse = (x: number, y: number): [number, number] => {
-    const native = toNative([x, y], toInfo.axisOrder)
-    const out = converter.inverse(native) as [number, number]
-    return fromNative(out, from.axisOrder)
-  }
+  const forward = (x: number, y: number): [number, number] =>
+    converter.forward([x, y]) as [number, number]
+  const inverse = (x: number, y: number): [number, number] =>
+    converter.inverse([x, y]) as [number, number]
 
   return {
     from,
     to: toInfo,
     forward,
     inverse,
-    axisOrder: toInfo.axisOrder,
     datumShift
   }
 }
@@ -431,9 +387,9 @@ function getProj4(): Promise<Proj4> {
 
 export type CoordIssue = 'nan' | 'geo-range' | 'looks-like-degrees' | 'axis-swap'
 
-/** 地理坐标的轴序：日本平面直角不会是 geographic，因此恒为 xy */
-export function geoComponents(info: CrsInfo, x: number, y: number): { lng: number; lat: number } {
-  return info.axisOrder === 'yx' ? { lng: y, lat: x } : { lng: x, lat: y }
+/** 地理坐标的分量：输入即 (经度, 纬度) */
+export function geoComponents(_info: CrsInfo, x: number, y: number): { lng: number; lat: number } {
+  return { lng: x, lat: y }
 }
 
 /**
@@ -453,19 +409,13 @@ export function checkCoord(info: CrsInfo, x: number, y: number): CoordIssue[] {
   }
 
   // 投影坐标却只有经纬度量级
-  const isJapan = info.axisOrder === 'yx'
-  if (!isJapan && Math.abs(x) <= 180 && Math.abs(y) <= 90) out.push('looks-like-degrees')
+  if (Math.abs(x) <= 180 && Math.abs(y) <= 90) out.push('looks-like-degrees')
 
   // GIS 惯例下 X 应在百万级以下（东向），Y 为百万级（北向）。
   // 反过来就是典型的轴序颠倒（PRD 6.4 异常表第 3 条）。
-  if (!isJapan && Math.abs(x) > 1_000_000 && Math.abs(y) < 1_000_000) out.push('axis-swap')
+  if (Math.abs(x) > 1_000_000 && Math.abs(y) < 1_000_000) out.push('axis-swap')
 
   return out
-}
-
-/** 该 CRS 的轴序标签所需信息：是否日本平面直角 */
-export function isJapanPlane(info: CrsInfo): boolean {
-  return info.axisOrder === 'yx'
 }
 
 /** 该 CRS 的本地化显示名（内置条目用短名，完整表用官方英文名） */
@@ -491,7 +441,7 @@ export type ZoneInfo =
 
 /**
  * 从 proj4 定义里读出带号或中央经线（PRD 6.4 要求结果中明示推算值）。
- * UTM 定义只有 +zone，高斯-克吕格与日本平面直角则带 +lon_0。
+ * UTM 定义只有 +zone，高斯-克吕格则带 +lon_0。
  */
 export function crsZoneInfo(info: CrsInfo): ZoneInfo | null {
   if (info.proj4.includes('+proj=utm')) {

@@ -122,7 +122,7 @@ describe('SR-01 表「接受的形式」', () => {
   })
 })
 
-describe('SR-01 全角归一化（ja 版必须）', () => {
+describe('SR-01 全角归一化', () => {
   it('全角数字与全角逗号', () => {
     const r = ok('１１６．３９７４，３９．９０８８')
     expect(r.lng).toBeCloseTo(116.3974, 10)

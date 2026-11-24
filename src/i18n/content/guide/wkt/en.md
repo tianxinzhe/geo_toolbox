@@ -1,6 +1,6 @@
 ---
-title: "WKT explained: geometry text, dimensions and SRID | GeoToolbox"
-description: How WKT writes POINT, LINESTRING, POLYGON and MULTIPOLYGON, the Z and M dimensions, ring closure rules, and the difference between standard WKT and PostGIS EWKT.
+title: 'WKT explained: geometry, dimensions and SRID | GeoToolbox'
+description: 'How WKT writes points, lines and polygons, the Z and M dimensions, ring closure rules, and how standard WKT differs from PostGIS EWKT.'
 heading: "WKT explained: geometry text, dimensions and SRID"
 group: vector
 order: 10
@@ -56,12 +56,12 @@ EWKT exists only in the PostGIS ecosystem. PostGIS reads a prefixed string with 
 
 ## Common mistakes and pitfalls
 
-- **Swapped longitude and latitude**: the point lands on the other side of the globe or in the ocean; latitude was written first; the map still loads, every location is wrong, and nothing reports an error.
-- **Unclosed ring**: the import reports a ring-not-closed error or the area comes out as zero; the first coordinate was written only once; the record is rejected, and a batch import may stop entirely.
-- **Wrong bracket depth**: the parser reports a syntax error; a polygon was written with a single pair of brackets, or a multipolygon is missing one level; the file cannot be read, and the fault often appears far from the start.
-- **EWKT treated as generic WKT**: a converter rejects the geometry; the string begins with `SRID=4326;`; the whole value is refused, or the prefix is silently stripped and the coordinates are misread in another system.
-- **Truncated decimals**: neighbouring points collapse onto each other and lines turn jagged; only two or three decimals were kept; survey precision is lost for good, and the original values cannot be reconstructed.
-- **Self-intersecting polygon**: areas look wrong or spatial queries miss results; the ring crosses itself; some databases store the geometry but mark it invalid, and later overlays cannot be trusted.
+- **Swapped longitude and latitude**: the point lands on the other side of the globe or in the ocean because latitude was written first. The map still loads, every location is wrong, and nothing reports an error.
+- **Unclosed ring**: the import reports a ring-not-closed error, or the area comes out as zero, because the first coordinate was written only once. The record is rejected, and a batch import may stop entirely.
+- **Wrong bracket depth**: a polygon was written with a single pair of brackets, or a multipolygon is missing a level, and the parser reports a syntax error. The file cannot be read, and the fault often appears far from the start.
+- **EWKT treated as generic WKT**: the string begins with `SRID=4326;`, and a converter rejects the geometry. Sometimes the whole value is refused; sometimes the prefix is silently stripped and the coordinates are misread in another system.
+- **Truncated decimals**: only two or three decimals were kept, so neighbouring points collapse onto each other and lines turn jagged. Survey precision is lost for good, and the original values cannot be reconstructed.
+- **Self-intersecting polygon**: the ring crosses itself, so areas look wrong or spatial queries miss results. Some databases store the geometry but mark it invalid, and later overlays cannot be trusted.
 
 ## Limits
 

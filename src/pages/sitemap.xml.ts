@@ -72,15 +72,15 @@ export const GET: APIRoute = async () => {
   const lastmodOf = (dates: Array<Date | undefined>, fallback = BUILD_DATE): string =>
     latestDate(dates)?.toISOString().slice(0, 10) ?? fallback
 
-  // ① 首页（每语言一个）
-  for (const lang of LAUNCHED) {
-    groups.push({
-      byLang: { [lang]: homePath(lang) },
-      changefreq: 'weekly',
-      priority: '1.0',
-      lastmod: BUILD_DATE
-    })
-  }
+  // ① 首页：各语言版本绑成一组，与 <head> 的 hreflang 保持一致
+  const homeByLang: PageGroup['byLang'] = {}
+  for (const lang of LAUNCHED) homeByLang[lang] = homePath(lang)
+  groups.push({
+    byLang: homeByLang,
+    changefreq: 'weekly',
+    priority: '1.0',
+    lastmod: BUILD_DATE
+  })
 
   // ② 工具页：同一 slug 的各语言版本绑成一组
   for (const tool of TOOLS) {
@@ -187,11 +187,20 @@ export const GET: APIRoute = async () => {
     )
   })
 
-  // 根路径：语言检测中枢，也是各组 hreflang 的 x-default 目标，单独收录
+  // 根路径：语言检测中枢，也是各组 hreflang 的 x-default 目标，单独收录。
+  // 与首页 <head> 一致地列出两条语言 alternate。
+  const rootAlternates = LAUNCHED.map(
+    (lang) =>
+      `    <xhtml:link rel="alternate" hreflang="${lang}" href="${esc(absolute(site.url, homePath(lang)))}" />`
+  )
+  rootAlternates.push(
+    `    <xhtml:link rel="alternate" hreflang="x-default" href="${esc(absolute(site.url, '/'))}" />`
+  )
   const rootEntry = [
     '  <url>',
     `    <loc>${esc(absolute(site.url, '/'))}</loc>`,
     `    <lastmod>${BUILD_DATE}</lastmod>`,
+    ...rootAlternates,
     '    <changefreq>weekly</changefreq>',
     '    <priority>1.0</priority>',
     '  </url>'

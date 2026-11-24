@@ -1,7 +1,7 @@
 /**
  * 中国常用坐标系：CGCS2000 / 西安 1980 / 北京 1954 + 高斯-克吕格 3°、6° 带。
  *
- * 与日本部分一样，这里只放**数据与代码映射**，投影公式交给 proj4。
+ * 这里只放**数据与代码映射**，投影公式交给 proj4。
  * 新增一个国家的支持应当是加几行参数，而不是加一套公式（PRD 6.4）。
  *
  * EPSG 代码已按注册表核验（scripts/verify-epsg.ts）：
@@ -13,6 +13,7 @@
 
 import { std } from '../coord/format'
 import type { CrsInfo, Localized } from './model'
+import type { Lang } from '../../config/i18n'
 
 export type ChinaDatumId = 'cgcs2000' | 'xian1980' | 'beijing1954'
 
@@ -38,8 +39,7 @@ export const CN_DATUMS: readonly ChinaDatum[] = [
     cmBase: { 3: 4534, 6: 4502 },
     label: {
       zh: 'CGCS2000（国家大地坐标系 2000）',
-      en: 'CGCS2000 (China Geodetic Coordinate System 2000)',
-      ja: 'CGCS2000（中国国家測地座標系2000）'
+      en: 'CGCS2000 (China Geodetic Coordinate System 2000)'
     }
   },
   {
@@ -50,8 +50,7 @@ export const CN_DATUMS: readonly ChinaDatum[] = [
     cmBase: { 3: 2370, 6: 2338 },
     label: {
       zh: '西安 1980（IAU76 椭球）',
-      en: 'Xian 1980 (IAU76 ellipsoid)',
-      ja: '西安1980（IAU76 楕円体）'
+      en: 'Xian 1980 (IAU76 ellipsoid)'
     }
   },
   {
@@ -62,8 +61,7 @@ export const CN_DATUMS: readonly ChinaDatum[] = [
     cmBase: { 3: 2422, 6: 21453 },
     label: {
       zh: '北京 1954（Krassovsky 椭球）',
-      en: 'Beijing 1954 (Krassovsky ellipsoid)',
-      ja: '北京1954（クラソフスキー楕円体）'
+      en: 'Beijing 1954 (Krassovsky ellipsoid)'
     }
   }
 ] as const
@@ -142,7 +140,6 @@ export function chinaGkCrs(datumId: ChinaDatumId, band: BandWidth, cm: number): 
     name: `${d.label.en.split(' (')[0]} / ${band === 3 ? '3-degree ' : ''}Gauss-Kruger CM ${cm}E`,
     proj4: chinaGkProj4(datumId, cm),
     kind: 'projected',
-    axisOrder: 'xy',
     datum: d.id.toUpperCase()
   }
 }
@@ -155,7 +152,6 @@ export function chinaGeographicCrs(datumId: ChinaDatumId): CrsInfo {
     name: d.label.en.split(' (')[0],
     proj4: `+proj=longlat +ellps=${d.ellps}${tw} +no_defs`,
     kind: 'geographic',
-    axisOrder: 'xy',
     datum: d.id.toUpperCase()
   }
 }
@@ -172,15 +168,12 @@ export function isChinaGkCode(code: number): boolean {
 }
 
 /** 高斯-克吕格 CM 条目的本地化标签 */
-export function chinaGkLabel(datumId: ChinaDatumId, band: BandWidth, cm: number, lang: 'zh' | 'en' | 'ja'): string {
+export function chinaGkLabel(datumId: ChinaDatumId, band: BandWidth, cm: number, lang: Lang): string {
   const short =
     lang === 'zh'
       ? { cgcs2000: 'CGCS2000', xian1980: '西安80', beijing1954: '北京54' }[datumId]
-      : lang === 'ja'
-        ? { cgcs2000: 'CGCS2000', xian1980: '西安1980', beijing1954: '北京1954' }[datumId]
-        : { cgcs2000: 'CGCS2000', xian1980: 'Xian 1980', beijing1954: 'Beijing 1954' }[datumId]
+      : { cgcs2000: 'CGCS2000', xian1980: 'Xian 1980', beijing1954: 'Beijing 1954' }[datumId]
   if (lang === 'zh') return `${short} · ${band}° 带 · 中央经线 ${std(cm, 0)}°E`
-  if (lang === 'ja') return `${short} · ${band}度帯 · 中央経線 ${std(cm, 0)}°E`
   return `${short} · ${band}° band · CM ${std(cm, 0)}°E`
 }
 
@@ -193,20 +186,14 @@ export function utmZoneForLongitude(lng: number): number {
   return Math.min(60, Math.max(1, Math.floor((lng + 180) / 6) + 1))
 }
 
-export type UtmDatumId = 'wgs84' | 'jgd2011'
+export type UtmDatumId = 'wgs84'
 
-/** UTM EPSG（仅覆盖本期常用 datum） */
-export function utmEpsg(datum: UtmDatumId, zone: number, south: boolean): number | undefined {
-  if (datum === 'wgs84') return (south ? 32700 : 32600) + zone
-  // JGD2011 只注册了 51~55 带（日本范围）
-  if (zone >= 51 && zone <= 55) return 6688 + (zone - 51)
-  return undefined
+/** UTM EPSG（WGS84） */
+export function utmEpsg(zone: number, south: boolean): number {
+  return (south ? 32700 : 32600) + zone
 }
 
-export function utmProj4(datum: UtmDatumId, zone: number, south: boolean): string {
+export function utmProj4(zone: number, south: boolean): string {
   const southFlag = south ? ' +south' : ''
-  if (datum === 'jgd2011') {
-    return `+proj=utm +zone=${zone}${southFlag} +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs`
-  }
   return `+proj=utm +zone=${zone}${southFlag} +datum=WGS84 +units=m +no_defs`
 }

@@ -1,6 +1,6 @@
 ---
-title: "TopoJSON explained: topology, arcs and quantisation | GeoToolbox"
-description: How TopoJSON shares boundaries through arcs, quantises coordinates with transform, organises layers in objects, and why it cannot be opened directly and loses a little precision.
+title: 'TopoJSON explained: topology and arcs | GeoToolbox'
+description: 'How TopoJSON shares boundaries through arcs, quantises coordinates, organises layers, and why it cannot be opened directly and loses some precision.'
 heading: "TopoJSON explained: arcs and quantisation"
 group: vector
 order: 5
@@ -124,7 +124,7 @@ Topology pays off again during simplification. Simplify a topology and each shar
 | FlatGeobuf | small, binary | no | low, needs tooling | GIS applications and some libraries |
 | GeoPackage | medium, indexed | no | low, SQLite | GIS software and databases |
 
-The choice is straightforward. If the data goes into a web map, feeds an API or must be inspected by eye, use GeoJSON. If the data is mostly shared borders, size is the bottleneck and a TopoJSON tool already sits in the pipeline, use TopoJSON. Converting between them changes organisation only; it does not reproject, and it does not repair boundaries that were already mismatched.
+If the data goes into a web map, feeds an API or must be inspected by eye, use GeoJSON. If the data is mostly shared borders, size is the bottleneck and a TopoJSON tool already sits in the pipeline, use TopoJSON. Converting between them changes organisation only; it does not reproject, and it does not repair boundaries that were already mismatched.
 
 ## Conversion notes
 

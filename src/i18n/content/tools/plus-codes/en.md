@@ -1,6 +1,6 @@
 ---
 title: 'Plus Codes Converter - Open Location Code | GeoToolbox'
-description: 'Encode latitude and longitude as a Plus Code (Open Location Code), or decode a full code back to coordinates. Supports 10 and 11 digits, with precision notes. Runs entirely in your browser.'
+description: 'Encode latitude and longitude as a Plus Code, or decode a full code back to coordinates. Supports 10 and 11 digits. Runs entirely in your browser.'
 updated: 2026-11-16
 faq:
   - q: 'Why does the same place give me a different Plus Code from someone else?'
@@ -17,7 +17,7 @@ faq:
 
 ## What Plus Codes are
 
-Plus Codes is the common name for Open Location Code (OLC), published by Google in 2014. It turns latitude and longitude into a short string that names a rectangular area on Earth. Unlike a street address, it does not depend on road names, postal codes or administrative boundaries, which makes it useful in places without formal addresses, at temporary locations and across languages.
+Plus Codes is the common name for Open Location Code (OLC), published by Google in 2014. It turns latitude and longitude into a short string that names a rectangular area on Earth. Unlike a street address, it does not depend on road names, postal codes or administrative boundaries. That is what makes it useful where no formal addresses exist, at temporary locations and across languages.
 
 A full code looks like this: `8FVC9G8F+6X`. It contains eight characters, a `+` separator and two more characters. The alphabet has only 20 characters: `23456789CFGHJMPQRVWX`. The digits 0 and 1 and the letters I, L, O and U are deliberately excluded because they are the easiest to confuse in handwriting, small print and speech. The remaining characters are more forgiving when one is misread.
 
@@ -38,7 +38,7 @@ Because the first eight characters describe a larger region, Plus Codes can drop
 
 The east–west size shrinks as latitude rises: multiply the longitude span by the cosine of the latitude. Near 40° north, a 10-digit cell is about 10.6 m wide and an 11-digit cell about 2.7 m wide.
 
-**More characters do not make a coordinate exact.** A code always describes an area, and decoding can only return the centre. For a 10-digit code the centre can differ from any point inside by up to about 7 m, and for 11 digits by up to about 1.7 m. Keep the original latitude and longitude when you need an exact position; do not treat the decoded centre as a surveyed coordinate.
+More characters do not make a coordinate exact. A code always describes an area, and decoding can only return the centre. For a 10-digit code the centre can differ from any point inside by up to about 7 m, and for 11 digits by up to about 1.7 m. Keep the original latitude and longitude when you need an exact position; do not treat the decoded centre as a surveyed coordinate.
 
 ## Choosing between Plus Codes and GeoHash
 
@@ -47,7 +47,7 @@ Both solve the same broad problem, with different emphases:
 - **GeoHash** uses 32 characters and no separator. Prefixes correspond cleanly to rectangles, which makes it a good fit for database filtering and indexing.
 - **Plus Codes** use 20 characters with a `+` separator. The alphabet avoids easily confused glyphs, so the code is easier to read aloud, copy by hand and put on a sign.
 
-If the goal is machine indexing and bulk queries, GeoHash is usually more convenient. If the goal is telling a person where to go, Plus Codes tend to be easier to read. Neither replaces precise coordinates, and neither is a projected coordinate system.
+GeoHash is usually more convenient for machine indexing and bulk queries. For telling a person where to go, Plus Codes read more easily. Neither replaces precise coordinates, and neither is a projected coordinate system.
 
 ## Where they help
 

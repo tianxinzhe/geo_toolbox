@@ -60,9 +60,9 @@ const zh: Record<UiKey, string> = {
   'common.allTools': '全部工具',
   'common.batch': '批量模式',
   'common.batchHint': '上传 CSV/TSV 文件，一次处理多行数据。',
-  'common.desktopRecommended': '这个工具在电脑上使用体验更好，但在手机上同样可以完成全部操作。',
+  'common.desktopRecommended': '在电脑上操作更顺手，手机上也能完成全部操作。',
   /* FR-05：分享按钮旁常驻提示 */
-  'common.shareWarning': '链接中包含你填写的全部内容，请勿分享敏感坐标数据。',
+  'common.shareWarning': '链接里带着你填写的全部内容，敏感坐标不要分享出去。',
   'common.shareTooLarge': '内容过大，无法通过链接分享。请下载文件后发送。',
   'common.shareReset': '链接中的参数无法识别，已重置为默认状态。',
   'common.swap': '交换',
@@ -107,14 +107,15 @@ const zh: Record<UiKey, string> = {
   'err.generic': '计算出错，你输入的内容已保留。',
 
   /* ---------- 首页与索引 ---------- */
+  'home.seoTitle': '地理工具箱 — 15 个本地计算的地理小工具',
   'home.h1': '数据不出浏览器的地理信息工具箱',
   'home.intro':
-    '15 个专注的小工具，覆盖坐标、投影与矢量格式。无需注册、无需上传，所有计算都在你自己的设备上完成。',
+    '15 个地理小工具，覆盖坐标、投影与矢量格式。不用注册，不用上传，所有计算都在你的浏览器本地完成，数据不离开设备，适合日常核对与制图，打开即用。',
   'home.section.tools': '全部工具',
   'home.section.why': '为什么用这个站',
-  'home.why.local': '数据不上传。地块边界、门店位置、轨迹数据始终留在你的设备上。',
+  'home.why.local': '数据不上传。地块边界、门店位置、轨迹都留在你自己的设备上。',
   'home.why.fast': '纯静态页面，输入即出结果，没有等待队列。',
-  'home.why.shareable': '每个结果都能生成一条链接，同事打开即看到完全相同的输入。',
+  'home.why.shareable': '每个结果都能生成一条链接，同事打开看到的就是同一份输入。',
   'home.toolCount': '共 {n} 个工具',
   'home.openTool': '打开工具',
   'home.section.guides': '延伸阅读',
@@ -123,7 +124,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- Cookie 同意（FR-10） ---------- */
   'cookie.title': 'Cookie 偏好设置',
   'cookie.body':
-    '我们使用必要的本地存储来记住你的偏好设置。在你同意之后，还会通过 Google AdSense 展示个性化广告。拒绝不影响任何工具的使用。',
+    '必要的本地存储用来记住你的偏好设置。同意之后才会通过 Google AdSense 展示个性化广告；拒绝也不影响使用任何工具。',
   'cookie.accept': '接受全部',
   'cookie.reject': '仅必要项',
   'cookie.purpose.necessary': '严格必要 —— 语言、精度与布局偏好，始终开启。',
@@ -141,7 +142,7 @@ const zh: Record<UiKey, string> = {
 
   /* ---------- 页脚 ---------- */
   'footer.rights': '© {year} {site}。所有计算均在浏览器本地完成。',
-  'footer.noAccount': '无需账号，无需上传，不追踪你的数据。',
+  'footer.noAccount': '不用账号，不用上传，也不会追踪你的数据。',
 
   /* ---------- T02 经纬度格式转换 ----------
      SEO 的 <title> 与 meta description 在文档 frontmatter 中，不在本字典。
@@ -175,17 +176,17 @@ const zh: Record<UiKey, string> = {
   /* PRD T02 专属异常②：单向转换合法，缺失项不是错误 */
   'tool.dms-decimal.notProvided': '未提供',
   /* PRD T02 专属异常①：按十进制度处理，同时给出另一种解读让用户自行确认 */
-  'tool.dms-decimal.alternative': '这个值也可以按{name}解读，那样结果是 {value}。请自行确认你要的是哪一种。',
+  'tool.dms-decimal.alternative': '这个值也能按{name}解读，结果是 {value}。请确认你要哪一种。',
   'tool.dms-decimal.partialHint': '两个框可以只填一个，缺失的一侧显示为未提供，不会报错。',
   'tool.dms-decimal.precisionNote':
     '十进制度保留 8 位小数（约 1 毫米）；度分按分保留 4 位，度分秒按秒保留 2 位（约 0.3 米）。',
 
   /* ---------- T03 投影坐标转换（EPSG） ---------- */
   'tool.epsg-convert.h1': '投影坐标转换（EPSG）',
-  'tool.epsg-convert.lead': '在任意两个 EPSG 坐标系之间转换坐标：WGS84、UTM、Web Mercator、中国高斯-克吕格 3°/6° 带，以及日本平面直角坐标系 19 个区带。全部在浏览器本地计算。',
-  'tool.epsg-convert.coordHint': '填写源坐标系下的坐标值。地理坐标系用十进制度，投影坐标系用米。允许 4,420,000 这类千分位写法。',
+  'tool.epsg-convert.lead': '任选两个 EPSG 坐标系互转：WGS84、UTM、Web Mercator，以及中国高斯-克吕格 3°/6° 带。换算在浏览器里完成。',
+  'tool.epsg-convert.coordHint': '填源坐标系下的坐标。地理坐标系用十进制度，投影坐标系用米，4,420,000 这种千分位写法也认。',
   'tool.epsg-convert.customCode': 'EPSG 代码',
-  'tool.epsg-convert.customCodeHint': '填写数字代码，例如 6669 或 4548。',
+  'tool.epsg-convert.customCodeHint': '填写数字代码，例如 3857 或 4548。',
   'tool.epsg-convert.invalidCode': '请输入有效的正整数 EPSG 代码。',
   'tool.epsg-convert.errNotFound': '未找到该代码的投影定义。请换一个代码，或从常用列表中选择。',
   'tool.epsg-convert.errNumber': '请输入数字。',
@@ -193,20 +194,16 @@ const zh: Record<UiKey, string> = {
   'tool.epsg-convert.errNeedBoth': '请把两个坐标值都填写完整。',
   'tool.epsg-convert.errGeneric': '无法完成转换，请检查源坐标系与输入值。',
   'tool.epsg-convert.autoNeedGeo': '自动带号需要先知道经度。请选择地理坐标系作为源，或先填写经度。',
-  'tool.epsg-convert.japanUtmRange': 'JGD2011 / UTM 只定义第 51~55 带（日本范围）。请改用 WGS84 UTM，或选择平面直角坐标系。',
   'tool.epsg-convert.loadingFull': '正在加载完整坐标系库…',
   'tool.epsg-convert.loadFailed': '完整 EPSG 表加载失败。请检查网络后重试，或从常用列表中选择。',
-  'tool.epsg-convert.axisNoteJapan': '日本平面直角坐标系规定 X 为北方向、Y 为东方向，与国际 GIS 惯例相反。第一个框请填北方向（X）。',
-  'tool.epsg-convert.axisNoteXY': 'X 为东方向、Y 为北方向（GIS 惯例）。部分坐标系允许负值，日本平面直角坐标系的西侧与南侧就是负值。',
+  'tool.epsg-convert.axisNoteXY': 'X 为东方向、Y 为北方向（GIS 惯例）。部分投影坐标系的西侧与南侧会出现负值，这是正常结果。',
   'tool.epsg-convert.eastX': 'X（东坐标）',
   'tool.epsg-convert.northY': 'Y（北坐标）',
-  'tool.epsg-convert.northX': 'X（北坐标）',
-  'tool.epsg-convert.eastY': 'Y（东坐标）',
   'tool.epsg-convert.xLongitude': 'X（经度）',
   'tool.epsg-convert.yLatitude': 'Y（纬度）',
   'tool.epsg-convert.swapXY': '交换 X / Y',
-  'tool.epsg-convert.swapWarning': '看起来 X / Y 填反了：X 是百万级、Y 却很小。GIS 惯例下 X 是东方向、Y 是北方向。点「交换 X / Y」后再看结果。',
-  'tool.epsg-convert.magnitudeWarning': '这组数值看起来像经纬度，而不是投影坐标。投影坐标通常以米为单位，数值大得多。',
+  'tool.epsg-convert.swapWarning': 'X / Y 可能填反了：X 在百万级，Y 却很小。GIS 惯例下 X 是东方向、Y 是北方向。点「交换 X / Y」再看结果。',
+  'tool.epsg-convert.magnitudeWarning': '这组数值更像经纬度。投影坐标以米为单位，数量级要大得多。',
   'tool.epsg-convert.resultTitle': '转换结果',
   'tool.epsg-convert.colSource': '源坐标系',
   'tool.epsg-convert.colTarget': '目标坐标系',
@@ -215,7 +212,7 @@ const zh: Record<UiKey, string> = {
   'tool.epsg-convert.shift.7param': '简化七参数（精度约 1~5 米）',
   'tool.epsg-convert.shift.missing': '无可用变换参数',
   'tool.epsg-convert.shift.custom': '自定义七参数',
-  'tool.epsg-convert.missingWarning': '这两个坐标系之间没有可用的基准变换参数，按无基准处理会产生米级以上的误差。在你明确确认之前，结果不会显示。JGD2000 ↔ JGD2011 需要日本半动态补正，西安 1980 需要官方参数，本站均不提供。',
+  'tool.epsg-convert.missingWarning': '这两个坐标系之间没有可用的基准变换参数，按无基准处理会有米级以上的误差。确认之前，结果不会显示。西安 1980 需要官方参数，本站不提供。',
   'tool.epsg-convert.allowMissing': '仍按无基准变换继续（结果可能有米级误差）',
   'tool.epsg-convert.custom7': '使用自定义七参数',
   'tool.epsg-convert.custom7Hint': 'Bursa-Wolf 参数：dx、dy、dz 单位米；rx、ry、rz 单位角秒；尺度单位 ppm。应用于源坐标系。',
@@ -234,7 +231,7 @@ const zh: Record<UiKey, string> = {
   'tool.epsg-convert.copyPair': '复制 X、Y',
   'tool.epsg-convert.identity': '源坐标系与目标坐标系相同，坐标原样返回。',
   'tool.epsg-convert.precisionNote1': '基准面变换采用简化七参数（Bursa-Wolf）模型，精度约 1~5 米。',
-  'tool.epsg-convert.precisionNote2': '未做历元补正（日本セミ・ダイナミック補正、板块运动修正），因此不适用于高精度测量。',
+  'tool.epsg-convert.precisionNote2': '未做历元补正与板块运动修正，因此不适用于高精度测量。',
   'tool.epsg-convert.precisionNote3': '结果不构成法定测绘依据。',
 
   /* ---------- T08 GeoHash 编解码 ----------
@@ -256,7 +253,7 @@ const zh: Record<UiKey, string> = {
   /* SR-06 三段式：发生了什么、为什么、怎么办 */
   'tool.geohash.errNumber': '这个坐标读不出来。',
   'tool.geohash.errNumberHint':
-    '只接受数字、一个句点作小数点，以及可选的前置负号。如果数据来源用逗号作小数点，请在高级选项里改掉逗号的含义。',
+    '只认数字、一个作小数点的句点，以及可选的前置负号。数据来源用逗号作小数点的话，去高级选项里改掉逗号的含义。',
   'tool.geohash.needBoth': '经度和纬度都填上，才能编码出 GeoHash。',
   /* PRD T08 专属异常②：超长精度夹取并提示 */
   'tool.geohash.hashTooLong': '输入超过 12 位，只按前 12 位计算。',
@@ -286,7 +283,7 @@ const zh: Record<UiKey, string> = {
   'tool.geohash.current': '当前',
   /* SR-03：精度声明常驻工具，不藏进文档 */
   'tool.geohash.precisionNote':
-    '解码得到的是网格中心点。GeoHash 表示的是一个面而不是精确坐标：同一个字符串覆盖它边界框内的所有位置。',
+    '解码得到的是网格中心点。GeoHash 表示一个面，涵盖边界框里的所有位置，不能当成精确坐标用。',
   /* 八个方向名由组件的 DIR_KEY 表动态查，
      ⚠️ 八个键必须齐全，缺一个就会在九宫格里渲染出 undefined */
   'tool.geohash.dir.n': '北',
@@ -446,7 +443,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- T10 等距圈与缓冲区 ---------- */
   'tool.buffer-circle.h1': '等距圈与缓冲区',
   'tool.buffer-circle.lead':
-    '回答「从这个点出发 N 公里覆盖到哪里」。生成考虑地球曲率的等距圈，或对已有要素做外扩缓冲区，在地图上查看并导出 GeoJSON、KML 或 WKT。',
+    '算清楚「从这个点出发 N 公里能覆盖到哪里」。可以按地球曲率生成等距圈，也可以对已有要素外扩缓冲区，在地图上查看，再导出 GeoJSON、KML 或 WKT。',
   'tool.buffer-circle.modeCircle': '等距圈',
   'tool.buffer-circle.modeBuffer': '要素缓冲区',
   'tool.buffer-circle.pickOn': '拾取中…（点击地图）',
@@ -463,7 +460,7 @@ const zh: Record<UiKey, string> = {
   'tool.buffer-circle.bufferInput': '待缓冲的要素',
   'tool.buffer-circle.bufferPlaceholder': '粘贴 GeoJSON、KML、GPX、CSV、WKT 要素，或每行一组「经度, 纬度」…',
   'tool.buffer-circle.bufferHint':
-    '支持点、线、面要素，每个要素都会按每个半径生成外扩缓冲区；点也可以直接按行粘贴经纬度。',
+    '点、线、面要素都能用，每个要素按每个半径各生成一个缓冲区；点也可以直接按行粘贴经纬度。',
   'tool.buffer-circle.chooseFile': '选择文件',
   'tool.buffer-circle.clearFile': '移除文件',
   'tool.buffer-circle.fileLoading': '读取文件…',
@@ -539,7 +536,7 @@ const zh: Record<UiKey, string> = {
   'tool.tile-coords.cancelGenerate': '取消生成',
   'tool.tile-coords.progress': '已完成 {done} / {total}',
   'tool.tile-coords.warnLarge':
-    '本次约 {count} 张瓦片，数量较大：计算、预览与下载会非常慢，浏览器可能卡顿甚至内存不足。建议降低缩放级别或缩小范围。',
+    '这次约 {count} 张瓦片，数量偏大：计算、预览和下载都会很慢，浏览器可能卡顿，甚至内存不足。建议降低缩放级别，或者缩小范围。',
   'tool.tile-coords.total': '共 {total} 张瓦片，按 Z → Y → X 排序。',
   'tool.tile-coords.downloadCsv': '下载 CSV',
   'tool.tile-coords.downloadZip': '下载 ZIP（每层一个 CSV）',
@@ -575,7 +572,7 @@ const zh: Record<UiKey, string> = {
   'tool.map-preview.totalFeatures': '共 {n} 个要素',
   'tool.map-preview.removeFile': '删除这个文件',
   'tool.map-preview.empty':
-    '尚未载入数据。选择一个或多个文件后，会在地图上叠加显示，并在这里给出每个文件的统计。',
+    '还没有载入数据。选一个或多个文件，就会在地图上叠加显示，每个文件的统计也列在这里。',
   'tool.map-preview.statFormat': '格式',
   'tool.map-preview.statFeatures': '要素',
   'tool.map-preview.statTypes': '几何类型',
@@ -621,7 +618,7 @@ const zh: Record<UiKey, string> = {
   'tool.clip-overlay.resultSkipped': '未参与运算',
   'tool.clip-overlay.download': '下载 GeoJSON',
   'tool.clip-overlay.clear': '清除',
-  'tool.clip-overlay.privacy': '所有计算在浏览器本地完成，文件不会上传。',
+  'tool.clip-overlay.privacy': '裁切计算在浏览器里完成，文件不会上传。',
   'tool.clip-overlay.note':
     '裁切、相交、擦除只处理面要素；点、线要素会被跳过并计入「未参与运算」。',
   'tool.clip-overlay.errTooLarge': '文件超过 20 MB，请先裁剪或简化。',
@@ -671,7 +668,7 @@ const zh: Record<UiKey, string> = {
   'tool.attribute-extract.resultCount': '命中 {matched} / {total} 个要素',
   'tool.attribute-extract.download': '下载 GeoJSON',
   'tool.attribute-extract.clear': '清除',
-  'tool.attribute-extract.privacy': '所有计算在浏览器本地完成，文件不会上传。',
+  'tool.attribute-extract.privacy': '筛选在浏览器里完成，文件不会上传。',
   'tool.attribute-extract.errNeedFile': '请先选择数据文件。',
   'tool.attribute-extract.errNeedField': '请选择用于筛选的字段。',
   'tool.attribute-extract.errNeedValue': '请输入要匹配的值。',
@@ -717,7 +714,7 @@ const zh: Record<UiKey, string> = {
   'tool.attribute-join.duplicateHint': '属性表有 {n} 个重复键被忽略，只采用首次出现的那一行。',
   'tool.attribute-join.download': '导出 GeoJSON',
   'tool.attribute-join.clear': '清空',
-  'tool.attribute-join.privacy': '全部计算在浏览器本地完成，文件不会上传。',
+  'tool.attribute-join.privacy': '连接在浏览器里完成，文件不会上传。',
   'tool.attribute-join.popupTitle': '属性',
   'tool.attribute-join.errNeedVector': '请先选择矢量文件。',
   'tool.attribute-join.errNeedTable': '请选择属性表文件（CSV、TSV 或 Excel）。',
@@ -760,7 +757,7 @@ const zh: Record<UiKey, string> = {
   'tool.merge-layers.geom.other': '其他',
   'tool.merge-layers.geom.none': '无几何',
   'tool.merge-layers.download': '导出 GeoJSON',
-  'tool.merge-layers.privacy': '全部计算在浏览器本地完成，文件不会上传。',
+  'tool.merge-layers.privacy': '合并在浏览器里完成，文件不会上传。',
   'tool.merge-layers.errNeedFiles': '请至少添加一个可用的矢量文件。',
   'tool.merge-layers.errTooLarge': '文件超过 20 MB，请先裁剪或简化。',
   'tool.merge-layers.errUnknownFormat': '无法识别文件格式，请先转换为 GeoJSON。',
@@ -796,7 +793,7 @@ const zh: Record<UiKey, string> = {
   'tool.dissolve.emptyValue': '（空）',
   'tool.dissolve.download': '导出 GeoJSON',
   'tool.dissolve.clear': '清空',
-  'tool.dissolve.privacy': '全部计算在浏览器本地完成，文件不会上传。',
+  'tool.dissolve.privacy': '融合在浏览器里完成，文件不会上传。',
   'tool.dissolve.errNeedFile': '请先选择矢量文件。',
   'tool.dissolve.errNeedField': '请选择用于融合的字段。',
   'tool.dissolve.errTooLarge': '文件超过 20 MB，请先裁剪或简化。',
@@ -808,9 +805,9 @@ const zh: Record<UiKey, string> = {
   'tool.dissolve.errGeneric': '融合失败，请检查数据是否有效。',
 
   /* ---------- 科普文章（P1 /guide/） ---------- */
-  'guide.title': '科普文章：坐标系、投影与矢量格式 | 地理工具箱',
+  'guide.title': '科普文章：投影与矢量格式 | 地理工具箱',
   'guide.description':
-    '用通俗语言讲清地图投影、EPSG 编码与矢量格式，并链接到可以直接使用的在线工具。',
+    '用通俗语言讲清地图投影、EPSG 编码与矢量格式的区别、选型与常见误区，并链接到可以直接使用的在线工具，边看边算，全部在浏览器本地完成，数据不上传。',
   'guide.h1': '科普文章',
   'guide.group.projection': '坐标系与投影',
   'guide.group.vector': '矢量数据格式',
@@ -834,7 +831,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- T21 Plus Codes ---------- */
   'tool.plus-codes.h1': 'Plus Codes 位置编码',
   'tool.plus-codes.lead':
-    '经纬度与 Plus Code 双向转换。Plus Codes 是开放的地址编码，全部在浏览器本地计算，坐标不会上传。',
+    '经纬度与 Plus Code 双向转换。Plus Codes 是开放的地址编码，换算都在浏览器里做，坐标不会上传。',
   'tool.plus-codes.mode': '输入类型',
   'tool.plus-codes.mode.encode': '坐标 → Plus Code',
   'tool.plus-codes.mode.decode': 'Plus Code → 坐标',
@@ -862,7 +859,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- T22 MVT 矢量瓦片 ---------- */
   'tool.mvt.h1': 'MVT 矢量瓦片解析',
   'tool.mvt.lead':
-    '上传 .pbf/.mvt 瓦片或粘贴 Base64，读出每个图层、要素数量与几何，并导出 GeoJSON。全部在浏览器本地完成。',
+    '上传 .pbf/.mvt 瓦片或粘贴 Base64，读出每个图层、要素数量和几何，再导出 GeoJSON。解析全在浏览器里完成。',
   'tool.mvt.modeFile': '文件',
   'tool.mvt.modePaste': '粘贴 Base64',
   'tool.mvt.fileHint': '支持 .pbf / .mvt，自动识别 gzip 压缩，单文件上限 20 MB。',
@@ -914,7 +911,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- T09 在线地图绘制器 ---------- */
   'tool.map-draw.h1': '在线地图绘制器',
   'tool.map-draw.lead':
-    '在地图上绘制点、线、面、矩形与圆，实时量测，编辑属性，并导出 GeoJSON、KML、GPX、WKT 或 CSV。全部在浏览器本地完成。',
+    '在地图上画点、线、面、矩形和圆，实时量测，编辑属性，再导出 GeoJSON、KML、GPX、WKT 或 CSV。绘制和导出都在浏览器里完成。',
   'tool.map-draw.modeSelect': '选择',
   'tool.map-draw.modePoint': '点',
   'tool.map-draw.modeLine': '线',
@@ -1099,7 +1096,7 @@ const zh: Record<UiKey, string> = {
   /* ---------- Cookie 同意（FR-10） ---------- */
   'cookie.aria': 'Cookie 同意',
   'cookie.text':
-    '我们使用必要的浏览器存储来记住你的选择与工具偏好。只有在你同意后，才会加载 Google AdSense，它可能设置广告 Cookie。',
+    '必要的浏览器存储用来记住你的选择和工具偏好。只有同意之后才加载 Google AdSense，它可能设置广告 Cookie。',
   'cookie.acceptAll': '全部接受',
   'cookie.necessary': '仅必要项',
   'cookie.privacy': '隐私政策',

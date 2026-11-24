@@ -1,12 +1,12 @@
 ---
-title: 'Vector Format Converter: GeoJSON, KML, GPX, Shapefile, GeoPackage | GeoToolbox'
+title: 'Vector Format Converter: GeoJSON, KML, GPX | GeoToolbox'
 description: 'Convert between GeoJSON, KML, GPX, Shapefile, GeoPackage, FlatGeobuf, CSV/Excel, WKT, TopoJSON and more in your browser, with properties preserved.'
 updated: 2026-11-23
 faq:
   - q: 'Are my files uploaded to a server?'
     a: 'No. The browser File API reads the file into the current tab, and the conversion runs locally. There is no upload request. Closing or refreshing the page discards the data, and the file is not written to local storage. That is the fundamental difference between this tool and most online converters.'
   - q: 'Why are the converted coordinates in the wrong place?'
-    a: 'This tool converts formats only; it does not transform coordinate systems. GeoJSON, KML and GPX are treated as WGS 84. If your source is a CGCS2000 projection or a Japanese plane rectangular grid, a format conversion keeps the original numbers and the position will be misplaced on a map. Convert to WGS 84 first with the EPSG converter, then come back.'
+    a: 'This tool converts formats only; it does not transform coordinate systems. GeoJSON, KML and GPX are treated as WGS 84. If your source uses a CGCS2000 projection or another projected CRS, a format conversion keeps the original numbers and the position will be misplaced on a map. Convert to WGS 84 first with the EPSG converter, then come back.'
   - q: 'Why does GPX not support polygons?'
     a: 'The GPX specification defines waypoints, routes and tracks only; it has no polygon representation. When GPX is the target and the data contains polygons, the tool lists the affected feature count and geometry types and waits for you to choose “skip these features”. Nothing is dropped silently.'
   - q: 'What does the CSV output look like?'
@@ -17,9 +17,9 @@ faq:
 
 ## What this tool solves
 
-The same geographic dataset is often required in different file formats: GIS desktop software prefers GeoJSON or TopoJSON, Google Earth wants KML/KMZ, GPS devices and sports apps use GPX, spreadsheets and reports need CSV, and databases or development work often use WKT. For large datasets and GIS databases, FlatGeobuf and GeoPackage are increasingly the exchange formats. The conversion itself is not hard. Finding a tool that requires no account, does not upload your data, and preserves both geometry and attributes is the hard part.
+The same geographic dataset is often required in different file formats: GIS desktop software prefers GeoJSON or TopoJSON, Google Earth wants KML/KMZ, GPS devices and sports apps use GPX, spreadsheets and reports need CSV, and databases or development work often use WKT. For large datasets and GIS databases, FlatGeobuf and GeoPackage are increasingly the exchange formats. The conversion itself is not hard. The hard part is finding a tool that needs no account, keeps your data on your machine and preserves geometry and attributes.
 
-This tool keeps the whole chain in the browser: choose the source and target formats, read, parse, summarise and validate, preview, download. The file never leaves your device.
+This tool keeps the whole chain in the browser. You choose the source and target formats; it reads, parses, summarises and validates the data, then you preview and download. The file never leaves your device.
 
 ## Supported formats
 

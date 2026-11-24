@@ -1,5 +1,5 @@
 ---
-title: "KML and KMZ explained: structure, styles and packaging | GeoToolbox"
+title: 'KML and KMZ explained: structure and styles | GeoToolbox'
 description: KML's Document, Placemark, coordinates and styling, what a KMZ archive contains, and their limits on coordinate systems, attributes and attachments.
 heading: "KML and KMZ explained"
 group: vector
@@ -47,7 +47,7 @@ A Placemark is simplest when it holds one kind of geometry. To keep a point, a l
 
 ## Structure and fields
 
-KML element names are fixed and their nesting is constrained by the schema. The table lists the parts a reader meets most often, roughly in document order.
+KML element names are fixed and their nesting is constrained by the schema. The table covers the parts a reader meets most often, roughly in document order.
 
 | Element or attribute | Required | Common values or units |
 | --- | --- | --- |

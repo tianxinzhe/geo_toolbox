@@ -1,6 +1,6 @@
 ---
-title: 'Clip & Overlay — Clip, intersect, difference, simplify | GeoToolbox'
-description: 'Load two vector layers and run Clip, Intersect or Difference, or simplify with a metre-based tolerance. Results are drawn on the map and exported as GeoJSON.'
+title: 'Clip & Overlay — clip, intersect, difference'
+description: 'Load two vector layers and run Clip, Intersect or Difference, or simplify with a metre tolerance. Results export as GeoJSON.'
 updated: 2026-11-23
 readingMinutes: 7
 faq:
@@ -18,13 +18,13 @@ faq:
 
 You have two vector layers and want to combine them: cut a study area out with an administrative boundary, take the shared area of two layers, subtract a protected area from parcels, or thin out an over-dense dataset. In QGIS these are Clip, Intersect, Difference and Simplify. This tool brings them to the browser: choose two files, run the operation, and see the result on the map with a GeoJSON export.
 
-No desktop GIS install and no upload: parsing, boolean operations and area statistics all happen in the page.
+There is no desktop GIS to install and nothing to upload. Parsing, boolean operations and area statistics all happen in the page.
 
 ## Choosing an operation
 
 - **Clip** keeps the part of layer A that falls inside layer B. The usual case is clipping a data layer by a boundary layer.
 - **Intersect** keeps the area shared by A and B. With two polygon layers the geometric result equals Clip; it is listed separately to match QGIS and to leave room for line/polygon intersection later.
-- **Difference** subtracts the part of A that overlaps B — removing rivers, protected areas or already-developed land from parcels.
+- **Difference** subtracts the part of A that overlaps B, which removes rivers, protected areas or already-developed land from parcels.
 - **Simplify** uses layer A only and reduces vertices by the given tolerance. It is useful for shrinking GeoJSON while keeping the shape recognisable, or for bringing survey-grade data down to display precision.
 
 Clip, Intersect and Difference need both layers; Simplify only needs A, and the B picker is disabled.
@@ -41,11 +41,11 @@ Clip, Intersect and Difference need both layers; Simplify only needs A, and the 
 - Up to 20 MB and 50,000 features per file. Crop or simplify larger datasets first.
 - Coordinates are read as WGS84 longitude/latitude. If the file stores projected metres, convert it with the EPSG converter first.
 - The simplify tolerance is metres converted to degrees using the layer’s mean latitude; data spanning a wide latitude range will see slightly different ground tolerances at the north and south edges.
-- Everything runs locally, files are never uploaded, and nothing is written to server logs.
+- Everything runs locally: files are never uploaded, and nothing reaches server logs.
 
 ## Common questions
 
-**The result is empty. Why?** Check that the layers actually overlap. If one of them contains only points or lines, all of its features are counted as skipped. Also verify the data is WGS84 longitude/latitude — projected coordinates put the geometry in a completely different place.
+**The result is empty. Why?** Check that the layers actually overlap. If one of them contains only points or lines, all of its features are counted as skipped. Also verify the data is WGS84 longitude/latitude. Projected coordinates put the geometry in a completely different place.
 
 **Can I process more than two layers?** Each run takes two layers. Export the result and feed it back as A or B to continue stacking operations.
 
@@ -88,7 +88,7 @@ Simplify runs a recursive vertex reduction and is usually faster than a boolean 
 | Batch work | Two layers per run | Model-based batches | Best for pipelines |
 | Typical size | Small to medium | Large, complex topology | Large and repetitive |
 
-Cutting a study area or subtracting a protected zone is fastest here. Repairing self-intersections, unifying coordinate systems, merging by attribute or running dozens of layers is safer in QGIS. A fixed daily overlay is more reliable as a GDAL or PostGIS script.
+Cutting a study area, or subtracting a protected zone, is fastest here. Repairing self-intersections, unifying coordinate systems or chaining dozens of layers is safer in QGIS. A fixed daily overlay is more reliable as a GDAL or PostGIS script.
 
 ## A worked example
 
